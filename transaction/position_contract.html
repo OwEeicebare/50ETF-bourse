@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>持仓合约</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div id="app">
+		<div class="title_wrap">
+			<div class="layui-btn-group l_left table_btn" id="fn">
+				<button class="layui-btn layui-btn-normal" id="move">移仓</button>
+			</div>
+			<form class="layui-form">
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label">母账户</label>
+					<div class="layui-input-block">
+						<select name="MId" id="MId" lay-filter="aihao">
+							<option value="-1" selected="">全部母账户</option>
+
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label">代理商</label>
+					<div class="layui-input-block">
+						<select name="AId" id="AId">
+							<option value="0" selected="selected">全部代理商</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label">加入时间</label>
+					<div class="layui-input-block">
+						<input type="text" class="layui-input" id="JTime" name="JTime" placeholder="请选择时间范围">
+					</div>
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label l_left">搜索关键字</label>
+					<input type="text" id="search_input" name="SearchKey" lay-verify="title" autocomplete="off"
+						placeholder="请输入用户名/手机号/合约代码" class="layui-input l_left"
+						style="width: initial;min-width: 320px;">
+					<span class="layui-btn l_left" style="border-radius: 0;" id="search_go" lay-submit
+						lay-filter="search_go"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+					<span class="layui-btn l_left" style="border-radius: 0;" id="exportExcel" lay-submit
+						lay-filter="exportExcel">导出Excel</span>
+					<a href="" download="download" style="display: none;" id="downloadExcel"></a>
+				</div>
+			</form>
+		</div>
+		<div class="table_wrap">
+			<table id="data_table" lay-filter="data_table"></table>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'table', 'laydate'], function () {
+		var form = layui.form;
+		var table = layui.table;
+		var $ = layui.jquery;
+		var laydate = layui.laydate;
+		var dataArr = [];//存持仓合约数据
+		var checkArr = []; //存储复选框数据
+
+		// 获取母账户列表
+		publicMathod.getDropdownList("api/Tool/GetMasterList", form, $("#MId"));
+		// 获取代理商列表
+		publicMathod.getAllAgency("api/Agents/GetAllTree", form, $("#AId"));
+
+
+		laydate.render({
+			elem: '#JTime'
+			, type: 'datetime'
+			, range: true
+		});
+
+		//实例化数据表格
+		var lock = true;
+		table.render({
+			elem: '#data_table',
+			url: publicMathod.hosturl + 'api/StockHold/GetList', //数据接口
+			method: 'post',
+
+			totalRow: true,
+
+			contentType: "application/json; charset=UTF-8",
+			cellMinWidth: 100,
+			headers: { token: publicMathod.token },
+			page: {
+				layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+			},
+			parseData: function (res) { //规定数据格式
+				if (!res.Data) {
+					layer.msg(res.Msg, { icon: 5 })
+				} else {
+					dataArr = res.Data.StockHoldList;
+					if (lock) {
+						lock = false
+						$(".layui-table-total table tbody ").after(`
+						<tr><td data-field="id" data-key="1-0-0" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="Mn" data-key="1-0-1" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="An" data-key="1-0-2" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="Uid" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="Up" data-key="1-0-4" class=""><div class="layui-table-cell laytable-cell-1-0-4"></div></td><td data-field="Un" data-key="1-0-5" class=""><div class="layui-table-cell laytable-cell-1-0-5"></div></td><td data-field="Dts" data-key="1-0-6" class=""><div class="layui-table-cell laytable-cell-1-0-6"></div></td><td data-field="Dsn" data-key="1-0-7" class=""><div class="layui-table-cell laytable-cell-1-0-7"></div></td><td data-field="Td" data-key="1-0-8" class=""><div class="layui-table-cell laytable-cell-1-0-8"></div></td><td data-field="Dp" data-key="1-0-9" class=""><div class="layui-table-cell laytable-cell-1-0-9"></div></td><td data-field="Dn" data-key="1-0-10" class=""><div class="layui-table-cell laytable-cell-1-0-10"></div></td><td data-field="Dpr" data-key="1-0-11" class=""><div class="layui-table-cell laytable-cell-1-0-11"></div></td><td data-field="Dnu" data-key="1-0-12" class=""><div class="layui-table-cell laytable-cell-1-0-12">全部合计:</div></td><td data-field="Dm" data-key="1-0-13" class=""><div class="layui-table-cell laytable-cell-1-0-13">${res.Data.SumStockHold.TotalCount}</div></td><td data-field="Ano" data-key="1-0-14" class=""><div class="layui-table-cell laytable-cell-1-0-14">${res.Data.SumStockHold.TotalAmount}</div></td><td data-field="Cn" data-key="1-0-15" class=""><div class="layui-table-cell laytable-cell-1-0-15"></div></td><td data-field="Unu" data-key="1-0-16" class=""><div class="layui-table-cell laytable-cell-1-0-16"></div></td><td data-field="Sc" data-key="1-0-17" class=""><div class="layui-table-cell laytable-cell-1-0-17"></div></td><td data-field="Sn" data-key="1-0-18" class=""><div class="layui-table-cell laytable-cell-1-0-18"></div></td><td data-field="As" data-key="1-0-19" class=""><div class="layui-table-cell laytable-cell-1-0-19"></div></td><td data-field="Tc" data-key="1-0-20" class=""><div class="layui-table-cell laytable-cell-1-0-20"></div></td><td data-field="Kj" data-key="1-0-21" class=""><div class="layui-table-cell laytable-cell-1-0-21"></div></td><td data-field="Rmk" data-key="1-0-22" class=""><div class="layui-table-cell laytable-cell-1-0-22"></div></td><td data-field="ope" data-key="1-0-23" class=""><div class="layui-table-cell laytable-cell-1-0-23"></div></td></tr>
+						`)
+					}
+
+				}
+				return {
+					"code": res.Status, //解析接口状态
+					"msg": res.Msg, //解析提示文本
+					"count": res.Count, //解析数据长度
+					"data": res.Data.StockHoldList //解析数据列表
+				};
+			},
+			response: {//规定响应成功状态码
+				statusCode: 1
+			},
+			cols: [[
+				{ type: 'checkbox' },
+				{ field: 'Id', title: 'ID', sort: true, width: 70 },
+				{ field: 'MId', title: '母账户', width: 75 },
+				{ field: 'AId', title: '代理商' },
+				{ field: 'Up', title: '用户手机', width: 130 },
+				{ field: 'Un', title: '用户姓名' },
+				{ field: 'Td', title: '加入时间', sort: true, width: 160 },
+				{ field: 'Sc', title: '合约代码' },
+				{ field: 'Sn', title: '合约名称', width: 140 },
+				{ field: 'Bp', title: '成本价格' },
+				{ field: 'Bn', title: '开仓张数' },
+				{ field: 'Bt', title: '开仓成本' },
+				{ field: 'Np', title: '最新价格', totalRowText: '本页合计:' },
+				{ field: 'Snu', title: '持仓张数', sort: true, totalRow: true },
+				{ field: 'Nm', title: '持仓市值', sort: true, totalRow: true },
+				{ field: 'Pht', title: '当日盈亏', totalRow: true, sort: true },
+				{ field: 'My', title: '持仓盈亏', totalRow: true, sort: true },
+				{ field: 'Msy', title: '平仓盈亏', totalRow: true, sort: true },
+				{ field: 'Phh', title: '累计盈亏', totalRow: true, sort: true },
+				{ field: 'Rmk', title: '备注' },
+			]]
+		});
+
+
+		//监听表格复选框
+		table.on('checkbox(data_table)', function (obj) {
+			//console.log(obj.checked); //当前是否选中状态
+			//console.log(obj.data); //选中行的相关数据
+			//console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
+			if (obj.type === 'one') {
+				for (let i = 0; i < checkArr.length; i++) {
+					if (obj.data.Id === checkArr[i].Id) {
+						if (obj.checked) {
+							return;
+						} else {
+							checkArr.splice(i, 1);
+							return;
+						}
+					}
+				}
+				checkArr.push(obj.data);
+			} else {
+				checkArr.splice(0, checkArr.length);
+				if (obj.checked) {
+					for (let i = 0; i < dataArr.length; i++) {
+						checkArr.push(dataArr[i]);
+					}
+				}
+			}
+		});
+
+		// 执行搜索
+		var data1;
+		form.on("submit(search_go)", function (data) {
+			var lock1 = true;
+			var formField = data.field;
+			table.reload('data_table', {
+				page: { curr: 1 },
+				where: formField,
+				parseData: function (res) { //规定数据格式
+					if (!res.Data) {
+						layer.msg(res.Msg, { icon: 5 })
+					} else {
+						data1 = res;
+						dataArr = res.Data.StockHoldList;
+					}
+					return {
+						"code": res.Status, //解析接口状态
+						"msg": res.Msg, //解析提示文本
+						"count": res.Count, //解析数据长度
+						"data": res.Data.StockHoldList //解析数据列表
+					};
+				},
+				done: function (res, curr, count) {
+					// console.log('分页触发', res, curr, count);
+					if (curr === 1 && lock1 && count) {
+						lock1 = false;
+						$(".layui-table-total table tbody ").after(`
+						<tr><td data-field="id" data-key="1-0-0" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="Mn" data-key="1-0-1" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="An" data-key="1-0-2" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="Uid" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="Up" data-key="1-0-4" class=""><div class="layui-table-cell laytable-cell-1-0-4"></div></td><td data-field="Un" data-key="1-0-5" class=""><div class="layui-table-cell laytable-cell-1-0-5"></div></td><td data-field="Dts" data-key="1-0-6" class=""><div class="layui-table-cell laytable-cell-1-0-6"></div></td><td data-field="Dsn" data-key="1-0-7" class=""><div class="layui-table-cell laytable-cell-1-0-7"></div></td><td data-field="Td" data-key="1-0-8" class=""><div class="layui-table-cell laytable-cell-1-0-8"></div></td><td data-field="Dp" data-key="1-0-9" class=""><div class="layui-table-cell laytable-cell-1-0-9"></div></td><td data-field="Dn" data-key="1-0-10" class=""><div class="layui-table-cell laytable-cell-1-0-10"></div></td><td data-field="Dpr" data-key="1-0-11" class=""><div class="layui-table-cell laytable-cell-1-0-11"></div></td><td data-field="Dnu" data-key="1-0-12" class=""><div class="layui-table-cell laytable-cell-1-0-12">全部合计:</div></td><td data-field="Dm" data-key="1-0-13" class=""><div class="layui-table-cell laytable-cell-1-0-13">${data1.Data.SumStockHold.TotalCount}</div></td><td data-field="Ano" data-key="1-0-14" class=""><div class="layui-table-cell laytable-cell-1-0-14">${data1.Data.SumStockHold.TotalAmount}</div></td><td data-field="Cn" data-key="1-0-15" class=""><div class="layui-table-cell laytable-cell-1-0-15"></div></td><td data-field="Unu" data-key="1-0-16" class=""><div class="layui-table-cell laytable-cell-1-0-16"></div></td><td data-field="Sc" data-key="1-0-17" class=""><div class="layui-table-cell laytable-cell-1-0-17"></div></td><td data-field="Sn" data-key="1-0-18" class=""><div class="layui-table-cell laytable-cell-1-0-18"></div></td><td data-field="As" data-key="1-0-19" class=""><div class="layui-table-cell laytable-cell-1-0-19"></div></td><td data-field="Tc" data-key="1-0-20" class=""><div class="layui-table-cell laytable-cell-1-0-20"></div></td><td data-field="Kj" data-key="1-0-21" class=""><div class="layui-table-cell laytable-cell-1-0-21"></div></td><td data-field="Rmk" data-key="1-0-22" class=""><div class="layui-table-cell laytable-cell-1-0-22"></div></td><td data-field="ope" data-key="1-0-23" class=""><div class="layui-table-cell laytable-cell-1-0-23"></div></td></tr>
+						`)
+					}
+				}
+			});
+			return false;
+		});
+		$('#search_input').bind('keyup', function (event) {
+
+			if (event.keyCode == "13") {
+				$("#search_go").click();
+			}
+		});
+		// 移仓
+		$('body').on('click', '#move', function () {
+			for (let i = 0; i < checkArr.length; i++) {
+				for (let j = i + 1; j < checkArr.length; j++) {
+					if (checkArr[j].MId !== checkArr[i].MId) {
+						layer.msg("您已选中的用户,包含多个母账户, 请在单个母账户中选择");
+						return;
+					}
+				}
+			}
+			if (checkArr.length > 0) {
+				open_adv("移仓")
+			} else {
+				layer.msg("请先选择合约", { icon: 5 });
+			}
+		})
+
+		var data2;
+		function open_adv(type) {
+			var lock2 = true;
+			var adjustId = '';
+			var mid = 0;
+			for (let i = 0; i < checkArr.length; i++) {
+				if (i === checkArr.length - 1) {
+					adjustId += checkArr[i].Id;
+				} else {
+					adjustId += checkArr[i].Id + ',';
+				}
+				if (i !== 0 && (i%22) === 0) {
+					adjustId += '<br>';
+				}
+				mid = checkArr[i].MId;
+			}
+			layer.open({
+				type: 2,
+				title: type,
+				area: ['800px', '500px'],
+				shade: 0.8,
+				content: ['position_contract_move.html?ids=' + adjustId + '&omd=' + mid]
+				, success: function (layero) {
+					layer.setTop(layero); //重点2
+				},
+				end: function () {
+					checkArr = [];
+					table.reload('data_table', {
+						page: { curr: 1 },
+						parseData: function (res) { //规定数据格式
+							if (!res.Data) {
+								layer.msg(res.Msg, { icon: 5 })
+							} else {
+								data2 = res;
+								dataArr = res.Data.StockHoldList;
+							}
+							return {
+								"code": res.Status, //解析接口状态
+								"msg": res.Msg, //解析提示文本
+								"count": res.Count, //解析数据长度
+								"data": res.Data.StockHoldList //解析数据列表
+							};
+						},
+						done: function (res, curr, count) {
+							// console.log('分页触发', res, curr, count);
+							if (curr === 1 && lock2 && count) {
+								lock2 = false;
+								$(".layui-table-total table tbody ").after(`
+						<tr><td data-field="id" data-key="1-0-0" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="Mn" data-key="1-0-1" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="An" data-key="1-0-2" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="Uid" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="Up" data-key="1-0-4" class=""><div class="layui-table-cell laytable-cell-1-0-4"></div></td><td data-field="Un" data-key="1-0-5" class=""><div class="layui-table-cell laytable-cell-1-0-5"></div></td><td data-field="Dts" data-key="1-0-6" class=""><div class="layui-table-cell laytable-cell-1-0-6"></div></td><td data-field="Dsn" data-key="1-0-7" class=""><div class="layui-table-cell laytable-cell-1-0-7"></div></td><td data-field="Td" data-key="1-0-8" class=""><div class="layui-table-cell laytable-cell-1-0-8"></div></td><td data-field="Dp" data-key="1-0-9" class=""><div class="layui-table-cell laytable-cell-1-0-9"></div></td><td data-field="Dn" data-key="1-0-10" class=""><div class="layui-table-cell laytable-cell-1-0-10"></div></td><td data-field="Dpr" data-key="1-0-11" class=""><div class="layui-table-cell laytable-cell-1-0-11"></div></td><td data-field="Dnu" data-key="1-0-12" class=""><div class="layui-table-cell laytable-cell-1-0-12">全部合计:</div></td><td data-field="Dm" data-key="1-0-13" class=""><div class="layui-table-cell laytable-cell-1-0-13">${data2.Data.SumStockHold.TotalCount}</div></td><td data-field="Ano" data-key="1-0-14" class=""><div class="layui-table-cell laytable-cell-1-0-14">${data2.Data.SumStockHold.TotalAmount}</div></td><td data-field="Cn" data-key="1-0-15" class=""><div class="layui-table-cell laytable-cell-1-0-15"></div></td><td data-field="Unu" data-key="1-0-16" class=""><div class="layui-table-cell laytable-cell-1-0-16"></div></td><td data-field="Sc" data-key="1-0-17" class=""><div class="layui-table-cell laytable-cell-1-0-17"></div></td><td data-field="Sn" data-key="1-0-18" class=""><div class="layui-table-cell laytable-cell-1-0-18"></div></td><td data-field="As" data-key="1-0-19" class=""><div class="layui-table-cell laytable-cell-1-0-19"></div></td><td data-field="Tc" data-key="1-0-20" class=""><div class="layui-table-cell laytable-cell-1-0-20"></div></td><td data-field="Kj" data-key="1-0-21" class=""><div class="layui-table-cell laytable-cell-1-0-21"></div></td><td data-field="Rmk" data-key="1-0-22" class=""><div class="layui-table-cell laytable-cell-1-0-22"></div></td><td data-field="ope" data-key="1-0-23" class=""><div class="layui-table-cell laytable-cell-1-0-23"></div></td></tr>
+						`)
+							}
+						}
+					});
+				}
+			});
+
+		}
+
+
+		//导出
+		form.on("submit(exportExcel)", function (data) {
+			// console.log(data);
+			var formField1 = data.field;
+			var sendData = {
+				AId: Number(formField1.AId),
+				MId: Number(formField1.MId),
+				SearchKey: formField1.SearchKey,
+				JTime: formField1.JTime,
+				AdminType: 0,
+				AdminID: Number(localStorage.getItem('id'))
+			}
+
+			publicMathod.exportExcel('api/StockApplyInfo/ExportExcelTakePositionContract', '持仓合约', sendData);
+		});
+	});
+
+</script>
+
+</html>

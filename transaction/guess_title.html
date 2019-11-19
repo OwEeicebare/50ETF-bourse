@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>称号管理</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div class="layui-fluid" id="root">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-header">
+					<a href="guess_up_down.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>猜涨猜跌</a>
+					<span lay-separator="">/</span>
+					<a><cite>称号管理</cite></a>
+				</div>
+
+				<div class="layui-card-body">
+					<form class="layui-form" lay-filter="sub_form">
+
+						<div class="layui-form-item">
+							<label class="layui-form-label">猜涨</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Tv" lay-verify="required|number" placeholder="请输入猜涨得分" autocomplete="off"
+									class="layui-input" />
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">猜跌</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Fv" lay-verify="required|number" placeholder="请输入猜跌得分" autocomplete="off"
+									class="layui-input" />
+							</div>
+						</div>
+						<div class="layui-input-block">
+							<button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+								lay-filter="sub_btn">确认提交</button>
+						</div>
+					</form>
+					<hr>
+					</hr>
+				</div>
+				<div class="layui-card-body">
+
+					<table id="buy_table" class="layui-table" lay-filter="data_table"></table>
+					<div class="layui-input-block">
+
+						<button type="button" class="layui-btn add_adv" id="sub_btn" lay-submit=""
+							lay-filter="add_adv">添加称号</button>
+					</div>
+					<script type="text/html" id="oper-col">
+					<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+					<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+				</script>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js"></script>
+	<script type="text/javascript">
+		publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+
+		layui.use(['form', 'table', 'jquery'], function () {
+			var form = layui.form;
+			var table = layui.table;
+			var $ = layui.jquery;
+
+			//监听添加称号
+			$('body').on('click', '.add_adv', function () {
+				var url = 'guess_title_add.html'
+				open_adv("添加栏目", url);
+			})
+			function open_adv(type, url) {
+				layer.open({
+					type: 2,
+					title: type,
+					area: ['500px', '300px'],
+					shade: 0.8,
+					content: [url, 'no']
+				});
+			}
+
+
+			// 设置猜涨积分
+			form.on('submit(sub_btn)', function (data) {
+				publicMathod.post({
+					url: "api/Ud/ScoreSetEdit",
+					data: {
+						"Tv":Number( data.field.Tv)
+						, "Fv": Number(data.field.Fv)
+					},
+					success: function (result) {
+						if (result.Status == 1) {
+							form.render();
+							layer.msg(result.Msg, { icon: 1, shade: 0.4, time: 1000 });
+						} else {
+							layer.msg(result.Msg, { icon: 1, shade: 0.4, time: 1000 });
+						}
+					}
+				})
+			})
+
+			//初始化积分
+			publicMathod.post({
+				url: 'api/Ud/GetScoreSetModel',
+				success: function (data) {
+					if (data.Status == "1") {
+						form.val("sub_form", {
+							"Tv": data.Data.Tv,
+							"Fv": data.Data.Fv,
+
+						})
+						form.render();
+					} else {
+						layer.msg("获取数据失败，请重试！", { icon: 5 })
+					}
+				}
+			})
+
+			// 设置猜涨积分
+			form.on('submit(sub_btn)', function (data) {
+				publicMathod.post({
+					url: "api/Ud/ScoreSetEdit",
+					data: {
+						"Tv": data.field.Tv
+						, "Fv": data.field.Fv
+					},
+					success: function (result) {
+						if (result.Status == 1) {
+							form.render();
+							layer.msg(result.Msg, { icon: 1, shade: 0.4, time: 1000 });
+							location.reload();
+						} else {
+							layer.msg(result.Msg, { icon: 1, shade: 0.4, time: 1000 });
+						}
+					}
+				})
+			})
+			// 实例化数据表格
+			table.render({
+				elem: '#buy_table',
+				height: 300,
+				url: publicMathod.hosturl + 'api/Ud/GetMedalSetList',
+				method: 'post',
+				contentType: "application/json; charset=UTF-8",
+				headers: { token: publicMathod.token },
+				cellMinWidth: 100,
+
+				parseData: function (res) { //规定数据格式
+					return {
+						"code": res.Status, //解析接口状态
+						"msg": res.Msg, //解析提示文本
+						"count": res.Count, //解析数据长度
+						"data": res.Data //解析数据列表
+					};
+				},
+				response: {//规定响应成功状态码
+					statusCode: 1
+				},
+				cols: [
+					[
+						{ field: 'Id', title: 'ID' },
+						{ field: 'Mn', title: '称号名称', edit: 'text' },
+						{ field: 'Mv', title: '最大积分', edit: 'text' },
+						{ templet: '#oper-col', title: '操作', width: 150 }
+					]
+				],
+			});
+
+
+
+			//监听工具条
+			table.on('tool(data_table)', function (obj) {
+				var data = obj.data;
+
+				if (obj.event === 'edit') {
+					var url = 'guess_title_edit.html?id=' + data.Id
+					open_adv("编辑栏目", url);
+				} else if (obj.event === 'del') {
+					//页面删除
+					layer.confirm('删除记录后不可恢复，您确定要继续吗？', function (index) {
+						publicMathod.post({
+							url: 'api/Ud/MedalSetRemove',
+							data: data.Id,
+							success: function (result) {
+								if (result.Status == 1) {
+									layer.msg("删除成功", { icon: 1 });
+									location.reload();
+								} else {
+									layer.msg("删除失败，请重试！", { icon: 5 });
+								}
+							}
+						})
+						return false;
+					});
+					//后台删除todo...
+				}
+			});
+
+
+		});
+	</script>
+</body>
+
+</html>

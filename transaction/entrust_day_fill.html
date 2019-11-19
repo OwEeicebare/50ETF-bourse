@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>当日委托补入持仓</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+	<style>
+		.Validform_checktip1 {
+			margin-right: 8px;
+			float: left;
+			line-height: 38px;
+			height: 38px;
+			overflow: hidden;
+			color: #000;
+		}
+
+		.Validform_checktip_cut {
+			margin-left: 8px;
+			height: 0.4;
+			line-height: 0.4;
+		}
+
+		.input-line {
+			min-width: 250px;
+			width: auto;
+			float: left;
+			line-height: 38px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-header">
+					<a href="entrust_day.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>当日委托</a>
+					<span lay-separator="">/</span>
+					<a><cite>补入持仓</cite></a>
+				</div>
+				<div class="layui-card-body" style="padding-bottom: 120px;">
+					<form class="layui-form" lay-filter="sub_form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">交易类型</label>
+							<!-- <div class="layui-input-inline"> -->
+							<span id="type" class="input-line">- - - -</span>
+							<!-- </div> -->
+						</div>
+
+						<div class="layui-form-item">
+							<label class="layui-form-label">母账户ID</label>
+							<div class="layui-input-inline">
+								<select name="MId" id="MId" lay-filter="aihao" lay-verify="required">
+
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">用户ID</label>
+							<!-- <div class="layui-input-inline"> -->
+							<span id="userId" class="input-line">- -</span>
+							<!-- </div> -->
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">合约代码</label>
+							<!-- <div class="layui-input-inline"> -->
+							<span id="stockCode" class="input-line">- - - - - - - -</span>
+							<!-- </div> -->
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">合约名称</label>
+							<!-- <div class="layui-input-inline"> -->
+							<span id="stockName" class="input-line">- - - - - - -</span>
+							<!-- </div> -->
+						</div>
+						<div class="layui-form-item" id="rDNumW">
+							<label class="layui-form-label">已成交数量</label>
+							<!-- <div class="layui-input-inline"> -->
+							<span id="rDNum" class="input-line">- -</span>
+							<!-- </div> -->
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">委托价格</label>
+							<div class="layui-input-inline">
+								<input type="text" id="order_price" autocomplete="off" name="order_price"
+									class="layui-input" lay-verify="oPrice|price">
+							</div>
+							<!-- <span id="order_price" class="input-line">-.- - -</span> -->
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">委托数量</label>
+							<div class="layui-input-inline">
+								<input type="text" id="order_num" lay-verify="oNum|number" autocomplete="off"
+									name="order_num" class="layui-input ">
+							</div>
+							<!-- <span id="order_num" class="input-line">- -</span> -->
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">委托编号</label>
+							<div class="layui-input-inline">
+								<input type="text" id="An" lay-verify="oMo" autocomplete="off" name="An"
+									class="layui-input ">
+							</div>
+							<!-- <span id="An" class="input-line">- - - - - - - - - -</span> -->
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">委托时间</label>
+							<div class="layui-input-inline">
+								<input type="text" name="GTime" lay-verify="oTime" class="layui-input" id="GTime"
+									placeholder="请选择委托时间">
+							</div>
+						</div>
+						<div class="layui-form-item" id="revokeNum">
+							<label class="layui-form-label">撤单数量</label>
+							<div class="layui-input-inline">
+								<input type="text" id="Drn" lay-verify="rNum" autocomplete="off" name="Drn"
+									class="layui-input ">
+
+							</div>
+						</div>
+						<div class="layui-form-item" id="revokeTime">
+							<label class="layui-form-label">撤单时间</label>
+							<div class="layui-input-inline">
+								<input type="text" id="Drt" lay-verify="rTime" name="Drt" placeholder="请选择撤单时间"
+									class="layui-input ">
+
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">成交状态</label>
+							<div class="layui-input-inline">
+								<select name="St" id="St" lay-filter="St">
+									<option value="3" selected="">已成</option>
+									<option value="5">废单</option>
+									<option value="7" id="rRevoke">已撤</option>
+									<option value="8">部成部撤</option>
+									<option value="11">部成</option>
+								</select>
+							</div>
+						</div>
+						<div style="overflow: hidden;" id="dInfo">
+							<div style="overflow: hidden;" id="index0">
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label">成交价格</label>
+									<div class="layui-input-inline" style="min-width: 100px;">
+										<span class="Validform_checktip1" id="isMore" style="display: none;">1</span>
+										<input type="text" id="DPR1" lay-verify="dPrice|price" autocomplete="off"
+											name="DPR1" class="layui-input l_left" style="width: 100px;">
+									</div>
+								</div>
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label">成交数量</label>
+									<div class="layui-input-inline" style="min-width: 100px;">
+										<input type="text" id="Dnu1" lay-verify="dNum|number" autocomplete="off"
+											name="Dnu1" class="layui-input l_left" style="width: 100px;">
+									</div>
+								</div>
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label">成交时间</label>
+									<div class="layui-input-inline">
+										<input type="text" class="layui-input  wd250 l_left" lay-verify="dTime"
+											id="DTM1" name="DTM1" placeholder="成交时间 HH:mm:ss">
+									</div>
+								</div>
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label">成交编号</label>
+									<div class="layui-input-inline">
+										<input type="text" id="Dmo1" lay-verify="dMo" autocomplete="off" name="Dmo1"
+											class="layui-input  wd250 l_left">
+										<span class="layui-icon layui-icon-add-1 Validform_checktip"
+											style="font-size: 28px;color: #000;" id="addPrice"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<!-- <div class="layui-form-item">
+							<label class="layui-form-label">成交价格</label>
+							<div class="layui-input-inline" id="dPrice">
+								<span class="Validform_checktip1">1</span>
+								<input type="text" id="DPR1" lay-verify="required|number" autocomplete="off" name="DPR"
+									class="layui-input wd250 l_left">
+								<span class="layui-icon layui-icon-add-1 Validform_checktip"
+									style="font-size: 28px;color: #000;" id="addPrice"></span>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">成交数量</label>
+							<div class="layui-input-inline">
+								<input type="text" id="Dnu1" lay-verify="required|number" autocomplete="off" name="Dnu"
+									class="layui-input  wd250 l_left">
+								<span class="layui-icon layui-icon-add-1 Validform_checktip"
+									style="font-size: 28px;color: #000;" id="addNum"></span>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">成交时间</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input  wd250 l_left" id="DTM1" name="time"
+									placeholder="成交时间 HH:mm:ss">
+								<span class="layui-icon layui-icon-add-1 Validform_checktip"
+									style="font-size: 28px;color: #000;" id="addTime"></span>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">成交编号</label>
+							<div class="layui-input-inline">
+								<input type="text" id="Dmo1" lay-verify="required|number" autocomplete="off" name="Dmo"
+									class="layui-input  wd250 l_left">
+								<span class="layui-icon layui-icon-add-1 Validform_checktip"
+									style="font-size: 28px;color: #000;" id="addCode"></span>
+							</div>
+						</div> -->
+						<!-- <div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">备注</label>
+							<div class="layui-input-block">
+								<textarea id="zhaiyao" name="zhaiyao" class="layui-textarea wd480"></textarea>
+							</div>
+						</div> -->
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label"></label>
+							<div class="layui-input-block">
+								<button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+									lay-filter="sub_btn">确认提交</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'laydate'], function () {
+		var laydate = layui.laydate;
+		var form = layui.form;
+		var upload = layui.upload;
+		var $ = layui.jquery;
+		var id = publicMathod.getUrlParam("id")
+		var lock = true
+		var userId = localStorage.getItem('id');
+	
+
+		var dInfoArr = [];
+
+		var lIndex = layer.load(1, {
+			shade: [0.1, '#000'] //0.1透明度的白色背景
+		});
+
+
+		laydate.render({
+			elem: '#DTM1'
+			, type: 'time'
+		});
+		laydate.render({
+			elem: '#GTime'
+			, type: 'time'
+		});
+		laydate.render({
+			elem: '#Drt'
+			, type: 'time'
+		});
+		// 获取交易类型
+		publicMathod.getDropdownList("api/Tool/GetSellStatus", form, $("#SellStatus"));
+		// 获取母账户列表
+		// publicMathod.getDropdownList("api/Tool/GetMasterList", form, $("#MId"));
+		publicMathod.post({
+			url: 'api/Tool/GetMasterList',
+			success: function (result) {
+				if (result.Status !== '1') {
+					layer.msg("获取母账户数据失败，请重试！", { icon: 5 });
+					return;
+				}
+				var str = "";
+				for (var i = 0; i < result.Data.length; i++) {
+					str += '<option value="' + result.Data[i].Id + '">' + result.Data[i].Name + '</option>';
+				}
+				$("#MId").append(str);
+				form.render(); //更新全部
+				getModel(); //初始化
+			}
+		});
+		//初始化  
+		function getModel() {
+			publicMathod.post({
+				url: 'api/StockApplyInfo/GetModel',
+				data: id,
+
+				success: function (data) {
+					layer.close(lIndex);
+					if (data.Status == "1") {
+						$('#type').text(data.Data.Dt == 10 ? "买入开仓" : data.Data.Dt == 11 ? "卖出平仓" : "");//交易类型10买 11卖
+						$('#userId').text(data.Data.UId);//用户Id
+						$('#stockCode').text(data.Data.Sc);//合约代码
+						$('#stockName').text(data.Data.Sn);//合约名称
+						$('#rDNum').text(data.Data.Dnu);//已成交数量
+						$('#rDNumW').css('display', 'none');//已成交数量
+						var preDate = new Date(data.Data.timedecl);
+						// console.log(data.Data.timedecl);
+						form.val("sub_form", {
+							"MId": data.Data.MId, //母账户Id
+							"GTime": (preDate.getHours() >= 10 ? preDate.getHours() : '0' + preDate.getHours()) + ':' + (preDate.getMinutes() >= 10 ? preDate.getMinutes() : '0' + preDate.getMinutes()) + ':' + (preDate.getSeconds() >= 10 ? preDate.getSeconds() : '0' + preDate.getSeconds()), //委托时间
+							"order_num": data.Data.Dn,//委托数量
+							"order_price": data.Data.Dp, //委托价格
+							"An": data.Data.An, //委托编号
+							"Dnu1": data.Data.Dn - data.Data.Dnu
+						})
+						if (data.Data.DealStatus == 11) {
+							$('#rRevoke').remove();
+							$("[lay-value='7']").remove();
+						}
+					} else {
+						lock = false;//获取数据失败，不允许提交数据
+						layer.msg("获取数据失败，请重试！", { icon: 5 })
+					}
+				},
+				error: function (err) {
+					layer.close(lIndex);
+					layer.msg("获取数据失败，请重试！", { icon: 5 })
+				}
+			})
+		}
+
+		//表单验证
+		form.verify(
+			{
+				dPrice: function (value, item) {
+					if (!value.length) {
+						return '成交价格不能为空'
+					}
+				},
+				dNum: function (value, item) {
+					if (!value.length) {
+						return '成交数量不能为空'
+					}
+					if (Number(value) > (Number($('#order_num').val()) - Number($('#rDNum').text()))) {
+						// console.log(value, $('#order_num').val(), value > $('#order_num').val())
+						return '成交数量不能大于可成交数量'
+					}
+				},
+				dTime: function (value, item) {
+					if (!value.length) {
+						return '成交时间不能为空'
+					}
+				},
+				dMo: function (value, item) {
+					if (!value.length) {
+						return '成交编号不能为空'
+					}
+				},
+				rNum: function (value, item) {
+					if (!value.length) {
+						return '撤单数量不能为空'
+					}
+					if (Number(value) > (Number($('#order_num').val()) - Number($('#rDNum').text()))) {
+						return '撤单数量不能大于可撤单数量'
+					}
+				},
+				rTime: function (value, item) {
+					if (!value.length) {
+						return '撤单时间不能为空'
+					}
+				},
+				oPrice: function (value, item) {
+					if (!value.length) {
+						return '委托价格不能为空'
+					}
+				},
+				oNum: function (value, item) {
+					if (!value.length) {
+						return '委托数量不能为空'
+					}
+					if (Number(value) < Number($('#rDNum').text())) {
+						return '委托数量不能小于已成交数量'
+					}
+				},
+				oMo: function (value, item) {
+					if (!value.length) {
+						return '委托编号不能为空'
+					}
+				},
+				oTime: function (value, item) {
+					if (!value.length) {
+						return '委托时间不能为空'
+					}
+				},
+				price: [
+					/^\d{1}\.\d{1,4}$/
+					, '价格不规范'
+				]
+			}
+		);
+
+		var totalInputDNum = 0;
+		form.on('submit(sub_btn)', function (data) {
+			var data = data.field;
+			// console.log(data);
+			// console.log(dInfoArr);
+			// 时间处理
+			var date1 = new Date();
+			var year = date1.getFullYear();
+			var month = date1.getMonth() + 1;
+			var day = date1.getDate();
+			data.GTime = year + "-" + (month > 10 ? month : ('0' + month)) + "-" + (day > 10 ? day : ('0' + day)) + " " + data.GTime;
+			data.Drt = data.Drt ? (year + "-" + (month > 10 ? month : ('0' + month)) + "-" + (day > 10 ? day : ('0' + day)) + " " + data.Drt) : 0;
+			// lock = false;
+			if (lock) {
+				lock = false
+				var tInfoArr = [];
+				if (dInfoArr.length) {
+					for (var i = 0; i < dInfoArr.length; i++) {
+						totalInputDNum += parseInt($(`#Dnu${i + 1}`).val());
+						tInfoArr.push({
+							DealTime: (year + "-" + (month > 10 ? month : ('0' + month)) + "-" + (day > 10 ? day : ('0' + day)) + " " + $(`#DTM${i + 1}`).val()),
+							DealPrice: Number($(`#DPR${i + 1}`).val()),
+							DealNum: parseInt($(`#Dnu${i + 1}`).val()),
+							DealNo: $(`#Dmo${i + 1}`).val()
+						})
+					}
+				} else {
+					var obj = {
+						DealTime: year + "-" + (month > 10 ? month : ('0' + month)) + "-" + (day > 10 ? day : ('0' + day)) + " " + data.DTM1,
+						DealPrice: Number(data.DPR1),
+						DealNum: parseInt(data.Dnu1),
+						DealNo: data.Dmo1,
+					};
+					tInfoArr.push(obj);
+					totalInputDNum = parseInt(data.Dnu1);
+				}
+				if (totalInputDNum > (Number($('#order_num').val())) - Number($('#rDNum').text())) {
+					layer.msg(`成交总数量为 ${totalInputDNum},可成交数量为 ${Number($('#order_num').val()) - Number($('#rDNum').text())} ,无法补仓`, { icon: 5, shade: 0.5, });
+					totalInputDNum = 0;
+					lock = true;
+					return;
+				} else if ((totalInputDNum < (Number($('#order_num').val())) - Number($('#rDNum').text())) && data.St == 3) {
+					layer.msg(`当前成交总数量为 ${totalInputDNum},应成交总数量为 ${Number($('#order_num').val()) - Number($('#rDNum').text())} ,无法补仓`, { icon: 5, shade: 0.5, });
+					totalInputDNum = 0;
+					lock = true;
+					return;
+				}
+				var dataObj;
+				if (data.St != 7 && data.St != 8) {
+					dataObj = {
+						"ApplyID": parseInt(id),//委托Id
+						"MasID": parseInt(data.MId),//母账户Id
+						"DeclTime": data.GTime,//委托时间
+						"StockCode": $('#stockCode').text(),//合约代码
+						"StockName": $('#stockName').text(),//合约名称
+						"DealType": ($('#type').text() === '买入开仓') ? 10 : ($('#type').text() === '卖出平仓') ? 11 : '',//成交类型
+						"DealStatus": parseInt(data.St),//成交状态
+						"DeclPrice": Number(data.order_price),//委托价格
+						"DeclNum": parseInt(data.order_num),//委托数量
+						"AuthNo": data.An,//委托编号
+						"lsDealModel": tInfoArr//成交价格 成交数量 成交时间 成交编号
+					}
+				} else {
+					if (data.St == 8 && (Number(totalInputDNum) + Number(data.Drn)) !== (Number($('#order_num').val()) - Number($('#rDNum').text()))) {
+						layer.msg(`当前成交数量为 ${totalInputDNum},撤单数量为 ${data.Drn},合计不等于可部成部撤数量 ${Number($('#order_num').val()) - Number($('#rDNum').text())} ,请重新填写`, { icon: 5, shade: 0.5, });
+						totalInputDNum = 0;
+						lock = true;
+						return;
+					}
+					if (data.St == 8) {
+						dataObj = {
+							"ApplyID": parseInt(id),//委托Id
+							"MasID": parseInt(data.MId),//母账户Id
+							"DeclTime": data.GTime,//委托时间
+							"StockCode": $('#stockCode').text(),//合约代码
+							"StockName": $('#stockName').text(),//合约名称
+							"DealType": ($('#type').text() === '买入开仓') ? 10 : ($('#type').text() === '卖出平仓') ? 11 : '',//成交类型
+							"DealStatus": parseInt(data.St),//成交状态
+							"DeclPrice": Number(data.order_price),//委托价格
+							"DeclNum": parseInt(data.order_num),//委托数量
+							"UndeclNum": parseInt(data.Drn),//撤单数量
+							"UndeclTime": data.Drt,//撤单时间
+							"AuthNo": data.An,//委托编号
+							"lsDealModel": tInfoArr//成交价格 成交数量 成交时间 成交编号
+						}
+					} else if (data.St == 7) {
+						dataObj = {
+							"ApplyID": parseInt(id),//委托Id
+							"MasID": parseInt(data.MId),//母账户Id
+							"DeclTime": data.GTime,//委托时间
+							"StockCode": $('#stockCode').text(),//合约代码
+							"StockName": $('#stockName').text(),//合约名称
+							"DealType": ($('#type').text() === '买入开仓') ? 10 : ($('#type').text() === '卖出平仓') ? 11 : '',//成交类型
+							"DealStatus": parseInt(data.St),//成交状态
+							"DeclPrice": Number(data.order_price),//委托价格
+							"DeclNum": parseInt(data.order_num),//委托数量
+							"UndeclNum": parseInt(data.Drn),//撤单数量
+							"UndeclTime": data.Drt,//撤单时间
+							"AuthNo": data.An,//委托编号
+							"lsDealModel": [{
+								DealTime: year + "-" + (month > 10 ? month : ('0' + month)) + "-" + (day > 10 ? day : ('0' + day)) + " " + (date1.getHours() >= 10 ? date1.getHours() : '0' + date1.getHours()) + ':' + (date1.getMinutes() >= 10 ? date1.getMinutes() : '0' + date1.getMinutes()) + ':' + (date1.getSeconds() >= 10 ? date1.getSeconds() : '0' + date1.getSeconds()),
+								DealPrice: 0,
+								DealNum: 0,
+								DealNo: 0,
+							}]//成交价格 成交数量 成交时间 成交编号
+						}
+					}
+				}
+				publicMathod.post({
+					url: "api/StockApplyInfo/Save",
+					data: dataObj,
+					success: function (result) {
+						// console.log("1111111",result)
+						if (result.Status == 1) {
+							layer.msg(result.Msg, { icon: 1, shade: 0.5, });
+							window.location.href = "entrust_day.html";
+						} else {
+							lock = true;
+							tInfoArr = [];
+							layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+						}
+
+					}
+				})
+			}
+			return false;
+		});
+
+
+		//添加成交价格输入框
+		$('body').on('click', '#addPrice', function () {
+			// $('#Dnu1').val("");
+			if (dInfoArr.length) {
+				// console.log(dInfoArr.length);
+				if (dInfoArr.length >= 1) {
+					$('#isMore').css('display', 'block');
+				}
+				var priceStr = `
+					<div style="overflow: hidden;" id="index${dInfoArr.length}">
+						<div class="layui-form-item l_left">
+							<label class="layui-form-label">成交价格</label>
+							<div class="layui-input-inline" style="min-width: 100px;">
+								<span class="Validform_checktip1">${dInfoArr.length + 1}</span>
+								<input type="text" id="DPR${dInfoArr.length + 1}" lay-verify="dPrice|price" autocomplete="off"
+									name="DPR${dInfoArr.length + 1}" class="layui-input l_left" style="width: 100px;">
+							</div>
+						</div>
+						<div class="layui-form-item l_left">
+							<label class="layui-form-label">成交数量</label>
+							<div class="layui-input-inline" style="min-width: 100px;">
+								<input type="text" id="Dnu${dInfoArr.length + 1}" lay-verify="dNum|number" autocomplete="off"
+									name="Dnu${dInfoArr.length + 1}" class="layui-input l_left" style="width: 100px;">
+							</div>
+						</div>
+						<div class="layui-form-item l_left">
+							<label class="layui-form-label">成交时间</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input  wd250 l_left" lay-verify="dTime" id="DTM${dInfoArr.length + 1}" name="DTM${dInfoArr.length + 1}"
+									placeholder="成交时间 HH:mm:ss">
+							</div>
+						</div>
+						<div class="layui-form-item l_left">
+							<label class="layui-form-label">成交编号</label>
+							<div class="layui-input-inline">
+								<input type="text" id="Dmo${dInfoArr.length + 1}" lay-verify="dMo" autocomplete="off"
+									name="Dmo${dInfoArr.length + 1}" class="layui-input  wd250 l_left">
+								<span class="Validform_checktip Validform_checktip_cut"
+										style="font-size: 72px;color: #000;" id="cutPrice${dInfoArr.length}">-</span>
+							</div>
+						</div>
+					</div>
+				`;
+				$('#dInfo').append(priceStr);
+				laydate.render({
+					elem: `#DTM${dInfoArr.length + 1}`
+					, type: 'time'
+				});
+				dInfoArr.push({ index: dInfoArr.length, DealPrice: $(`#DPR${dInfoArr.length + 1}`).val(), DealNum: $(`#Dnu${dInfoArr.length + 1}`).val(), DealTime: $(`#DTM${dInfoArr.length + 1}`).val(), DealNo: $(`#Dmo${dInfoArr.length + 1}`).val() })
+			} else {
+				//第一个加号
+				$('#isMore').css('display', 'block');
+				dInfoArr.push({ index: 0, DealPrice: $('#DPR1').val(), DealNum: $('#Dnu1').val(), DealTime: $('#DTM1').val(), DealNo: $('#Dmo1').val() })
+				var priceStr = `
+					<div style="overflow: hidden;" id="index1">
+						<div class="layui-form-item l_left">
+							<label class="layui-form-label">成交价格</label>
+							<div class="layui-input-inline" style="min-width: 100px;">
+								<span class="Validform_checktip1">2</span>
+								<input type="text" id="DPR2" lay-verify="dPrice|price" autocomplete="off"
+									name="DPR2" class="layui-input l_left" style="width: 100px;">
+							</div>
+						</div>
+						<div class="layui-form-item l_left">
+							<label class="layui-form-label">成交数量</label>
+							<div class="layui-input-inline" style="min-width: 100px;">
+								<input type="text" id="Dnu2" lay-verify="dNum|number" autocomplete="off"
+									name="Dnu2" class="layui-input l_left" style="width: 100px;">
+							</div>
+						</div>
+						<div class="layui-form-item l_left">
+							<label class="layui-form-label">成交时间</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input  wd250 l_left" lay-verify="dTime" id="DTM2" name="DTM2"
+									placeholder="成交时间 HH:mm:ss">
+							</div>
+						</div>
+						<div class="layui-form-item l_left">
+							<label class="layui-form-label">成交编号</label>
+							<div class="layui-input-inline">
+								<input type="text" id="Dmo2" lay-verify="dMo" autocomplete="off"
+									name="Dmo2" class="layui-input  wd250 l_left">
+								<span class="Validform_checktip Validform_checktip_cut"
+										style="font-size: 72px;color: #000;" id="cutPrice1">-</span>
+							</div>
+						</div>
+					</div>
+				`;
+				$('#dInfo').append(priceStr);
+				laydate.render({
+					elem: '#DTM2'
+					, type: 'time'
+				});
+				dInfoArr.push({ index: 1, DealPrice: $('#DPR2').val(), DealNum: $('#Dnu2').val(), DealTime: $('#DTM2').val(), DealNo: $('#Dmo2').val() })
+			}
+		})
+
+		//删减
+		$('body').on('click', function (event) {
+			// console.log((/cutPrice/).test(event.target.id));
+			if ((/cutPrice/).test(event.target.id)) {
+				var index = event.target.id.substring(event.target.id.indexOf('e') + 1);
+				// console.log(index);
+				for (var i = 0; i < dInfoArr.length; i++) {
+					if (dInfoArr[i].index == index) {
+						dInfoArr.splice(i, 1);
+						break;
+					}
+				}
+				// console.log(dInfoArr);
+				if (dInfoArr.length === 1) {
+					$('#isMore').css('display', 'none');
+				}
+				$(`#index${index}`).remove();
+			}
+		})
+
+
+		//监听状态
+		if ($('#St').val() != 7 && $('#St').val() != 8) {
+			$('#revokeNum').css('display', 'none');
+			$('#revokeTime').css('display', 'none');
+			$('#Drn').attr('lay-verify', '');
+			$('#Drt').attr('lay-verify', '');
+		} else {
+			$('#revokeNum').css('display', 'block');
+			$('#revokeTime').css('display', 'block');
+			$('#Drn').attr('lay-verify', 'rNum');
+			$('#Drt').attr('lay-verify', 'rTime');
+		}
+		form.on('select(St)', function (data) {
+			// console.log(data.value); //得到被选中的值
+			if (data.value != 7 && data.value != 8) {
+				$('#revokeNum').css('display', 'none');
+				$('#revokeTime').css('display', 'none');
+				$('#Drn').attr('lay-verify', '');
+				$('#Drt').attr('lay-verify', '');
+			} else {
+				$('#revokeNum').css('display', 'block');
+				$('#revokeTime').css('display', 'block');
+				$('#Drn').attr('lay-verify', 'rNum');
+				$('#Drt').attr('lay-verify', 'rTime');
+			}
+			if (data.value == 7 || data.value == 5) {//废单和已撤
+				$('#Drn').val(Number($('#order_num').val()) - Number($('#rDNum').text()))
+				if (dInfoArr.length) {
+					for (var i = 0; i < dInfoArr.length; i++) {
+						$(`#DPR${i + 1}`).attr('lay-verify', '');
+						$(`#DTM${i + 1}`).attr('lay-verify', '');
+						$(`#Dmo${i + 1}`).attr('lay-verify', '');
+						$(`#Dnu${i + 1}`).attr('lay-verify', '');
+					}
+				} else {
+					$('#DPR1').attr('lay-verify', '');
+					$('#DTM1').attr('lay-verify', '');
+					$('#Dmo1').attr('lay-verify', '');
+					$('#Dnu1').attr('lay-verify', '');
+				}
+				$('#dInfo').css('display', 'none')
+			} else {
+				$('#Drn').val("")
+				if (dInfoArr.length) {
+					for (var i = 0; i < dInfoArr.length; i++) {
+						$(`#DPR${i + 1}`).attr('lay-verify', 'dPrice|price');
+						$(`#DTM${i + 1}`).attr('lay-verify', 'dTime');
+						$(`#Dmo${i + 1}`).attr('lay-verify', 'dMo');
+						$(`#Dnu${i + 1}`).attr('lay-verify', 'dNum|number');
+					}
+				} else {
+					$('#DPR1').attr('lay-verify', 'dPrice|price');
+					$('#DTM1').attr('lay-verify', 'dTime');
+					$('#Dmo1').attr('lay-verify', 'dMo');
+					$('#Dnu1').attr('lay-verify', 'dNum|number');
+				}
+				$('#dInfo').css('display', 'block')
+			}
+			if (data.value == 3 && (dInfoArr.length == 0 || dInfoArr.length == 1)) {
+				$('#Dnu1').val($('#order_num').val() - $('#rDNum').text());
+			}
+		});
+	})
+</script>
+
+</html>

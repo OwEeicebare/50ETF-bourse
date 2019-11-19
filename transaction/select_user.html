@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>查看用户</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+
+	<div id="app">
+		<div class="title_wrap">
+			<div class="layui-card-header">
+				<a href="guess_up_down.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>猜涨猜跌</a>
+				<span lay-separator="">/</span>
+				<a><cite>查看用户</cite></a>
+			</div>
+			<form class="layui-form">
+
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label">参与类型</label>
+					<div class="layui-input-block">
+						<select name="interest" lay-filter="aihao" id="type">
+							<option value="" selected="">所有类型</option>
+							<option value="0">看涨</option>
+							<option value="1">看跌</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label l_left">搜索关键字</label>
+					<input type="text" name="title" lay-verify="title" autocomplete="off"
+						placeholder="请输入用户名/手机号" class="layui-input l_left"
+						style="width: initial;min-width: 320px;" id="search_input">
+					<button class="layui-btn l_left" style="border-radius: 0;" id="search"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+					<button class="layui-btn l_left" type="button" style="border-radius: 0;">导出Excel</button>
+				</div>
+			</form>
+		</div>
+		<div class="table_wrap">
+			<table id="data_table" lay-filter="data_table"></table>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'table', 'laydate'], function () {
+		var form = layui.form;
+		var table = layui.table;
+		var $ = layui.jquery;
+		var laydate = layui.laydate;
+		var id=Number(publicMathod.getUrlParam("id"));
+
+		laydate.render({
+			elem: '#time'
+			, type: 'datetime'
+			, range: true
+		});
+
+		//实例化数据表格
+		table.render({
+			elem: '#data_table',
+			url: publicMathod.hosturl + 'api/Ud/GetUserSourceList', //数据接口
+			where: {
+				'Tid': id
+			},
+			method: 'post',
+			contentType: "application/json; charset=UTF-8",
+			cellMinWidth: 100,
+			headers: {token: publicMathod.token},
+			page: {
+				layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+			},
+			parseData: function (res) { //规定数据格式
+				//console.log(res.Data)
+				return {
+					"code": res.Status, //解析接口状态
+					"msg": res.Msg, //解析提示文本
+					"count": res.Count, //解析数据长度
+					"data": res.Data //解析数据列表
+				};
+			},
+			response: {//规定响应成功状态码
+				statusCode: 1
+			},
+			cols: [[
+				{ field: 'Id', title: 'ID', sort: true },
+				{ field: 'Un', title: '用户姓名' },
+				{ field: 'Up', title: '用户手机' },
+				{ field: 'Ov', title: '参与类型' },
+				{ field: 'Ct', title: '参与时间' },
+			]]
+		});
+		//搜索重载表格
+		$("#search").click(function(){
+			var type=Number($("#type").val());//获取参与类型    //存疑，type的值对应的类型
+			var search_val=$("#search_input").val();//获取搜索框的值
+			table.reload('data_table', {
+				url: publicMathod.hosturl + 'api/Ud/GetUserSourceList', //数据接口
+				where: { //设定异步数据接口的额外参数
+					"Tid": id,
+					"UType": type,
+					"AgentId": 0,
+				
+					"OrderKey": "",
+					"Sort": "",
+					"SearchKey": search_val
+				},
+				page: {
+					curr: 1 //重新从第 1 页开始
+				}
+			});
+		})
+		$("body").on("click", ".selectuser", function () {
+			window.event.returnValue = false;
+			window.location.href = "namemanage.html"
+		});
+	});
+</script>
+
+</html>

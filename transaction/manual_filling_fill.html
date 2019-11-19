@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>手动补仓补入持仓</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row">
+				<div class="layui-card">
+					<div class="layui-card-header">
+						<a href="manual_filling.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>手动补仓</a> 
+						<span lay-separator="">/</span>
+						<a><cite>补入持仓</cite></a>
+					</div>
+					<div class="layui-card-body">
+						<form class="layui-form">
+							<div class="layui-form-item">
+								<label class="layui-form-label">交易类型</label>
+								<div class="layui-input-inline">
+									<select name="SellStatus" id="SellStatus" lay-filter="aihao">
+										<option value="" id="SellStatusD" selected="">操作类型</option>
+									</select>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">母账户ID</label>
+								<div class="layui-input-inline">
+									<input type="text" id="motherId" autocomplete="off" name="mother_id" class="layui-input" readonly="readonly">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">用户ID</label>
+								<div class="layui-input-inline">
+									<input type="text" id="userId" autocomplete="off" name="user_id" class="layui-input " readonly="readonly">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">合约代码</label>
+								<div class="layui-input-inline">
+									<input type="text" id="code" autocomplete="off" name="code" class="layui-input " readonly="readonly">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">合约名称</label>
+								<div class="layui-input-inline">
+									<input type="text" id="order_name" autocomplete="off" name="order_name" class="layui-input " readonly="readonly">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">委托价格</label>
+								<div class="layui-input-inline">
+									<input type="text" id="order_price" autocomplete="off" name="order_price" class="layui-input " readonly="readonly">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">委托数量</label>
+								<div class="layui-input-inline">
+									<input type="text" id="order_num" autocomplete="off" name="order_num" class="layui-input " readonly="readonly">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">委托编号</label>
+								<div class="layui-input-inline">
+									<input type="text" id="An" autocomplete="off" name="An" class="layui-input ">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">成交价格</label>
+								<div class="layui-input-inline">
+									<input type="text" id="DPR" lay-verify="required|number" autocomplete="off" name="DPR" class="layui-input ">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">成交数量</label>
+								<div class="layui-input-inline">
+									<input type="text" id="Dnu" lay-verify="required|number" autocomplete="off" name="Dnu" class="layui-input ">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">成交金额</label>
+								<div class="layui-input-inline">
+									<input type="text" id="seo_title" lay-verify="required|number" autocomplete="off" name="seo_title" class="layui-input ">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">成交时间</label>
+								<div class="layui-input-inline">
+								  <input type="text" class="layui-input" id="test5" name="time" placeholder="yyyy-MM-dd HH:mm:ss">
+								</div>
+							  </div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">成交编号</label>
+								<div class="layui-input-inline">
+									<input type="text" id="Dmo" lay-verify="required|number" autocomplete="off" name="Dmo" class="layui-input ">
+								</div>
+							</div>
+							<div class="layui-form-item layui-form-text">
+								<label class="layui-form-label">备注</label>
+								<div class="layui-input-block">
+									<textarea id="zhaiyao" name="zhaiyao" class="layui-textarea wd480"></textarea>
+								</div>
+							</div>
+							<div class="layui-form-item layui-form-text">
+								<label class="layui-form-label"></label>
+								<div class="layui-input-block">
+									<button  type="button" class="layui-btn" id="sub_btn" lay-submit="" lay-filter="sub_btn">确认提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+		layui.use(['form', 'laydate', 'jquery'], function() {
+			var laydate = layui.laydate;
+			var form = layui.form;
+			var upload = layui.upload;
+			var $ = layui.jquery;
+			var id=publicMathod.getUrlParam("id")
+			
+			//自定义验证规则
+			form.verify({
+				
+			});
+			//初始化  
+			publicMathod.post({
+				url:'api/StockApplyInfo/GetModel',
+				data:id,
+				
+				success:function(data){
+					$("#SellStatusD").val(data.Dts==10?"买入开仓":"卖出平仓")
+					if (data.Status == "1") {
+						form.val("sub_form",{
+							"mother_id": data.Data.MId,
+							"user_id": data.Data.UId,
+							"code": data.Data.Sc,
+							"order_name": data.Data.Sn,
+							"order_price": data.Data.Dp,
+							"order_num":  data.Data.Dt,
+							"An": data.Data.An,
+						})
+					}else{
+						layer.msg("获取数据失败，请重试！", { icon: 5 }) 
+					}
+				}
+			}) 
+		var lock = true
+			form.on('submit(sub_btn)', function (data) {
+			var data = data.field;
+			var newtime = new Date(data.time)
+			if(lock){
+				lock = false
+			publicMathod.post({
+				url: "api/StockApplyInfo/Edit",
+				data: {
+					"Id": id,
+					"Dt":data.SellStatus ,
+					"MId": data.mother_id,
+					"UId": data.user_id,
+					"Sc": data.code,
+					"Sn": data.order_name,
+					"Dp": data.order_price,
+					"Dn": data.order_num,
+					"An": data.An,
+					"Dpr": data.DPR,
+					"Dnu": data.Dnu,
+					"Dmo": data.Dmo,
+					"Dti": newtime ,
+					"Rmk": data.zhaiyao	
+				},
+				success: function (result) {
+					if (result.Status == 1) {
+						//关闭窗口，刷新表格
+						var index = parent.layer.getFrameIndex(window.name);
+						parent.layer.close(index);
+
+					} else {
+						lock = true
+						layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+					}
+
+				}
+			})
+		}
+			return false;
+		});
+		})
+		
+	</script>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>手动补仓</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+	</head>
+	<body>
+		<div id="app">
+			<div class="title_wrap">
+				<div class="layui-btn-group l_left table_btn">
+					<a href="manual_filling_fill.html" ><button class="layui-btn layui-btn-normal">补入持仓</button></a>
+				</div>
+				<form class="layui-form">
+					<div class="layui-form-item l_left">
+						<label class="layui-form-label">交易类型</label>
+						<div class="layui-input-block">
+							<select name="SellStatus" id="SellStatus" lay-filter="aihao">
+								<option value=""  selected="">全部类型</option>
+							
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item l_left">
+						<label class="layui-form-label">母账户</label>
+						<div class="layui-input-block">
+							<select name="category_id" id="category_id" lay-filter="aihao" >
+								<option value=""  selected="">全部母账户</option>
+							
+							</select>
+						</div>
+					</div>
+				
+					<div class="layui-form-item l_left">
+						<label class="layui-form-label l_left">搜索关键字</label>
+						<input type="text" id="search_input" name="SearchKey" lay-verify="title" autocomplete="off" placeholder="请输入用户名/手机号" class="layui-input l_left" style="width: initial;min-width: 320px;">
+						<span class="layui-btn l_left" style="border-radius: 0;" id="search_go"  lay-submit lay-filter="search_go"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+						<button class="layui-btn l_left" type="button" style="border-radius: 0;">导出Excel</button>
+					</div>
+				</form>
+			</div>
+			<div class="table_wrap">
+				<table id="data_table" lay-filter="data_table">
+					<script type="text/html" id="barDemo">
+						<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="select" >编辑</a>
+					</script>
+				</table>
+			</div>
+		</div>
+	</body>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js"></script>
+	<script type="text/javascript">
+		publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+		layui.use(['form', 'table'], function() {
+			var form = layui.form;
+			var table = layui.table;
+		// 获取母账户列表
+		publicMathod.getDropdownList("api/Tool/GetMasterList", form, $("#category_id"));
+		// 获取交易类型
+		publicMathod.getDropdownList("api/Tool/GetSellStatus", form, $("#SellStatus"));
+			table.render({
+				elem: '#data_table',
+				url: publicMathod.hosturl + 'api/StockJoin/GetList', //数据接口
+				method: 'post',
+				contentType: "application/json; charset=UTF-8",
+				cellMinWidth: 100,
+				headers: {token: publicMathod.token},
+				page: {
+					layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+				},
+				parseData: function (res) { //规定数据格式
+					 return {
+						"code": res.Status, //解析接口状态
+						"msg": res.Msg, //解析提示文本
+						"count": res.Count, //解析数据长度
+						"data": res.Data.MasterDealList //解析数据列表
+					};
+				},
+				response: {//规定响应成功状态码
+					statusCode: 1
+				},
+				cols: [[ 
+					{field: 'Id',title: 'ID',sort: true}, 
+					{field: 'MId',title: '母账户ID'}, 
+					{field: 'AId',title: '代理商'}, 
+					{field: 'Up',title: '用户手机'}, 
+					{field: 'Un',title: '用户姓名'}, 
+					{field: 'Td',title: '成交时间'}, 
+					{field: 'Dts',title: '交易类型'}, 
+					{field: 'Dsn',title: '状态',
+					templet: function (obj) {
+						    if(obj.Dsn == 1){ return "提交成功"}
+							if(obj.Dsn == 3){ return "已成"}
+							if(obj.Dsn == 5){ return "费单"}
+							if(obj.Dsn == 6){ return "以报"}
+							if(obj.Dsn == 7){ return "已撤单"}
+							if(obj.Dsn == 10){ return "部撤"}
+							if(obj.Dsn == 11){ return "部成"}
+							if(obj.Dsn == 100){ return "撤单申请"}
+							if(obj.Dsn == 101){ return "撤单处理中"}
+							if(obj.Dsn == 71){ return "已撤手动"}
+							if(obj.Dsn == 72){ return "已撤自动"}
+							if(obj.Dsn == 81){ return "部撤手动"}
+							if(obj.Dsn == 82){ return "部撤自动"}
+						}}, 
+					{field: 'Sc',title: '合约代码'}, 
+					{field: 'Sn',title: '合约名称'}, 
+					{field: 'Dpr',title: '成交价格',}, 
+					{field: 'Dnu',title: '成交数量',}, 
+					{field: 'Dm',title: '成交金额',}, 
+					{field: 'Ano',title: '成交编号',}, 
+					{field: 'Cn',title: '合同编号',},
+					{field: 'ope',title: '操作',fixed: 'right',templet: '#barDemo'} 
+				]]
+			});
+			//搜索
+			form.on("submit(search_go)", function (data) {
+			var formField = data.field;
+			table.reload('data_table',{
+				page: { curr: 1 },
+				where: formField
+			});
+			return false;
+		});
+		
+		});
+		
+		
+	</script>
+</html>
