@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>员工管理</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div id="app">
+		<div class="title_wrap">
+			<div class="layui-btn-group l_left table_btn">
+				<!-- 展开按钮 -->
+				<a href="javascript:;" style="margin-left: 1px;"><button class="layui-btn layui-btn-normal"
+						id="btn-expand">全部展开</button></a>
+				<a href="javascript:;" style="margin-left: 1px;"><button class="layui-btn layui-btn-normal"
+						id="btn-fold">全部折叠</button></a>
+				<a href="staff_add.html" style="margin-left: 1px;"><button
+						class="layui-btn layui-btn-normal">添加</button></a>
+			</div>
+			<form class="layui-form">
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label l_left">添加时间</label>
+					<input type="text" name="GTime" class="layui-input l_left" id="GTime"
+						style="width: initial;min-width: 120px;" placeholder="请选择时间">
+					<div class="layui-btn l_left" id="sjan" style="border-radius: 0;"><i
+							class="layui-icon layui-icon-search layuiadmin-button-btn"></i></div>
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label l_left">状态</label>
+					<div class="layui-input-inline">
+						<select name="stuas" id="stuas">
+							<option value="-1" selected="selected">所有状态</option>
+							<option value="0">正常</option>
+							<option value="1">禁用</option>
+						</select>
+					</div>
+					<div class="layui-btn l_left" id="search_status_btn" style="border-radius: 0;"><i
+							class="layui-icon layui-icon-search layuiadmin-button-btn"></i></div>
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label l_left">搜索关键字</label>
+					<input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="输入员工姓名/手机号/状态"
+						class="layui-input l_left" style="width: initial;min-width: 320px;" id="search_val">
+					<div class="layui-btn l_left" id="search_btn" style="border-radius: 0;"><i
+							class="layui-icon layui-icon-search layuiadmin-button-btn"></i></div>
+				</div>
+			</form>
+		</div>
+		<div class="table_wrap">
+			<table id="data_table" class="layui-table" lay-filter="data_table"></table>
+			<script type="text/html" id="oper-col">
+                    <a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="log"><i class="layui-icon">&#xe770;</i>登录</a>
+                </script>
+		</div>
+	</div>
+</body>
+
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.config({
+		base: '../lib/'
+	}).extend({
+		treetable: 'treetable-lay/treetable'
+	}).use(['table', 'jquery', 'layer', 'treetable', 'form', 'laydate'], function () {
+		var table = layui.table;
+		var $ = layui.jquery;
+		var layer = layui.layer;
+		var treetable = layui.treetable;
+		var form = layui.form;
+		var laydate = layui.laydate;
+
+		laydate.render({
+			elem: '#GTime'
+
+		});
+		//加载所有代理商
+		//publicMathod.getAllAgency("api/Agents/GetTree",form,$("#pare"));
+		// 获取状态
+		publicMathod.getDropdownList("api/Tool/GetPlatformEmployeeStatus", form, $("#category_id"));
+		// 渲染表格
+
+		publicMathod.post({
+			url: 'api/SysStaffList/GetList',
+			data: { page: 1 },
+			success: function (data) {
+				// //console.log('员工管理', data);
+				var minPid = 0;
+				if (data.Status === '1' && data.Data != null && data.Data && data.Data.length) {
+					data.Data.sort((a, b) => {
+						return a.pid - b.pid;
+					})
+					minPid = data.Data[0].pid;
+				}
+				treetable.render({
+					treeColIndex: 1,
+					treeSpid: minPid,
+					treeIdName: 'id',
+					treePidName: 'pid',
+					treeDefaultClose: true,
+					treeLinkage: false,
+					elem: '#data_table',
+					data: data.Data,
+					cols: [
+						[
+							{ field: 'id', title: 'ID', width: 80, sort: true },
+							{ field: 'stame', title: '员工姓名', minWidth: 120 },
+							{ field: 'staffnum', title: '员工编号', minWidth: 120 },
+							{ field: 'stount', title: '登录账号', minWidth: 120 },
+							{ field: 'rabuy', title: '开仓服务费提成', minWidth: 135 },
+							{ field: 'ratale', title: '平仓服务费提成', minWidth: 135 },
+							{ field: 'ratlay', title: '延期服务费提成', minWidth: 135 },
+							{
+								field: 'is_lock', title: '状态', width: 80,
+								templet: function (obj) {
+									if (obj.is_lock == 0) {
+										return '<span>正常</span>';
+									} else if (obj.is_lock == 1) {
+										return '<span >禁用 </span>';
+									}
+								},
+							},
+							{ field: 'co_qq', title: 'QQ', minWidth: 160 },
+							{ field: 'conchat', title: '微信', minWidth: 160 },
+							{ field: 'conbile', title: '手机', minWidth: 160 },
+							{ field: 'addtime', title: '添加时间', minWidth: 165 },
+							{ field: 'rerk', title: '备注' },
+							{ title: '操作', toolbar: '#oper-col', width: 230, fixed: 'right' }
+						]
+					]
+				})
+			}
+		})
+		//监听工具条
+		table.on('tool(data_table)', function (obj) {
+			var data = obj.data;
+
+			if (obj.event === 'edit') {//编辑
+
+				window.location.href = "stafff_edit.html?id=" + data.id;
+			} else if (obj.event === 'del') {//删除
+
+				layer.confirm('删除记录后不可恢复，您确定要继续吗？', function (index) {
+					publicMathod.post({
+						url: 'api/SysStaffList/Del',
+						data: data.id,
+						success: function (result) {
+							if (result.Status == 1) {
+								layer.msg("删除成功", { icon: 1 });
+								location.reload();
+							} else {
+								layer.msg("删除失败，请重试！", { icon: 5 });
+							}
+						}
+					})
+					return false;
+
+				});
+			} else if (obj.event === 'log') {
+				// //console.log(data);
+				window.open(publicMathod.staffUrl + "login_staff.html?platStaff=" + data.stount);
+			}
+		});
+		//全部展开
+		$('#btn-expand').click(function () {
+			treetable.expandAll('#data_table');
+		});
+		//全部折叠
+		$('#btn-fold').click(function () {
+			treetable.foldAll('#data_table');
+		});
+		//搜索按钮
+		$('#search_btn').click(function () {
+			var search_val = $('#search_val').val();
+			clear_serach();
+			search(search_val);
+		});
+
+		//状态按钮
+		$('#search_status_btn').click(function () {
+				var search_val = publicMathod.getSelectText('stuas');
+				if ($('#stuas').val() == -1) {
+					search_val = '';
+					$('.layui-table-body tbody tr').css('background-color', 'rgba(250,230,160,0.5)');
+					return;
+				}
+				clear_serach();
+				search(search_val);
+			});
+		//搜索按钮
+		// $('#search_btn').click(function () {
+		// 	var search_val1 = $('#search_val1').val();
+		// 	$('#search_val').val('')
+		// 	$('#search_val2').val('')
+		// 	var url = '.laytable-cell-1-0-1'
+		// 	clear_serach();
+		// 	search(search_val1, url);
+		// });
+		//搜索按钮
+		$('#sjan').click(function () {
+
+			var search_val1 = $('#GTime').val();
+			var url = '.laytable-cell-1-0-11'
+			clear_serach();
+			search1(search_val1, url);
+		});
+		function search1(str, url) {
+			var keyword = str;//得到搜索的值
+			if (keyword.trim().length === 0) {
+				layer.msg("请输入搜索内容", { icon: 5 });
+				return;
+			}
+			var searchCount = 0;
+			$(url).each(function () {
+				var text = $(this).text();
+				if (text.indexOf(keyword) >= 0) {
+					$(this).parent().parent().css('background-color', 'rgba(250,230,160,0.5)');
+					if (searchCount == 0) {
+						treetable.expandAll('#data_table');
+						$('html,body').stop(true);
+						$('html,body').animate({ scrollTop: $(this).offset().top - 150 }, 500);
+					}
+					searchCount++;
+				}
+			});
+			if (searchCount == 0) {
+				layer.msg("没有匹配结果", { icon: 5 });
+			}
+		}
+
+		function search(str) {
+			var keyword = str;//得到搜索的值
+			if (keyword.trim().length === 0) {
+				layer.msg("请输入搜索内容", { icon: 5 });
+				return;
+			}
+			var searchCount = 0;
+			$('#data_table').next('.treeTable').find('.layui-table-body tbody tr td').each(function () {
+				var text = $(this).text();
+				if (text.indexOf(keyword) >= 0) {
+					$(this).parent().css('background-color', 'rgba(250,230,160,0.5)');
+					if (searchCount == 0) {
+						treetable.expandAll('#data_table');
+						$('html,body').stop(true);
+						$('html,body').animate({ scrollTop: $(this).offset().top - 150 }, 500);
+					}
+					searchCount++;
+				}
+			});
+			if (searchCount == 0) {
+				layer.msg("没有匹配结果", { icon: 5 });
+			}
+		}
+		//清空搜索样式
+		function clear_serach() {
+			$('#data_table').next('.treeTable').find('.layui-table-body tbody tr').each(function () {//清空选中样式
+				$(this).css('background-color', 'transparent');
+			})
+		}
+
+	});
+</script>
+
+</html>

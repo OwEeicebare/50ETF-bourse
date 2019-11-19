@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>编辑员工</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row">
+				<div class="layui-card">
+					<div class="layui-card-header">
+						<a href="staff.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>员工管理</a> 
+						<span lay-separator="">/</span>
+						<a><cite>编辑员工</cite></a>
+					</div>
+					<div class="layui-card-body">
+						<form class="layui-form" lay-filter="sub_form">
+							<h6>基本信息</h6>
+							<div class="layui-form-item">
+								<label class="layui-form-label">员工姓名</label>
+								<div class="layui-input-inline">
+									<input type="text" name="stame" lay-verify="required|title" autocomplete="off" class="layui-input " lay-verify="title" />
+								</div>
+							</div>
+							<div class="layui-form-item" >
+									<label class="layui-form-label">员工级别</label>
+									<div class="layui-input-inline">
+										<select id="pid" lay-verify="required" lay-filter="test" name="pid" >
+											<option value="" selected="selected">请选择</option>
+											<option value="0">经理</option>
+											<option value="1">员工</option>
+										</select>
+									</div>
+								</div>
+								<div class="layui-form-item" id="ridno">
+									<label class="layui-form-label">所属上级</label>
+									<div class="layui-input-inline">
+										<select id="RId" name="RId"  lay-filter="RId" >
+											<option value="0" selected="selected">请选择</option>
+										</select>
+									</div>
+								</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">登录账号</label>
+								<div class="layui-input-inline">
+									<input type="text" name="stount" lay-verify="required|content|phone" autocomplete="off" class="layui-input wd250 l_left"  />
+									<span class="Validform_checktip">*登录账号必须为手机号</span>
+								</div>
+							</div>
+							<div class="layui-form-item">
+                                <label class="layui-form-label">登录密码</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" id="seo_keywords" lay-verify="password" name="pard" class=" wd250 l_left layui-input">
+                                    <span class="Validform_checktip">密码必须以字母开头包含数字并且要高于6位</span>
+                                </div>
+							</div>
+							<div class="layui-form-item">
+                                <label class="layui-form-label">账户状态</label>
+                                <div class="layui-input-block">
+                                    <input type="radio" name="is_lock" value="0" title="正常">
+                                    <input type="radio" name="is_lock" value="1" title="禁用">
+                                </div>
+							</div>
+							<hr>
+							<h6>员工提成</h6>
+							<div class="layui-form-item">
+								<label class="layui-form-label l_width">开仓服务费提成</label>
+								<div class="layui-input-inline">
+									<input type="text" name="rabuy" id="rabuy" lay-verify="required|number" autocomplete="off" class="layui-input wd250 l_left"  lay-verify="zznumber"/>
+									<span class="Validform_checktip">*元/张</span>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label l_width">平仓服务费提成</label>
+								<div class="layui-input-inline">
+									<input type="text" name="ratale" lay-verify="required|number" id="ratale" autocomplete="off" class="layui-input wd250 l_left"  lay-verify="zznumber"/>
+									<span class="Validform_checktip">*元/张</span>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label l_width">追加延期服务费提成</label>
+								<div class="layui-input-inline">
+									<input type="text" name="ratlay" lay-verify="required|number" id="ratlay"autocomplete="off" class="layui-input wd250 l_left"  lay-verify="zznumber"/>
+									<span class="Validform_checktip">*元/张</span>
+								</div>
+							</div>
+							<hr>
+							<h6>联系方式</h6>
+							<div class="layui-form-item">
+								<label class="layui-form-label">QQ</label>
+								<div class="layui-input-inline">
+									<input type="text" id="seo_keywords" lay-verify="required|number" name="co_qq" class="layui-input ">
+								</div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">手机</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" id="seo_keywords" lay-verify="required|phone" name="conbile" class="layui-input ">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">微信</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" id="seo_keywords" lay-verify="required" name="conchat" class="layui-input ">
+                                </div>
+                            </div>
+						
+                            <div class="layui-form-item layui-form-text">
+                                <label class="layui-form-label">备注</label>
+                                <div class="layui-input-inline">
+                                    <textarea placeholder="请输入内容" class="layui-textarea wd480" name="rerk"></textarea>
+                                </div>
+                            </div>
+							<div class="layui-form-item">
+								<label class="layui-form-label"></label>
+								<div class="layui-input-block">
+									<button  type="button" class="layui-btn" id="sub_btn" lay-submit="" lay-filter="sub_btn">确认提交</button>
+								</div>
+                            </div>
+                            
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+
+	<!-- 表单即时校验 -->
+
+	<script type="text/javascript">
+
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+		layui.use(['form', 'jquery','element'], function() {
+			var form = layui.form;
+			var element = layui.element;
+			var $ = layui.jquery;
+			//获取id值和上级代理
+			var id = publicMathod.getUrlParam("id");
+		
+			//上级代理Id
+			var parent_id;
+		
+			//自定义验证规则
+			form.verify({
+				title: function(value) {
+					if (value.length > 20) {
+						return '名字长度不能超过20';
+					}
+				},
+				content: function(value) {
+					if (value.length > 11) {
+						return '账号长度不能超过11';
+					}
+				},
+				password: function(value) {
+                    var par = /^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){5,19}$/;
+					if (!par.exec(value)) {
+						return '密码必须以字母开头包含数字并且要高于6位';
+					}
+				}
+				
+			});
+			// 获取所有经理
+			publicMathod.getJingLiList("api/SysStaffList/GetModelJinli", form, $("#RId"));
+			//改变显隐
+			form.on('select(test)', function(data){
+			
+				
+				if(data.value == 0) {
+					$("#ridno").hide();
+					$("#RId").val(0);
+					form.render(); 
+			
+				}else{
+					$("#ridno").show();
+				}
+			
+			});   
+			//监听提交
+			publicMathod.post({
+				url:"api/SysStaffList/GetModel?id="+id,
+				
+				success:function(data){
+					
+				var datas = data.Data;
+				
+					
+					// 判断是否为员工操作
+					if(datas.teyp == 0){
+						$("#ridno").hide();
+					
+					}
+					
+					//表单初始化
+					form.val("sub_form", {
+						"stame": datas.stame//员工姓名
+						,"pid": datas.teyp==1?"1":"0"//父级id
+						,"RId": datas.pid
+						,"stount": datas.stount//登录账户
+						,"pard":datas.pard //登录密码
+						,"is_lock":datas.is_lock==0?"0":"1"//代理状态
+						,"rabuy":datas.rabuy//开仓服务费
+						,"ratale":datas.ratale//平仓服务费
+						,"ratlay":datas.ratlay//追加延期服务费
+						,"conbile":datas.conbile//手机
+						,"conchat":datas.conchat//微信
+						,"co_qq":datas.co_qq//qq
+						,"rerk":datas.rerk//备注
+						 
+					})
+					
+				},
+			});
+				//监听提交
+				var lock = true
+				form.on('submit(sub_btn)', function(data) {
+				var data = data.field;
+				if(lock){
+				lock = false
+				publicMathod.post({
+					url:"api/SysStaffList/Edit",
+					data:{
+						"id": parseInt(id),
+						"stame": data.stame,
+						"pid": parseInt(data.RId),
+						"stount": data.stount,
+						"pard": data.pard,
+						"is_lock": parseInt(data.is_lock),
+						"rabuy": parseFloat(data.rabuy) ,
+						"ratale": parseFloat(data.ratale),
+						"ratlay": parseFloat(data.ratlay),
+						"conbile": data.conbile,
+						"conchat": data.conchat,
+						"co_qq": data.co_qq,
+						"rerk": data.rerk,
+						"teyp":parseInt(data.pid),
+					},
+					success:function(result){
+						if(result.Status==1){
+							window.location.href="staff.html";
+						}else{
+							lock = true
+							layer.msg(result.Msg,{icon:5,shade:0.5,});	
+						}
+					}
+				})
+			}
+				return false;
+			});
+		})
+		
+	</script>
+</html>
