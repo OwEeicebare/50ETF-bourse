@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>编辑期权合约</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-header">
+					<a href="option_list.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>期权合约列表</a>
+					<span lay-separator="">/</span>
+					<a><cite>编辑期权合约</cite></a>
+				</div>
+				<div class="layui-card-body">
+					<form class="layui-form" lay-filter="sub_form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">行权类型</label>
+							<div class="layui-input-inline">
+								<select id="SoTy" name="SoTy" lay-verify="required">
+									<option value="0" selected="selected">请选择</option>
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">合约代码</label>
+							<div class="layui-input-inline">
+								<input type="text" name="StCo" autocomplete="off" class="layui-input " lay-verify="required|number|title"
+									lay-verify="title" />
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">合约名称</label>
+							<div class="layui-input-inline">
+								<input type="text" name="StNa" autocomplete="off" class="layui-input" lay-verify="required"/>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">产品代码</label>
+							<div class="layui-input-inline">
+								<input type="text" id="SoCo" name="SoCo" class=" wd250 l_left layui-input" lay-verify="required">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">行权价格</label>
+							<div class="layui-input-inline">
+								<input type="text" id="DePr" name="DePr" class="layui-input wd250 l_left" lay-verify="required|number">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">行权日期</label>
+							<div class="layui-input-inline">
+								<input type="text" id="EnDa" name="EnDa" readonly="" class="layui-input" lay-verify="required">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">到期月份</label>
+							<div class="layui-input-inline">
+								<input type="text" id="SoDa" name="SoDa" readonly="" class="layui-input" lay-verify="required">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">保证金</label>
+							<div class="layui-input-inline">
+								<input type="text" id="DeMo" name="DeMo" class="layui-input " lay-verify="required|number">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">证券代码</label>
+							<div class="layui-input-inline">
+								<input type="text" id="TiCo" name="TiCo" class="layui-input " lay-verify="required">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">证券名称</label>
+							<div class="layui-input-inline">
+								<input type="text" id="TiNa" name="TiNa" class="layui-input " lay-verify="required">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">交易单位</label>
+							<div class="layui-input-inline">
+								<input type="text" id="DeNu" name="DeNu" class="layui-input " lay-verify="required">
+							</div>
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">备注</label>
+							<div class="layui-input-inline">
+								<textarea placeholder="请输入内容" class="layui-textarea wd480" name="Remark"></textarea>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label"></label>
+							<div class="layui-input-block">
+								<button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+									lay-filter="sub_btn">确认提交</button>
+							</div>
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'laydate'], function () {
+		var form = layui.form;
+		var laydate = layui.laydate;
+
+		laydate.render({
+			elem: '#EnDa'
+			, type: 'datetime'
+		});
+
+		laydate.render({
+			elem: '#SoDa'
+			, type: 'datetime'
+		});
+
+		//绑定行权类型
+		publicMathod.getDropdownList("api/Tool/GetProductDoType", form, $("#SoTy"));
+
+		//绑定数据
+		//绑定数据
+		var id = publicMathod.getUrlParam("id");
+		if (id > 0) {
+			setTimeout(() => {
+				//编辑，需要绑定数据
+				//通过id获取数据
+				publicMathod.post({
+					url: "api/Stock/GetModel",
+					data: id,
+					success: function (data) {
+						var data = data.Data;
+						var soty = 0;
+						switch (data.SoTy) {
+							case "认购":
+								soty = 1;
+								break;
+							case "认沽":
+								soty = 2;
+								break;
+						}
+
+						//表单初始化
+						form.val("sub_form", {
+							"SoTy": soty//行权类型
+							, "StCo": data.StCo//合约代码
+							, "StNa": data.StNa//合约名称
+							, "SoCo": data.SoCo//产品代码
+							, "DePr": data.DePr//行权价格
+							, "EnDa": data.EnDa//行权日期
+							, "SoDa": data.SoDa//到期月份
+							, "DeMo": data.DeMo //义务仓保证金
+							, "TiCo": data.TiCo//证券代码
+							, "TiNa": data.TiNa//证券名称
+							, "DeNu": data.DeNu//交易单位
+							, "Remark": data.Remark//备注
+						})
+						form.render();
+					}
+				});
+			}, 100);
+
+		}
+
+		//表单验证
+		form.verify({
+				title: function(value, item){ //value：表单的值、item：表单的DOM对象
+					if (value.length != 8) {
+						return '合约代码是8位的哦'
+					}
+				},
+			
+			})
+
+		//监听提交
+		form.on('submit(sub_btn)', function (data) {
+			layedit.getContent(layedit_index); //获得富文本内容包括样式
+			layer.alert(JSON.stringify(data.field), {
+				title: '最终的提交信息'
+			})
+			return false;
+		});
+
+		//监听提交
+		form.on('submit(sub_btn)', function (data) {
+			var loading = layer.msg('正在提交',{icon:16,shade:0.3,time:0});
+			var data = data.field;
+			var soty = "";
+			switch (data.SoTy) {
+				case "1":
+					soty = "认购";
+					break;
+				case "2":
+					soty = "认沽";
+					break;
+			}
+	
+			
+			publicMathod.post({
+				url: "api/Stock/Edit",
+				data: {
+					"Id": parseInt(id),
+					"SoTy": soty,
+					"StCo": data.StCo,
+					"StNa": data.StNa,
+					"SoCo": data.SoCo,
+					"DePr": data.DePr == "" ? 0 : Number(data.DePr),
+					"EnDa": data.EnDa,
+					"SoDa": data.SoDa,
+					"DeMo":  Number(data.DeMo) ,
+					"TiCo": data.TiCo,
+					"TiNa": data.TiNa,
+					"DeNu": parseInt(data.DeNu),
+					"Remark": data.Remark
+				},
+				success: function (result) {
+					layer.close(loading);
+					if (result.Status == 1) {
+						//成功，跳转回列表页面
+						layer.msg(result.Msg, { icon: 1, shade: 0.5, },function(){
+							window.location.href = "option_list.html";
+						});
+
+					} else {
+						layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+					}
+				}
+			})
+			return false;
+
+		});
+
+	})
+
+</script>
+
+</html>

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>系统设置</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+	<link rel="stylesheet" type="text/css" href="../css/agency.css" />
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-body">
+					<div class="layui-tab">
+						<ul class="layui-tab-title">
+							<li class="layui-this">基础信息</li>
+							<li>接口服务</li>
+							<li>安全服务</li>
+						</ul>
+						<div class="layui-tab-content">
+							<!-- 基础信息 -->
+							<div class="layui-tab-item layui-show">
+								<form class="layui-form" lay-filter="sub_form1">
+									<div class="layui-form-item">
+										<label class="layui-form-label">网站名称</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Wn" autocomplete="off" class="layui-input wd480"
+												lay-verify="title" />
+											<span class="Validform_checktip">*任意字符，控制在255个字符内</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">公司名称</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Cn" autocomplete="off" class="layui-input wd480"
+												lay-verify="company" />
+											<span class="Validform_checktip">*任意字符，控制在255个字符内</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+											<label class="layui-form-label">公司地址</label>
+											<div class="layui-input-inline">
+												<input type="text" name="Ca" autocomplete="off" class="layui-input wd480"
+													lay-verify="company" />
+												<span class="Validform_checktip">*任意字符，控制在255个字符内</span>
+											</div>
+										</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">网站域名</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Wd" autocomplete="off" class="layui-input wd480"
+												lay-verify="domain" />
+											<span class="Validform_checktip">*以"http://"开头</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">手机域名</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Md" autocomplete="off" class="layui-input wd480"
+												lay-verify="tel-domain" />
+											<span class="Validform_checktip">*以"http://"开头</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">API域名</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Ad" autocomplete="off" class="layui-input wd480"
+												lay-verify="api" />
+											<span class="Validform_checktip">*网站API接口中心连接地址</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">客服热线</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Ct" autocomplete="off" class="layui-input wd480"
+												lay-verify="hot-line" />
+											<span class="Validform_checktip">*非必填，区间+电话号码</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">客服QQ</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Cq" autocomplete="off" class="layui-input wd480"
+												lay-verify="qq" />
+											<span class="Validform_checktip">*多个请注意格式区分</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+											<label class="layui-form-label">客服微信</label>
+											<div class="layui-input-inline">
+												<input type="text" name="Cw" autocomplete="off" class="layui-input wd480"
+													lay-verify="qq" />
+												<span class="Validform_checktip"></span>
+											</div>
+										</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">工作时间</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Wt" autocomplete="off" class="layui-input wd480"
+												lay-verify="qq" />
+											<span class="Validform_checktip">*如周一至周五早上9点到晚上6点</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">广告标语</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Ap" autocomplete="off" class="layui-input wd480"
+												lay-verify="ad" />
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">微信号码</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Wcn" autocomplete="off" class="layui-input wd480"
+												lay-verify="wx" />
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">微信二维码</label>
+										<div class="layui-input-inline">
+											<input type="text" id="Wcq" name="Wcq" placeholder="请上传图片"
+												autocomplete="off" class="layui-input wd340" disabled="disabled">
+										</div>
+										<div id="img_view_1"
+											style="display: none;position: fixed;left: 0;right: 0;top: 0;bottom: 0;z-index: 1001;background: rgba(0, 0, 0, 0.5);">
+											<img src=""
+												style="position: relative;left: 50%;top: 50%;transform: translate(-50%, -50%);" />
+										</div>
+										<button style="float: left;" type="button" class="layui-btn"
+											id="upload_img_url_1">上传图片</button>
+										<button style="float: left;margin-left: 10px;" type="button" class="layui-btn"
+											id="show_view_1">预览</button>
+									</div>
+
+									<div class="layui-form-item">
+										<label class="layui-form-label">网站LOGO</label>
+										<div class="layui-input-inline">
+											<input type="text" id="Wl" name="Wl" placeholder="请上传图片" autocomplete="off"
+												class="layui-input wd340" disabled="disabled">
+										</div>
+										<div id="img_view_2"
+											style="display: none;position: fixed;left: 0;right: 0;top: 0;bottom: 0;z-index: 1001;background: rgba(0, 0, 0, 0.5);">
+											<img src="" style="position: relative;left: 50%;top: 50%;transform: translate(-50%, -50%);">
+										</div>
+										<button style="float: left;" type="button" class="layui-btn"
+											id="upload_img_url_2">上传图片</button>
+										<button style="float: left;margin-left: 10px;" type="button" class="layui-btn"
+											id="show_view_2">预览</button>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">网站备案号</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Wf" autocomplete="off" class="layui-input wd480" />
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">首页标题(SEO)</label>
+										<div class="layui-input-inline">
+											<input type="text" id="index_title" name="Wti" class="layui-input wd480">
+											<span class="Validform_checktip">*自定义的首页标题</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">页面关键字(SEO)</label>
+										<div class="layui-input-inline">
+											<input type="text" id="index_keywords" name="Wk" class="layui-input wd480">
+											<span class="Validform_checktip">*页面关键词(keyword)</span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label">页面描述(SEO)</label>
+										<div class="layui-input-block">
+											<textarea id="index_description" name="Wde"
+												class="layui-textarea wd480"></textarea>
+											<span class="Validform_checktip">*页面描述(description)</span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label">网站版权信息</label>
+										<div class="layui-input-block">
+											<textarea id="index_copyright" name="Wc"
+												class="layui-textarea wd480"></textarea>
+											<span class="Validform_checktip">*支持HTML</span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label"></label>
+										<div class="layui-input-block">
+											<button type="button" class="layui-btn" id="base_btn" lay-submit=""
+												lay-filter="sub_btn_1">确认修改</button>
+										</div>
+									</div>
+								</form>
+							</div>
+							<!-- 接口服务 -->
+							<div class="layui-tab-item">
+								<form class="layui-form" lay-filter="sub_form2">
+									<div class="layui-form-item">
+										<label class="layui-form-label">短信接口</label>
+										<div class="layui-input-block" id="SIty">
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">短信ID</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Sid" autocomplete="off"
+												class="layui-input wd480" />
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">短信账号</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Sa" autocomplete="off" class="layui-input wd480" />
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">短信密码</label>
+										<div class="layui-input-inline">
+											<input type="password" name="Sp" autocomplete="off"
+												class="layui-input wd480" />
+											<span class="Validform_checktip">*使用加密后的密码</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">短信签名</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Ss" autocomplete="off" class="layui-input wd480" />
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">短信发送间隔</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Ssti" autocomplete="off" class="layui-input wd480"
+												lay-verify="api" />
+											<span class="Validform_checktip">秒</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">每日手机限制</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Sst" autocomplete="off" class="layui-input wd480"
+												lay-verify="hot-line" />
+											<span class="Validform_checktip">*每日限制同一手机号码发送次数，0不限制</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">每日IP限制</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Sit" autocomplete="off"
+												class="layui-input wd480" />
+											<span class="Validform_checktip">*每日限制同一IP发送次数，0不限制</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">接口密钥</label>
+										<div class="layui-input-inline">
+											<input type="password" name="Ifk" autocomplete="off"
+												class="layui-input wd480" />
+											<span class="Validform_checktip">*请使用加密后的密钥</span>
+										</div>
+									</div>
+									<hr>
+									<div class="layui-form-item">
+										<label class="layui-form-label">行情接口</label>
+										<div class="layui-input-block" id="Pif">
+										</div>
+									</div>
+									<hr>
+									<div class="layui-form-item">
+										<label class="layui-form-label">实名接口</label>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">验证接口</label>
+										<div class="layui-input-block" id="RnIf">
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">APP下载地址</label>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">安卓地址</label>
+										<div class="layui-input-inline">
+											<input type="text" id="a_address" name="Aad" class="layui-input wd480">
+											<span class="Validform_checktip">*安卓版APP下载地址</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">苹果地址</label>
+										<div class="layui-input-inline">
+											<input type="text" id="m_address" name="Iad" class="layui-input wd480">
+											<span class="Validform_checktip">*苹果版APP下载地址</span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label"></label>
+										<div class="layui-input-block">
+											<button type="button" class="layui-btn" id="api_btn" lay-submit=""
+												lay-filter="sub_btn_2">确认修改</button>
+										</div>
+									</div>
+								</form>
+							</div>
+							<!-- 安全服务 -->
+							<div class="layui-tab-item">
+								<form class="layui-form" lay-filter="sub_form3">
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭注册:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="Isu" value="1" title="开启" checked>
+											<input type="radio" name="Isu" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后会员将无法注册</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭买入:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="Ib" value="1" title="开启" checked>
+											<input type="radio" name="Ib" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后所有会员将无法开仓</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭平仓:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="Ise" value="1" title="开启" checked>
+											<input type="radio" name="Ise" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后所有会员将无法平仓</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭充值:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="Ir" value="1" title="开启" checked>
+											<input type="radio" name="Ir" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后所有会员将无法充值</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭提现:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="Iw" value="1" title="开启" checked>
+											<input type="radio" name="Iw" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后所有会员将无法提现</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭弱密码:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="Iwp" value="1" title="开启" checked>
+											<input type="radio" name="Iwp" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后系统将不检查会员密码强度</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭报表导出:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="Iee" value="1" title="开启" checked>
+											<input type="radio" name="Iee" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后所有报表在交易时间将无法导出</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭电话黑名单:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="Ipb" value="1" title="开启" checked>
+											<input type="radio" name="Ipb" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后在黑名单中的会员也可以注册</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">关闭实名认证:</label>
+										<div class="layui-input-block">
+											<input type="radio" name="IRS" value="1" title="开启" checked>
+											<input type="radio" name="IRS" value="2" title="关闭">
+											<span class="Validform_checktip">*关闭后只要用户提交认证信息都可以完成认证</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">登录限制</label>
+										<div class="layui-input-inline">
+											<input type="text" id="login_limit" name="Ilt" class="layui-input wd480">
+											<span class="Validform_checktip">*登录错误次数：可连续输入错误次数，0不限制</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">封禁时间</label>
+										<div class="layui-input-inline">
+											<input type="text" id="limit_time" name="Bt" class="layui-input wd480">
+											<span class="Validform_checktip">*登录错误次数达到上线后，禁止登录的时长(分钟)</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">登录验证:</label>
+										<div class="layui-input-block" id="Lct">
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label">系统号码</label>
+										<div class="layui-input-inline">
+											<input type="text" id="sys_num" name="Sp" class="layui-input wd480">
+											<span class="Validform_checktip">*系统接受短信手机号码</span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label">IP白名单</label>
+										<div class="layui-input-block">
+											<textarea id="Iwh" name="Iwh" class="layui-textarea wd480"></textarea>
+											<span class="Validform_checktip">*可登录管理后台IP白名单</span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label"></label>
+										<div class="layui-input-block">
+											<button type="button" class="layui-btn" id="security_btn" lay-submit=""
+												lay-filter="sub_btn_3">确认修改</button>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'upload', 'element'], function () {
+		var form = layui.form;
+		var upload = layui.upload;
+		var element = layui.element;
+		var url = ""; //存储上传的图片
+
+		//基础服务
+		var baseId = 0; //基础服务Id
+		var wxUrl = ""; //微信二维码上传地址
+		var logoUrl = ""; //Logo 地址
+
+		//数据绑定
+		publicMathod.post({
+			url: "api/SystemSet/GetBase",
+			success: function (data) {
+				var data = data.Data;
+
+				if (data != null) {
+
+					baseId = data.Id;
+					$('#img_view_1>img').attr('src', data.ImgUrlWcq);
+					$('#img_view_2>img').attr('src', data.ImgUrlWl);
+					//表单初始化
+					form.val("sub_form1", {
+						"Wn": data.Wn//网站名称
+						, "Cn": data.Cn//公司名称
+						, "Ca":data.Ca//公司地址
+						, "Wd": data.Wd//网站域名
+						, "Md": data.Md//手机域名
+						, "Ad": data.Ad//API域名
+						, "Ct": data.Ct//客服热线
+						, "Cq": data.Cq//客服QQ
+						, "Cw": data.Cw//客服微信
+						, "Wt": data.Wt//工作时间 
+						, "Ap": data.Ap//广告标语
+						, "Wcn": data.Wcn//微信号码
+						, "Wcq": data.Wcq//微信二维码
+						, "Wl": data.Wl//网站LOGO
+						, "Wf": data.Wf//网站备案号
+						, "Wti": data.Wti//首页标题(SEO)
+						, "Wk": data.Wk//页面关健词(SEO)
+						, "Wde": data.Wde//页面描述(SEO)
+						, "Wc": data.Wc//网站版权信息
+
+					})
+					form.render();
+
+				}
+			}
+		});
+
+		//图片上传 - 微信二维码
+		//图片上传初始化
+		upload.render({
+			elem: '#upload_img_url_1',
+			url: publicMathod.upload //上传接口
+			, accept: 'images' //只允许上传图片类型
+			, acceptMime: 'image/*'
+			//,auto: false //不自动上传
+			, size: 3072 //限制文件大小，单位 KB
+			// ,bindAction: '#sub_btn' //绑定触发的上传按钮
+			, choose: function (obj) { //选择文件触发
+				obj.preview(function (index, file, result) {
+					$("#Wcq").val(file.name);
+					$('#img_view_1>img').attr('src', result);
+					url = file;
+				})
+			},
+			done: function (res, index, upload) {//上传时触发
+				if (res.status === '1') {
+					//图片地址 res.path
+					wxUrl=res.data.fullPath;
+					$("#Wcq").val(res.data.path);
+				} else {
+					layer.msg('图片上传失败,' + res.Msg);
+				}
+
+			},
+		});
+
+		//图片预览 - 微信二维码
+		$("body").on("click", "#show_view_1", function () {
+			var url = $("#img_view_1>img").attr("src");
+			if (url.length <= 0) {
+				layer.msg('请选择图片后再预览！');
+				return;
+			}
+			$("#img_view_1").css("display", "block");
+		})
+		//关闭预览
+		$("body").on("click", "#img_view_1", function () {
+			$("#img_view_1").css("display", "none");
+		})
+
+
+
+
+		//图片上传 - 网站LOGO
+		upload.render({
+			elem: '#upload_img_url_2',
+			url: publicMathod.upload //上传接口
+			, accept: 'images' //只允许上传图片类型
+			, acceptMime: 'image/*'
+			//,auto: false //不自动上传
+			, size: 3072 //限制文件大小，单位 KB
+			// ,bindAction: '#sub_btn' //绑定触发的上传按钮
+			, choose: function (obj) { //选择文件触发
+				obj.preview(function (index, file, result) {
+					$("#Wl").val(file.name);
+					$('#img_view_2>img').attr('src', result);
+					url = file;
+				})
+			},
+			done: function (res, index, upload) {//上传时触发
+				
+				if (res.status === '1') {
+					//图片地址 res.path
+					logoUrl=res.data.fullPath;
+					$("#Wl").val(res.data.path);
+				} else {
+					layer.msg('图片上传失败,' + res.Msg);
+				}
+
+			},
+		});
+
+		//图片预览 - 网站LOGO
+		$("body").on("click", "#show_view_2", function () {
+			var url = $("#img_view_2>img").attr("src");
+			if (url.length <= 0) {
+				layer.msg('请选择图片后再预览！');
+				return;
+			}
+			$("#img_view_2").css("display", "block");
+		})
+
+		$("body").on("click", "#img_view_2", function () {
+			$("#img_view_2").css("display", "none");
+		})
+
+
+		form.on('submit(sub_btn_1)', function (data) {
+
+			var data = data.field;
+			publicMathod.post({
+				url: "api/SystemSet/BaseEdit",
+				data: {
+					"Id": parseInt(baseId)
+					, "Wn": data.Wn//网站名称
+					, "Cn": data.Cn//公司名称
+					, "Ca":data.Ca//公司地址
+					, "Wd": data.Wd//网站域名
+					, "Md": data.Md//手机域名
+					, "Ad": data.Ad//API域名
+					, "Ct": data.Ct//客服热线
+					, "Cq": data.Cq//客服QQ
+					, "Cw": data.Cw//客服微信
+					, "Wt": data.Wt//工作时间 
+					, "Ap": data.Ap//广告标语
+					, "Wcn": data.Wcn//微信号码
+					, "Wcq": data.Wcq//微信二维码
+					, "Wl": data.Wl//网站LOGO
+					, "Wf": data.Wf//网站备案号
+					, "Wti": data.Wti//首页标题(SEO)
+					, "Wk": data.Wk//页面关健词(SEO)
+					, "Wde": data.Wde//页面描述(SEO)
+					, "Wc": data.Wc//网站版权信息
+
+				},
+				success: function (result) {
+					if (result.Status == 1) {
+						//关闭窗口，刷新表格
+						layer.msg(result.Msg, { icon: 1, shade: 0.5, });
+
+
+					} else {
+						layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+					}
+				}
+			})
+			return false;
+		});
+
+
+
+
+		//接口服务
+
+		//短信接口，单选
+		publicMathod.getRadio("api/Tool/GetSystemInterfaceSmsType", form, $("#SIty"), "SIty");
+
+		//行情接口，单选
+		publicMathod.getRadio("api/Tool/GetSystemInterfacePriceType", form, $("#Pif"), "Pif");
+
+		//验证接口，单选
+		publicMathod.getRadio("api/Tool/GetSystemInterfaceRealNameType", form, $("#RnIf"), "RnIf");
+
+		//获取所有的短信接口数据保存起来
+		var smsType;
+
+		publicMathod.post({
+			url: "api/SystemSet/GetSmsTypeList",
+			success: function (data) {
+				var data = data.Data;
+				if (data != null) {
+					smsType = data;
+				
+				}
+			}
+		});
+
+		//单选按钮点击事件
+		form.on('radio(SIty)', function (data) {
+	
+
+			var typeId = data.value;
+
+			//清空原来赋值的短信字段
+			form.val("sub_form2", {
+				"Sid": ""//短信ID
+				, "Sa": ""//短信账号
+				, "Sp": ""//短信密码
+				, "Ss": ""//短信签名
+				, "Ssti": ""//短信发送间隔
+				, "Ifk": ""//接口密钥
+			})
+
+			//重新赋值
+			for (var i = 0; i < smsType.length; i++) {
+				if (smsType[i].SIty == typeId) {
+					form.val("sub_form2", {
+						"Sid": smsType[i].Sid//短信ID
+						, "Sa": smsType[i].Sa//短信账号
+						, "Sp": smsType[i].Sp//短信密码
+						, "Ss": smsType[i].Ss//短信签名
+						, "Ssti": smsType[i].Ssti//短信发送间隔
+						, "Ifk": smsType[i].Ifk//接口密钥
+					})
+					break;
+				}
+			}
+
+			form.render();
+
+		});
+
+
+
+
+		var interfaceId = 0;
+
+		//数据绑定
+		setTimeout(() => {
+			publicMathod.post({
+				url: "api/SystemSet/GetInterface",
+				success: function (data) {
+					var data = data.Data;
+
+				
+					if (data != null) {
+						interfaceId = data.Id;
+
+						//表单初始化
+						form.val("sub_form2", {
+							"SIty": data.SIty.toString()//短信接口
+							, "Sid": data.Sid//短信ID
+							, "Sa": data.Sa//短信账号
+							, "Sp": data.Sp//短信密码
+							, "Ss": data.Ss//短信签名
+							, "Ssti": data.Ssti//短信发送间隔
+							, "Ifk": data.Ifk//接口密钥
+							, "Sst": data.Sst//每日手机限制
+							, "Sit": data.Sit//每日IP限制 
+							, "Pif": data.Pif.toString()//行情接口
+							, "RnIf": data.RnIf.toString()//验证接口
+							, "Aad": data.Aad//安卓地址
+							, "Iad": data.Iad//苹果地址
+						})
+						form.render();
+					}
+				}
+			})
+		}, 100);
+
+		//提交数据
+		form.on('submit(sub_btn_2)', function (data) {
+
+			var data = data.field;
+			publicMathod.post({
+				url: "api/SystemSet/InterfaceEdit",
+				data: {
+					"Id": parseInt(interfaceId)
+					, "SIty": parseInt(data.SIty)//短信接口
+					, "Sid": parseInt(data.Sid)//短信ID
+					, "Sa": data.Sa//短信账号
+					, "Sp": data.Sp//短信密码
+					, "Ss": data.Ss//短信签名
+					, "Ssti": parseInt(data.Ssti)//短信发送间隔
+					, "Ifk": data.Ifk//接口密钥
+					, "Sst": parseInt(data.Sst)//每日手机限制
+					, "Sit": parseInt(data.Sit)//每日IP限制 
+					, "Pif": parseInt(data.Pif)//行情接口
+					, "RnIf": parseInt(data.RnIf)//验证接口
+					, "Aad": data.Aad//安卓地址
+					, "Iad": data.Iad//苹果地址
+
+				},
+				success: function (result) {
+					if (result.Status == 1) {
+						//关闭窗口，刷新表格
+						layer.msg(result.Msg, { icon: 1, shade: 0.5, });
+
+
+					} else {
+						layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+					}
+				}
+			})
+			return false;
+		});
+
+
+
+
+
+
+
+		//安全服务
+		var safeId = 0;
+
+		//登录验证绑定
+		publicMathod.post({
+			url: "api/Tool/GetSystemCheckLoginType",
+			success: function (result) {
+				var str = "";
+				for (var i = 0; i < result.Data.length; i++) {
+					if (i == 0) {
+						str += '<input type="radio" name="Lct" value="' + result.Data[i].Id + '" title="' + result.Data[i].Name + '" checked="">';
+					} else {
+						str += '<input type="radio" name="Lct" value="' + result.Data[i].Id + '" title="' + result.Data[i].Name + '">';
+					}
+
+				}
+				str += '<span class="Validform_checktip">*登录验证方式，仅针对(管理员、代理、员工)有效</span>';
+				$("#Lct").append(str);
+				form.render(); //更新全部
+			}
+		});
+
+
+
+
+
+		//数据绑定
+		setTimeout(() => {
+			publicMathod.post({
+				url: "api/SystemSet/GetSafe",
+				success: function (data) {
+					var data = data.Data;
+
+		
+
+					if (data != null) {
+						safeId = data.Id;
+
+						//表单初始化
+						form.val("sub_form3", {
+							"Isu": data.Isu.toString()//注册
+							, "Ib": data.Ib.toString()//开仓
+							, "Ise": data.Ise.toString()//平仓
+							, "Ir": data.Ir.toString()//充值
+							, "Iw": data.Iw.toString()//提现
+							, "Iwp": data.Iwp.toString()//弱密码
+							, "Iee": data.Iee.toString()//报表导出
+							, "Ipb": data.Ipb.toString()//电话黑名单 
+							, "IRS": data.IRS.toString()//关闭实名认证
+							, "Ilt": data.Ilt//登录限制
+							, "Bt": data.Bt//封禁时间
+							, "Lct": data.Lct.toString()//登录验证
+							, "Sp": data.Sp//系统号码
+							, "Iwh": data.Iwh//IP白名单
+						})
+						form.render();
+					}
+				}
+			});
+
+
+		}, 100)
+
+
+		form.on('submit(sub_btn_3)', function (data) {
+
+			var data = data.field;
+			publicMathod.post({
+				url: "api/SystemSet/SafeEdit",
+				data: {
+					"Id": parseInt(safeId)
+					, "Isu": parseInt(data.Isu)//注册
+					, "Ib": parseInt(data.Ib)//开仓
+					, "Ise": parseInt(data.Ise)//平仓
+					, "Ir": parseInt(data.Ir)//充值
+					, "Iw": parseInt(data.Iw)//提现
+					, "Iwp": parseInt(data.Iwp)//弱密码
+					, "Iee": parseInt(data.Iee)//报表导出
+					, "Ipb": parseInt(data.Ipb)//电话黑名单 
+					, "IRS": data.IRS//关闭实名认证 
+					, "Ilt": parseInt(data.Ilt)//登录限制
+					, "Bt": parseInt(data.Bt)//封禁时间
+					, "Lct": parseInt(data.Lct)//登录验证
+					, "Sp": data.Sp//系统号码
+					, "Iwh": data.Iwh//IP白名单
+
+				},
+				success: function (result) {
+					if (result.Status == 1) {
+						//关闭窗口，刷新表格
+						layer.msg(result.Msg, { icon: 1, shade: 0.5, });
+
+
+					} else {
+						layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+					}
+				}
+			})
+			return false;
+		});
+
+
+
+
+
+
+
+
+		//自定义验证规则
+		form.verify({
+			title: function (value) {
+				if (value.length > 255) {
+					return '名称不能超过255个字符';
+				}
+			}
+		});
+
+
+		$('#base').click(function () {
+			var id = getUrlParam('id');
+			window.location.href = "edit_base.html?id=" + id;
+		})
+
+		$('#detail').click(function () {
+			var id = getUrlParam('id');
+			window.location.href = "edit_detail.html?id=" + id;
+		})
+		var uploadUrl = publicMathod.upload;
+		function uploadImg(btnEle, uploadUrl, inputID) {
+			//图片上传初始化
+			upload.render({
+				elem: btnEle,
+				url: uploadUrl //上传接口
+				, accept: 'images' //只允许上传图片类型
+				, auto: false //不自动上传
+				, size: 3072 //限制文件大小，单位 KB
+				, choose: function (obj) { //选择文件触发
+					obj.preview(function (index, file, result) {
+						$(inputID).val(file.name);
+						url = file;
+					})
+				},
+				done: function (res) { //上传时触发
+		
+				},
+			});
+		}
+
+		uploadImg("#upload_img_url", "/upload/", "#qrcode");
+		uploadImg("#upload_logo_url", "/upload/", "#logo");
+
+
+		//监听提交
+		form.on('submit(sub_btn)', function (data) {
+			layer.alert(JSON.stringify(data.field), {
+				title: '最终的提交信息'
+			})
+			return false;
+		});
+	})
+
+</script>
+
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>支付提现设置</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+    </head>
+	<body>
+		<div id="app">
+            <div class="layui-tab" lay-filter="tab">
+                <ul class="layui-tab-title">
+					<li class="layui-this">支付设置</li>
+					<li>线下支付</li>
+                    <li>代付设置</li>
+                </ul>
+                <div class="layui-tab-content">
+					<!--支付-->
+                    <div class="layui-tab-item layui-show">
+                        <div class="title_wrap">
+                            <div class="layui-btn-group l_left table_btn" style="margin:15px 0 20px 0;">
+                                <a href="javascript:;" class="add_adv" data-add="pay" ><button class="layui-btn layui-btn-normal" >添加</button></a>
+                            </div>
+                        </div>
+                        <div class="table_wrap">
+                            <table id="data_table1" lay-filter="data_table1"></table>
+                            <script type="text/html" id="barDemo1">
+                                <a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+								<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe642;</i>状态</a>
+								<a class="layui-btn layui-btn-black layui-btn-xs" lay-event="deldel"><i class="layui-icon">&#xe640;</i>删除</a>
+                            </script>
+                        </div>
+					</div>
+
+					<!--银行卡支付-->
+					<div class="layui-tab-item">
+							<div class="title_wrap">
+								<div class="layui-btn-group l_left table_btn" style="margin:15px 0 20px 0;">
+									<a href="javascript:;" class="add_adv" data-add="c_pay"><button class="layui-btn layui-btn-normal" >添加</button></a>
+								
+								</div>
+							</div>
+							<div class="table_wrap">
+								<table id="btc_table" lay-filter="btc_table"></table>
+							
+								
+							</div>
+						</div>
+
+					<!---代付-->
+                    <div class="layui-tab-item">
+                        <div class="title_wrap">
+                            <div class="layui-btn-group l_left table_btn" style="margin:15px 0 20px 0;">
+                                <a href="javascript:;" class="add_adv" data-add="d_pay"><button class="layui-btn layui-btn-normal" >添加</button></a>
+                            </div>
+                        </div>
+                        <div class="table_wrap">
+                            <table id="data_table2" lay-filter="data_table2"></table>
+                            <script type="text/html" id="barDemo2">
+                                <a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="d_edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+								<a class="layui-btn layui-bg-orange layui-btn-xs" lay-event="d_del"><i class="layui-icon">&#xe642;</i>状态</a>
+								<a class="layui-btn layui-btn-black layui-btn-xs" lay-event="del3"><i class="layui-icon">&#xe640;</i>删除</a>
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+			
+		</div>
+	</body>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js"></script>
+	<script type="text/javascript">
+		publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+		layui.use(['table', 'element', 'layer'], function() {
+			var table = layui.table;
+			var element = layui.element;
+			var layer = layui.layer;
+			user_list= table.render({
+                elem: '#data_table1',
+                cellMinWidth: 115,
+                contentType: "application/json; charset=UTF-8",
+				method: 'post',
+				page: true,
+				headers: {token: publicMathod.token},
+			    url: publicMathod.hosturl + 'api/SystemPayconfig/GetList', //数据接口
+			   
+				parseData: function (res) { //规定数据格式
+				
+                    return {
+                        "code": res.Status, //解析接口状态
+                        "msg": res.Msg, //解析提示文本
+                        "count": res.Count, //解析数据长度
+                        "data": res.Data //解析数据列表
+                    };
+                },
+                response: {//规定响应成功状态码
+                    statusCode: 1
+                },		
+				cols: [[
+					{field: 'Id',title: 'Id',sort: true}, 
+					{field: 'PlaceName',title: '渠道名称'}, 
+					{field: 'MpName',title: '支付渠道'}, 
+					{field: 'MpRate',title: '服务费（%）'}, 
+					{field: 'MpMinre',title: '最低服务费',sort: true},
+					{field: 'MpPaid',title: '起付金额'}, 
+					{field: 'Status',title: '状态',
+						templet: function(obj) {
+							if (obj.Status == 0) {
+								return '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="qi">启用</a>';
+							} else if (obj.Status == 1) {
+								return '<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="jin">禁用</a>';
+							} 
+						},
+					}, 
+                    {field: 'Remark',title: '备注'}, 
+					
+					{field: 'ope',title: '操作',fixed: 'right',width: 240, templet: '#barDemo1'}
+				]]
+			});
+			// 实例化银行卡设置与代付
+		
+
+			element.on('tab(tab)', function(data){
+				if(data.index===1){
+					
+					
+					//实例化数据表格2
+					table.render({
+						elem: '#btc_table',
+						cellMinWidth: 100,
+						contentType: "application/json; charset=UTF-8",
+						method: 'post',
+						page: true,
+						headers: {token: publicMathod.token},
+						url: publicMathod.hosturl + 'api/SystemBankList/GetBankInfo', //数据接口
+						parseData: function (res) { //规定数据格式
+							return {
+								"code": res.Status, //解析接口状态
+								"msg": res.Msg, //解析提示文本
+								"count": res.Count, //解析数据长度
+								"data": res.Data //解析数据列表
+							};
+						},
+						response: {//规定响应成功状态码
+							statusCode: 1
+						},
+						cols: [
+							[
+								{field: 'id',title: 'ID',width:100,sort:true},
+								{field: 'baame',title: '开户银行'},
+								{field: 'banch',title: '开户支行'},
+								{field: 'acname',title: '账户名称'},
+								{field: 'bard',title: '银行卡号'},
+								{field: 'sharge',title: '服务费（%）'},
+								{field: 'mharge',title: '最低服务费'},
+								{field: 'pute',title: '对公对私',
+								templet: function (obj) {//1启用，2禁用
+                                    if (obj.pute === 1) {
+										return '<span >对公</span>';
+                                    } else if (obj.pute === 2) {
+                                        return '<span >对私</span>';
+									}
+								}},
+								{field: 'stru',title: '状态',
+								templet: function (obj) {//1启用，2禁用
+                                    if (obj.stru === 1) {
+										return '<span  style="color:red">启用</span>';
+                                    } else if (obj.stru === 2) {
+                                        return '<span >禁用</span>';
+									}
+								}
+							},	{field: 'deul',title: '默认',width:140,
+								templet: function (obj) {//1启用，2禁用
+                                    if (obj.deul === 1) {
+										return '<a class="layui-btn layui-bg-gray layui-btn-xs" lay-event="moren"><i class="layui-icon">&#xe67a;</i>默认使用</a>';
+                                    } else{
+                                        return '<a class="layui-btn layui-bg-red layui-btn-xs" lay-event="feimoren"><i class="layui-icon">&#xe67b;</i>设为默认</a>';
+									}
+								}
+							},
+							
+								{field: 'ramak',title: '备注'},
+								{field: 'ope',title: '操作', width: 240, fixed: 'right',templet: function (obj){
+									if(obj.stru ===1){
+										return '<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="c_edit"><i class="layui-icon">&#xe642;</i>编辑</a><a class="layui-btn layui-btn-black layui-btn-xs" lay-event="deldeldel"><i class="layui-icon">&#xe640;</i>删除</a><a class="layui-btn layui-bg-black layui-btn-xs" lay-event="c_jin"><i class="layui-icon">&#x1006;</i>禁用</a>'
+										
+									}else if(obj.stru ===2){
+										return '<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="c_edit"><i class="layui-icon">&#xe642;</i>编辑</a><a class="layui-btn layui-btn-black layui-btn-xs" lay-event="deldeldel"><i class="layui-icon">&#xe640;</i>删除</a><a class="layui-btn layui-bg-orange layui-btn-xs" lay-event="c_qi"><i class="layui-icon">&#xe605;</i>启用</a>'
+									}
+								}
+							}
+							]
+						]
+					});
+				};
+				
+				if(data.index===2){
+				
+					//实例化数据表格2
+					table.render({
+						elem: '#data_table2',
+						cellMinWidth: 120,
+						contentType: "application/json; charset=UTF-8",
+						method: 'post',
+						page: true,
+						headers: {token: publicMathod.token},
+						url: publicMathod.hosturl + 'api/SystemPaymentconfig/GetList', //数据接口
+						parseData: function (res) { //规定数据格式
+				
+						return {
+								"code": res.Status, //解析接口状态
+								"msg": res.Msg, //解析提示文本
+								"count": res.Count, //解析数据长度
+								"data": res.Data //解析数据列表
+							};
+						},
+						response: {//规定响应成功状态码
+							statusCode: 1
+						},	
+						cols: [[
+							{field: 'Id',title: 'ID',sort: true}, 
+							{field: 'MpName',title: '代付渠道'}, 
+						//	{field: 'MpType',title: '代付产品类型'}, 
+							{field: 'MpRate',title: '服务费（%）'}, 
+							{field: 'MpPoundage',title: '最低服务费',sort: true},
+							{field: 'MpMaxQu',title: '最大代付金额'}, 
+							{field: 'MpMinQu',title: '最小代付金额'}, 
+							{field: 'FroDisp',title: '用户提现提示'}, 
+							{field: 'Status',title: '状态',
+								templet: function(obj) {
+									if (obj.Status == 0) {
+										return '<a class="layui-btn layui-bg-black layui-btn-xs" lay-event="jin">禁用</a>';
+										
+									} else if (obj.Status == 1) {
+										return '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="qi">启用</a>';
+									} 
+								},
+							}, 
+							{field: 'Default',title: '默认代付', width: 140,
+								templet: function(obj) {
+									if (obj.Default == 0) {
+										return '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="xd">选择代付</a>';
+									} else if (obj.Default == 1) {
+										return '<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="md">默认代付</a>';
+									} 
+								},
+							}, 
+							// {field: 'belong',title: '用户提现提示'}, 
+							{title: '操作',toolbar: '#barDemo2',width: 240,fixed: 'right'},
+						]]
+					});
+				};
+			});
+
+
+			//监听单元格事件
+			table.on('tool(data_table1)', function(obj){
+				var data = obj.data;
+			
+				
+				if(obj.event === 'qi'){
+					//这里一般是发送修改的Ajax请求
+					obj.update({
+						state:1
+					})
+				}else if(obj.event === "jin"){
+                    obj.update({
+						state:0
+					})
+                }else if(obj.event === 'edit') {
+					open_adv("编辑支付","pay_edit.html?id="+obj.data.Id,['800px', '500px']);
+				}else if(obj.event === 'del') {
+					//页面删除
+					layer.confirm('修改支付状态，您确定要继续吗？', function(index) {
+						publicMathod.post({
+							url: "api/SystemPayconfig/EditStatus?id="+obj.data.Id,
+							success: function (result) {
+								if (result.Status == "0") {
+									//失败
+									layer.msg(result.Msg, { icon: 5 });
+									layer.close(index);
+								} else if (result.Status == "-1") {
+									//程序异常
+									layer.msg("失败！", { icon: 5 });
+									layer.close(index);
+								} else {
+									//成功
+								
+									obj.update({
+										Status: 2
+									});
+									layer.close(index);
+									window.location.href = "pay.html";
+								}
+							},
+							error: function (result) {
+							
+							}
+						});
+					});
+					//后台删除todo...
+				}else if(obj.event === 'deldel'){
+					layer.confirm('是否确认删除这条支付渠道？', {}, function (index) {
+							layer.close(index);
+							publicMathod.post({
+								url: 'api/SystemPayconfig/Delete?id=' + data.Id,
+								success: function (result) {
+									if (result.Status == "1") {
+
+										layer.msg(result.Msg, { icon: 1 });
+									table.reload('data_table1')
+									} else {
+										layer.msg(result.Msg, { icon: 5 });
+									}
+								}
+							})
+						});
+                   
+                        return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可
+				}
+			});
+
+
+			//监听单元格事件
+			table.on('tool(data_table2)', function(obj){
+				var data = obj.data;
+		
+				
+				if(obj.event === 'qi'){
+					//这里一般是发送修改的Ajax请求
+					obj.update({
+						state:1
+					})
+				}else if(obj.event === "jin"){
+                    obj.update({
+						state:0
+					})
+                }else if(obj.event === "xd"){
+					layer.confirm('选择此代付渠道为默认代付吗？', function(index) {
+						publicMathod.post({
+							url: "api/SystemPaymentconfig/EditDefault?id="+obj.data.Id,
+							success: function (result) {
+								if (result.Status == "0") {
+									//失败
+									layer.msg(result.Msg, { icon: 5 });
+									layer.close(index);
+								} else if (result.Status == "-1") {
+									//程序异常
+									layer.msg("失败！", { icon: 5 });
+									layer.close(index);
+								} else {
+									//成功
+								
+									obj.update({
+										Status: 2
+									});
+									layer.close(index);
+									table.reload('data_table2')
+								}
+							},
+							error: function (result) {
+						
+							}
+						});
+					});
+					
+                }else if(obj.event === "md"){
+					layer.msg("修改成功!", { icon: 5 });
+                }else if(obj.event === 'd_edit') {
+					open_adv("编辑支付","d_pay_edit.html?id="+obj.data.Id,['800px', '600px']);
+				}else if(obj.event === 'd_del') {
+					//页面删除
+					layer.confirm('修改支付状态，您确定要继续吗？', function(index) {
+						publicMathod.post({
+							url: "api/SystemPaymentconfig/EditStatus?id="+obj.data.Id,
+							success: function (result) {
+								if (result.Status == "0") {
+									//失败
+									layer.msg(result.Msg, { icon: 5 });
+									layer.close(index);
+								} else if (result.Status == "-1") {
+									//程序异常
+									layer.msg("失败！", { icon: 5 });
+									layer.close(index);
+								} else {
+									//成功
+								
+									obj.update({
+										Status: 2
+									});
+									layer.close(index);
+									table.reload('data_table2')
+								}
+							},
+							error: function (result) {
+							
+							}
+						});
+					});
+					//后台删除todo...
+				}else if(obj.event === 'del3') {
+					//页面删除
+					layer.confirm('删除支付状态，您确定要继续吗？', function(index) {
+						publicMathod.post({
+							url: "api/SystemPaymentconfig/Delete?id="+obj.data.Id,
+						
+							success: function (result) {
+								if (result.Status == "0") {
+									//失败
+									layer.msg(result.Msg, { icon: 5 });
+									layer.close(index);
+								} else if (result.Status == "-1") {
+									//程序异常
+									layer.msg("失败！", { icon: 5 });
+									layer.close(index);
+								} else {
+									//成功
+								
+									obj.update({
+										Status: 2
+									});
+									layer.close(index);
+									table.reload('data_table2')
+								}
+							},
+							error: function (result) {
+						
+							}
+						});
+					});
+					//后台删除todo...
+				}
+				
+			});
+
+				//监听单元格事件银行卡设置
+				table.on('tool(btc_table)', function(obj){
+				var data = obj.data;
+		
+				
+				if(obj.event === 'c_qi'){
+					
+					
+					layer.confirm('启用支付状态，您确定要继续吗？', function(index) {
+						publicMathod.post({
+							url: "api/SystemBankList/EnableBank",
+							data:obj.data.id,
+							success: function (result) {
+								if (result.Status == "0") {
+									//失败
+									layer.msg(result.Msg, { icon: 5 });
+								
+								} else if (result.Status == "-1") {
+									//程序异常
+									layer.msg("失败！", { icon: 5 });
+									
+								} else {
+									//成功
+									layer.close(index);
+									table.reload('btc_table', {
+										page: {
+										curr: 1 //重新从第 1 页开始
+										}
+									
+									});
+								}
+							},
+							error: function (result) {
+						
+							}
+						});
+					});
+				}else if(obj.event === "c_jin"){
+					layer.confirm('启用支付状态，您确定要继续吗？', function(index) {
+						publicMathod.post({
+							url: "api/SystemBankList/EnableBank",
+							data:obj.data.id,
+							success: function (result) {
+								if (result.Status == "0") {
+									//失败
+									layer.msg(result.Msg, { icon: 5 });
+								
+								} else if (result.Status == "-1") {
+									//程序异常
+									layer.msg("失败！", { icon: 5 });
+									
+								} else {
+									//成功
+									layer.close(index);
+									table.reload('btc_table', {
+										page: {
+										curr: 1 //重新从第 1 页开始
+										}
+									
+									});
+								}
+							},
+							error: function (result) {
+						
+							}
+						});
+					});
+                }else if(obj.event === 'c_edit') {
+		
+					
+					open_adv("编辑支付","c_pay_edit.html?id="+obj.data.id,['800px', '700px']);
+				}else if(obj.event === 'deldeldel') {
+					layer.confirm('删除银行卡信息，您确定要继续吗？', function(index) {
+						publicMathod.post({
+							url: "api/SystemBankList/DelBankInfo",
+							data:obj.data.id,
+							success: function (result) {
+								if (result.Status == "0") {
+									//失败
+									layer.msg(result.Msg, { icon: 5 });
+								
+								} else if (result.Status == "-1") {
+									//程序异常
+									layer.msg("失败！", { icon: 5 });
+									
+								} else {
+									//成功
+									layer.close(index);
+									table.reload('btc_table', {
+										page: {
+										curr: 1 //重新从第 1 页开始
+										}
+									
+									});
+								}
+							},
+							error: function (result) {
+			
+							}
+						});
+					});
+				}else if(obj.event === 'feimoren') {
+					layer.confirm('设置这条为默认支付渠道，您确定要继续吗？', function(index) {
+						publicMathod.post({
+							url: "api/SystemBankList/DefaultBank",
+							data:obj.data.id,
+							success: function (result) {
+								if (result.Status == "0") {
+									//失败
+									layer.msg(result.Msg, { icon: 5 });
+								
+								} else if (result.Status == "-1") {
+									//程序异常
+									layer.msg("失败！", { icon: 5 });
+									
+								} else {
+									//成功
+									layer.close(index);
+									table.reload('btc_table', {
+										page: {
+										curr: 1 //重新从第 1 页开始
+										}
+									
+									});
+								}
+							},
+							error: function (result) {
+						
+							}
+						});
+					});
+				}
+				
+			});
+			
+			//添加广告
+			$('body').on('click', '.add_adv', function() {
+				var type = $(this).data("add");
+				if(type=="pay"){
+					open_adv("添加支付","pay_add.html",['800px', '500px']);
+				}else if(type=="d_pay"){
+					open_adv("添加代付","d_pay_add.html",['800px', '600px']);
+				}else if(type == "c_pay"){
+					open_adv("添加银行卡","c_pay_add.html",['800px', '600px']);
+				}
+				
+			})
+
+			function open_adv(type,url,are){
+				layer.open({
+					type: 2, 
+					title:type,
+					area:are ,
+					shade:0.8,
+					content: [url,'no'] 
+				});
+				
+			}
+		});
+	</script>
+</html>

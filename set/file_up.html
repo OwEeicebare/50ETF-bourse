@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>文件上传设置</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="sub_form1">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">文件上传目录</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="filepath" autocomplete="off" class="layui-input "
+                                    lay-verify="title" />
+                            </div>
+                            <span class="tip">*文件保存的目录名，自动创建根目录下</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">文件保存方式</label>
+                            <div class="layui-input-inline">
+                                <select id="filesave" name="filesave">
+                                    <option value="1" selected="selected">按年月/日/存入不同目录</option>
+                                    <option value="2">按年月日每天一个目录</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">文件上传类型</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="fileextension" autocomplete="off" class="layui-input "
+                                    lay-verify="title" />
+                            </div>
+                            <span class="tip">*以英文的逗号分隔开，如："zip,rar"</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">文件上传大小</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="attachsize" autocomplete="off" class="layui-input wd250 l_left"
+                                    lay-verify="title" />
+                                <span class="company">M</span>
+                            </div>
+                            <span class="tip">*超过设定的大小文件不予上传，0为不受限制</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">图片最大尺寸</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="imgmaxheight" autocomplete="off"
+                                    class="layui-input wd100 l_left" lay-verify="title" />
+                                <span class="company">×</span>
+                                <input type="text" name="imgmaxwidth" autocomplete="off"
+                                    class="layui-input wd100 l_left" lay-verify="title" />
+                                <span class="company">PX</span>
+                            </div>
+                            <span class="tip">*左边高度，右边宽度，超出自动裁剪，0为不受限制</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">是否生成缩略图</label>
+                            <div class="layui-input-inline">
+                                <input type="radio" name="isThumbnail" value="0" title="否" checked="">
+                                <input type="radio" name="isThumbnail" value="1" title="是">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">生成缩略图尺寸</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="thumbnailheight" autocomplete="off"
+                                    class="layui-input wd100 l_left" lay-verify="title" />
+                                <span class="company">×</span>
+                                <input type="text" name="thumbnailwidth" autocomplete="off"
+                                    class="layui-input wd100 l_left" lay-verify="title" />
+                                <span class="company">PX</span>
+                            </div>
+                            <span class="tip">*左边高度，右边宽度</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">是否需要水印</label>
+                            <div class="layui-input-inline">
+                                <input type="radio" name="isWater" value="0" title="否" checked="">
+                                <input type="radio" name="isWater" value="1" title="是">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">图片水印类型</label>
+                            <div class="layui-input-inline">
+                                <input type="radio" name="watermarktype" value="1" title="关闭水印" checked="">
+                                <input type="radio" name="watermarktype" value="2" title="文字水印">
+                                <input type="radio" name="watermarktype" value="3" title="图片水印">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">图片水印位置</label>
+                            <div class="layui-input-inline">
+                                <input type="radio" name="watermarkposition" value="1" title="左上" checked="">
+                                <input type="radio" name="watermarkposition" value="2" title="中上">
+                                <input type="radio" name="watermarkposition" value="3" title="右上">
+                                <input type="radio" name="watermarkposition" value="4" title="左中">
+                                <input type="radio" name="watermarkposition" value="5" title="居中">
+                                <input type="radio" name="watermarkposition" value="6" title="右中">
+                                <input type="radio" name="watermarkposition" value="7" title="左下">
+                                <input type="radio" name="watermarkposition" value="8" title="中下">
+                                <input type="radio" name="watermarkposition" value="9" title="右下">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">图片生成质量</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="watermarkimgquality" autocomplete="off"
+                                    class="layui-input wd250 l_left" lay-verify="title" />
+                            </div>
+                            <span class="tip">*只适用于加水印的jpeg格式图片.取值范围 0-100, 0质量最低</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">图片水印文件</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="watermarkpic" autocomplete="off"
+                                    class="layui-input wd250 l_left" lay-verify="title" />
+                            </div>
+                            <span class="tip">*需存放在站点目录下，如图片不存在将使用文字水印</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">水印透明度</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="watermarktransparency" autocomplete="off"
+                                    class="layui-input wd250 l_left" lay-verify="title" />
+                            </div>
+                            <span class="tip">*取值范围1--10 (10为不透明)</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">水印文字</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="watermarktext" autocomplete="off"
+                                    class="layui-input wd250 l_left" lay-verify="title" />
+                            </div>
+                            <span class="tip">*文字水印的内容</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">文字字体</label>
+                            <div class="layui-input-inline">
+                                <select id="watermarkfont" name="watermarkfont">
+                                        <option value="Arial" selected="selected">Arial</option>
+                                        <option value="Arial Black">Arial Black</option>
+                                        <option value="Tunga">Tunga</option>
+                                        <option value="Verdana">Verdana</option>
+                                        <option value="Webdings">Webdings</option>
+                                        <option value="Wingdings">Wingdings</option>
+                                        <option value="仿宋_GB2312">仿宋_GB2312</option>
+                                        <option value="宋体">宋体</option>
+                                        <option value="新宋体">新宋体</option>
+                                        <option value="楷体_GB2312">楷体_GB2312</option>
+                                        <option value="黑体">黑体</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100">字体大小</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="watermarkfontsize" autocomplete="off"
+                                    class="layui-input wd250 l_left" lay-verify="title" />
+                            </div>
+                            <span class="tip">*文字水印的内容</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label wd100"></label>
+                            <div class="layui-input-block">
+                                <button type="button" class="layui-btn" id="sub_btn_1" lay-submit=""
+                                    lay-filter="sub_btn_1">确认修改</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+    layui.use(['form'], function () {
+        var form = layui.form;
+        var baseId = 0; //基础服务Id
+        //数据绑定
+        publicMathod.post({
+            url: "api/SystemFile/GetBase",
+            success: function (data) {
+                var data = data.Data;
+                if (data != null) {
+
+                    baseId = data.id;
+           
+                    //表单初始化
+                    form.val("sub_form1", {
+                        "filepath": data.filepath//附件上传目录
+                        , "filesave": data.filesave//附件保存方式
+                        , "fileextension": data.fileextension//附件上传类型
+                        , "attachsize": data.attachsize//文件上传大小
+                        , "imgmaxheight": data.imgmaxheight//图片最大高度
+                        , "imgmaxwidth": data.imgmaxwidth//图片最大宽度
+                        , "isThumbnail": data.isThumbnail.toString()//是否生成缩略图
+                        , "thumbnailheight": data.thumbnailheight//生成缩略图高度(像素)
+                        , "thumbnailwidth": data.thumbnailwidth//生成缩略图宽度(像素) 
+                        , "isWater": data.isWater.toString()//是否开启水印
+                        , "watermarktype": data.watermarktype.toString()//图片水印类型
+                        , "watermarkposition": data.watermarkposition.toString()//图片水印位置
+                        , "watermarkimgquality": data.watermarkimgquality//图片生成质量
+                        , "watermarkpic": data.watermarkpic//图片水印文件
+                        , "watermarktransparency": data.watermarktransparency//图片水印透明度
+                        , "watermarktext": data.watermarktext//水印文字
+                        , "watermarkfont": data.watermarkfont//文字字体
+                        , "watermarkfontsize": data.watermarkfontsize//文字大小
+
+                    })
+                    form.render();
+
+                }
+            }
+        });
+
+
+
+        // //自定义验证规则
+        // form.verify({
+        // 	title: function(value) {
+        // 		if (value.length < 5) {
+        // 			return '标题至少得5个字符啊';
+        // 		}
+        // 	}
+        // });
+
+        form.on('submit(sub_btn_1)', function (data) {
+
+            var data = data.field;
+ 
+            
+            publicMathod.post({
+                url: "api/SystemFile/BaseEdit",
+                data: {
+                    "id": parseInt(baseId)
+                    , "filepath": data.filepath//附件上传目录
+                    , "filesave": parseInt(data.filesave)//附件保存方式
+                    , "fileextension": data.fileextension//附件上传类型
+                    , "attachsize": parseInt(data.attachsize)//文件上传大小
+                    , "imgmaxheight": parseInt(data.imgmaxheight)//图片最大高度
+                    , "imgmaxwidth": parseInt(data.imgmaxwidth)//图片最大宽度
+                    , "isThumbnail": parseInt(data.isThumbnail)//是否生成缩略图
+                    , "thumbnailheight": parseInt(data.thumbnailheight)//生成缩略图高度(像素)
+                    , "thumbnailwidth": parseInt(data.thumbnailwidth)//生成缩略图宽度(像素) 
+                    , "isWater": parseInt(data.isWater)//是否开启水印
+                    , "watermarktype": parseInt(data.watermarktype)//图片水印类型
+                    , "watermarkposition": parseInt(data.watermarkposition)//图片水印位置
+                    , "watermarkimgquality": parseInt(data.watermarkimgquality)//图片生成质量
+                    , "watermarkpic": data.watermarkpic//图片水印文件
+                    , "watermarktransparency": parseInt(data.watermarktransparency)//图片水印透明度
+                    , "watermarktext": data.watermarktext//水印文字
+                    , "watermarkfont": data.watermarkfont//文字字体
+                    , "watermarkfontsize": parseInt(data.watermarkfontsize)//文字大小
+
+                },
+                success: function (result) {
+                    if (result.Status == 1) {
+                        //关闭窗口，刷新表格
+                        layer.msg(result.Msg, { icon: 1, shade: 0.5, });
+                    } else {
+                        layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+                    }
+                }
+            })
+            return false;
+        });
+
+
+        // //监听提交
+        // form.on('submit(sub_btn)', function(data) {
+        // 	layedit.getContent(layedit_index); //获得富文本内容包括样式
+        // 	layer.alert(JSON.stringify(data.field), {
+        // 		title: '最终的提交信息'
+        // 	})
+        // 	return false;
+        // });
+    })
+
+</script>
+
+</html>

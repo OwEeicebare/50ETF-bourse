@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>编辑交易设置</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-body">
+					<form class="layui-form" lay-filter="sub_form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">名称</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Na" autocomplete="off" class="layui-input wd480" />
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">调用别名</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Co" autocomplete="off" class="layui-input wd480" />
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">值</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Iv" autocomplete="off" class="layui-input wd480" />
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">时间（秒）</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Dt" autocomplete="off" class="layui-input wd480" />
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-block" id="St">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">备注</label>
+							<div class="layui-input-block">
+								<textarea id="seo_description" name="Rmk" class="layui-textarea wd480"
+									style="min-height:85px;"></textarea>
+							</div>
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label"></label>
+							<div class="layui-input-block">
+								<button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+									lay-filter="sub_btn">确认提交</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript" defer async>
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form'], function () {
+		var form = layui.form;
+
+		publicMathod.getRadio("api/Tool/GetDealConfigType", form, $("#St"), "St");
+
+		//绑定数据
+		var id = publicMathod.getUrlParam("id");
+		if (id > 0) {
+			setTimeout(() => {
+				//编辑，需要绑定数据
+				//通过id获取数据
+				publicMathod.post({
+					url: "api/DealConfig/GetModel",
+					data: id,
+					success: function (data) {
+						var data = data.Data;
+						//表单初始化
+						form.val("sub_form", {
+							"Co": data.Co//调用别名
+							, "Na": data.Na//名称
+							, "Iv": data.Iv//值
+							, "Dt": data.Dt//分钟
+							, "Rmk": data.Rmk//备注
+							, "St": data.St.toString()//状态							
+						})
+						form.render();
+					}
+				});
+			}, 100);
+
+		}
+
+
+		//自定义验证规则
+		form.verify({
+			// title: function(value) {
+			// 	if (value.length < 5) {
+			// 		return '标题至少得5个字符啊';
+			// 	}
+			// }
+		});
+
+var lock = true
+		form.on('submit(sub_btn)', function (data) {
+			var data = data.field;
+			if(lock){
+				lock = false
+			publicMathod.post({
+				url: "api/DealConfig/Edit",
+				data: {
+					"Id": parseInt(id),
+					"Co": data.Co//调用别名
+					, "Na": data.Na//名称
+					, "Iv": parseInt(data.Iv)//值
+					, "Dt": data.Dt//分钟
+					, "Rmk": data.Rmk//备注
+					, "St": parseInt(data.St)//状态	
+				},
+				success: function (result) {
+					if (result.Status == 1) {
+						//关闭窗口，刷新表格
+						var index = parent.layer.getFrameIndex(window.name);
+						parent.layer.close(index);
+
+					} else {
+						lock = true
+						layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+					}
+
+				}
+			})
+		}
+			return false;
+		});
+	})
+
+</script>
+
+</html>

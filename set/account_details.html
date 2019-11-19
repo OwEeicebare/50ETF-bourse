@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>母账户交易配置</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/management_table.css" />
+</head>
+<style>
+	.L_lable {
+		line-height: 38px;
+		border: none;
+		background: none;
+	}
+</style>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-header">
+					<a href="account.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>母账户配置</a>
+					<span lay-separator="">/</span>
+					<a><cite>详情</cite></a>
+				</div>
+				<div class="layui-card-body">
+					<form class="layui-form" lay-filter="sub_form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">账号</label>
+							<input type="text" name="An" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">客户手机</label>
+							<input type="text" name="Up" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">母账户</label>
+							<input type="text" name="Aid" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">登录密码</label>
+							<input type="text" name="Alp" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">通讯密码</label>
+							<input type="text" name="Acp" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">客户姓名</label>
+							<input type="text" name="Un" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">券商姓名</label>
+							<input type="text" name="Tbn" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">状态</label>
+							<input type="text" name="St" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">可买金额</label>
+							<input type="text" name="Mb" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">限买额度</label>
+							<input type="text" name="Lbm" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">持仓张数</label>
+							<input type="text" name="Htc" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">限买张数</label>
+							<input type="text" name="Lbtc" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">web端口</label>
+							<input type="text" name="Wp" class="L_lable" readonly="" />
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">备注</label>
+							<textarea name="Rmk" class="L_lable" readonly=""></textarea>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'upload', 'layedit'], function () {
+		var form = layui.form;
+		var upload = layui.upload;
+		var layedit = layui.layedit;
+
+		var url = ""; //存储上传的图片
+		var lock = "0"; //switch开关,默认正常
+
+		var id = publicMathod.getUrlParam("id");
+	 
+		publicMathod.post({
+			url: "api/Master/Detail",
+			data: id,
+			success: function (data) {
+				var data = data.Data;
+				var status = "";
+				switch (data.St) {
+					case 1:
+						status = "正常";
+						break;
+					case 2:
+						status = "禁买";
+						break;
+					case 3:
+						status = "异常";
+						break;
+				}
+				//表单初始化
+				form.val("sub_form", {
+					"An": data.An//账号
+					, "Up": data.Up//登录密码
+					, "Aid": data.Aid//母账户
+					, "Alp": data.Alp//登录密码
+					, "Acp": data.Acp//通讯密码
+					, "Un": data.Un//客户姓名
+					, "Tbn": data.Tbn//券商姓名
+					, "St": status //状态
+					,"Mb":data.Mb//可买金额
+					,"Lbm":data.Lbm//限买额度
+					,"Htc":data.Htc//持仓张数
+					,"Lbtc":data.Lbtc//限买张数
+					,"Rmk":data.Rmk//备注
+					,"Wp":data.Wp//web端口
+
+
+					// , "Lo": data.Lo == 1//用户状态
+					// , "RId": data.RId//管理角色
+					// , "Ie": data.Ie.toString()//隐藏用户  
+				})
+				form.render();
+			}
+		});
+
+
+		//监听指定开关
+		form.on('switch(is_lock_status)', function (data) {
+			lock = this.checked ? 0 : 1;
+		});
+
+		//图片上传初始化
+		upload.render({
+			elem: '#upload_img_url',
+			url: publicMathod.upload //上传接口
+			, accept: 'images' //只允许上传图片类型
+			, auto: false //不自动上传
+			, size: 3072 //限制文件大小，单位 KB
+			, bindAction: '#sub_btn' //绑定触发的上传按钮
+			, choose: function (obj) { //选择文件触发
+				obj.preview(function (index, file, result) {
+					$("#img_url").val(file.name);
+					$('#img_view>img').attr('src', result);
+					url = file;
+				})
+			},
+			done: function (res) { //上传时触发
+			 
+			},
+		});
+		//预览
+		$("body").on("click", "#show_view", function () {
+			var url = $("#img_view>img").attr("src");
+			if (url.length <= 0) {
+				layer.msg('请选择图片后再预览！');
+				return;
+			}
+			$("#img_view").css("display", "block");
+		})
+		//关闭预览
+		$("body").on("click", "#img_view", function () {
+			$("#img_view").css("display", "none");
+		})
+
+		//富文本编辑器
+		layedit.set({
+				uploadImage: {
+					url: publicMathod.upload //接口url
+						,
+					type: 'post' //默认post
+				}
+			});
+		var layedit_index = layedit.build('layedit'); //建立编辑器
+
+		//自定义验证规则
+		form.verify({
+			title: function (value) {
+				if (value.length < 5) {
+					return '标题至少得5个字符啊';
+				}
+			}
+		});
+		//监听提交
+		form.on('submit(sub_btn)', function (data) {
+			layedit.getContent(layedit_index); //获得富文本内容包括样式
+			layer.alert(JSON.stringify(data.field), {
+				title: '最终的提交信息'
+			})
+			return false;
+		});
+	})
+
+</script>
+
+</html>

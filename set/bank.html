@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>银行管理</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+	</head>
+	<body>
+		<div id="app">
+			<div class="title_wrap">
+				<div class="layui-btn-group l_left table_btn">
+					<button class="layui-btn layui-btn-normal" id="bank_add">添加</button>
+				</div>
+			</div>
+			<div class="table_wrap">
+				<table id="data_table" lay-filter="data_table"></table>
+				<script type="text/html" id="oper-col">
+					<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+					<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+				</script>
+			</div>
+		</div>
+	</body>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js"></script>
+	<script type="text/javascript">
+		publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+		layui.use(['form', 'table', 'jquery', 'layer'], function() {
+			var form = layui.form;
+			var table = layui.table;
+            user_list= table.render({
+                elem: '#data_table',
+                cellMinWidth: 100,
+                contentType: "application/json; charset=UTF-8",
+                method: 'post',
+				headers: {token: publicMathod.token},
+                url: publicMathod.hosturl + 'api/SystemBankList/GetList', //数据接口
+                parseData: function (res) { //规定数据格式
+                    return {
+                        "code": res.Status, //解析接口状态
+                        "msg": res.Msg, //解析提示文本
+                        "count": res.Count, //解析数据长度
+                        "data": res.Data //解析数据列表
+                    };
+                },
+                response: {//规定响应成功状态码
+                    statusCode: 1
+                },
+                page: false ,//是否开启分页
+				cols: [[
+					{field: 'Id',title: 'ID',sort: true, width: 100}, 
+					{field: 'Tile',title: '类别名称',templet:function(obj){
+						return "<img src="+obj.ImgUrl+" style=' margin-right: 8px;width: 27px' />"+obj.Tile
+					}},
+					{field: 'SortId',title: '排序',sort: true}, 
+					{field: 'ImgUrl',title: '背景颜色',templet:function(obj){
+						return "<div style='width: 20px;height:20px;background-color:"+obj.blour+"'></div>"
+					}}, 
+					{templet: '#oper-col',title: '操作',width:150}
+				]]
+			});
+
+
+			//监听工具条
+			table.on('tool(data_table)', function(obj) {
+				var data = obj.data;
+				if (obj.event === 'edit') {
+					//获取编辑行数据,跳转
+					//layer.alert('编辑行：<br>'+ JSON.stringify(data))
+					 layer.open({
+						type: 2,
+						title: "编辑银行卡",
+						area: ['800px', '500px'],
+						shade: 0.8,
+						content: ["bank_edit.html?id="+data.Id, 'no']
+					})
+					
+				} else if(obj.event === 'del'){
+					
+					layer.confirm('删除记录后不可恢复，您确定要继续吗？', function(index) {
+						publicMathod.post({
+                            url: 'api/SystemBankList/DelBanklist' ,
+							data:data.Id,
+                            success: function (result) {
+                                if (result.Status == 1) {
+                                    layer.msg("删除成功", { icon: 1 });
+                                    location.reload();
+                                } else {
+                                    layer.msg("删除失败，请重试！", { icon: 5 });
+                                }
+                            }
+                        })
+                        return false;
+                        
+					});
+				}
+			});
+
+			$('#bank_add').click(function () {
+				layer.open({
+					type: 2,
+					title: "添加银行卡",
+					area: ['800px', '500px'],
+					shade: 0.8,
+					content: ['bank_add.html', 'no']
+				})
+			})
+
+		
+		});
+	</script>
+</html>

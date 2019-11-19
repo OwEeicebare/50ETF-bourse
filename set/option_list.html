@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>期权合约列表</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div id="app">
+		<div class="title_wrap">
+			<div class="layui-btn-group l_left table_btn">
+				<a href="option_list_add.html"><button class="layui-btn layui-btn-normal">添加</button></a>
+			</div>
+			<form class="layui-form">
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label" style="width:100px;">产品代码类型</label>
+					<div class="layui-input-inline">
+						<select name="TyId" id="TyId" lay-filter="TyId">
+							<option value="0" selected="">全部类型</option>
+						</select>
+					</div>
+
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label">到期时间</label>
+					<div class="layui-input-block wd300">
+						<input type="text" class="layui-input" id="time" readonly="" placeholder="请选择时间范围">
+					</div>
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label l_left">搜索关键字</label>
+					<input type="text" id="search_val" name="title" lay-verify="title" autocomplete="off"
+						placeholder="请输入搜索关键字" class="layui-input l_left" style="width: initial;min-width: 320px;">
+					<div class="layui-btn l_left" style="border-radius: 0;" id="search_btn"><i
+							class="layui-icon layui-icon-search layuiadmin-button-btn"></i></div>
+				</div>
+			</form>
+		</div>
+		<div class="table_wrap">
+			<table id="data_table" lay-filter="data_table"></table>
+			<script type="text/html" id="barDemo">
+					<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+					<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+				</script>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'table', 'laydate'], function () {
+		var form = layui.form;
+		var table = layui.table;
+		var laydate = layui.laydate;
+
+		laydate.render({
+			elem: '#time'
+			, type: 'datetime'
+			, range: true
+			
+		});
+
+		//产品代码类型
+		publicMathod.getDropdownList("api/Tool/GetProductCodeType", form, $("#TyId"));
+
+		//实例化数据表格
+		table.render({
+			elem: '#data_table',
+			url: publicMathod.hosturl + 'api/Stock/GetList',
+			method: 'post',
+			contentType: "application/json; charset=UTF-8",
+			headers: {token: publicMathod.token},
+			cellMinWidth: 100 ,
+			parseData: function (res) { //规定数据格式
+		
+				return {
+					"code": res.Status, //解析接口状态
+					"msg": res.Msg, //解析提示文本
+					"count": res.Count, //解析数据长度
+					"data": res.Data //解析数据列表
+				};
+			},
+			response: {//规定响应成功状态码
+				statusCode: 1
+			},
+			page: {
+				layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+			},
+			cols: [[
+				{ field: 'Id', title: 'ID', minWidth: 80, sort: true },
+				{ field: 'StDe', title: '证券代码' },
+				{ field: 'StKn', title: '证券名称' },
+				{ field: 'SoTy', title: '行权类型' },
+				{ field: 'StCo', title: '合约代码' },
+				{ field: 'StNa', title: '合约名称', minWidth: 160 },
+				{ field: 'SoCo', title: '产品代码', minWidth: 180 },
+				{ field: 'DeNu', title: '合约单位' },
+				{ field: 'DePr', title: '行权价格', sort: true },
+				{ field: 'EnDa', title: '行权日期', minWidth: 160, sort: true },
+				{ field: 'SoDa', title: '到期月份', minWidth: 160, sort: true },
+				{ field: 'DeMo', title: '保证金', minWidth: 150, sort: true },
+				{ field: 'Remark', title: '备注' },
+				{ field: 'UpTi', title: '更新时间', minWidth: 160, sort: true },
+				{ title: '操作', toolbar: '#barDemo', width: 150, fixed: 'right' }
+			]]
+		});
+
+		//搜索重载表格
+		$("#search_btn").click(function () {
+			table.reload('data_table', {
+				url: publicMathod.hosturl + 'api/Stock/GetList', //数据接口
+				where: { //设定异步数据接口的额外参数
+					"Sort": "",
+					"Time": $("#time").val(),
+					"TyId": $("#TyId").val(),
+					"SearchKey": $("#search_val").val(),
+					"limit": this.limit,
+					"page": this.curr
+				},
+				page: {
+					curr: 1 //重新从第 1 页开始
+				}
+			});
+		})
+
+		//监听工具条
+		table.on('tool(data_table)', function (obj) {
+			var data = obj.data;
+			if (obj.event === 'edit') {
+				//获取编辑行数据,跳转
+				window.location.href = "option_list_edit.html?id=" + data.Id;
+
+			} else if (obj.event === 'del') {
+				//页面删除
+				layer.confirm('删除记录后不可恢复，您确定要继续吗？', function (index) {
+					publicMathod.post({
+						url: "api/Stock/Remove",
+						data: data.Id,
+						success: function (result) {
+							if (result.Status == "0") {
+								//删除失败
+								layer.msg(result.Msg, { icon: 5 });
+								layer.close(index);
+							} else if (result.Status == "-1") {
+								//程序异常
+								layer.msg("删除失败！", { icon: 5 });
+								layer.close(index);
+							} else {
+								//删除成功
+								obj.del();
+								layer.close(index);
+								location.reload();
+							}
+						},
+						error: function (result) {
+							
+						}
+					});
+
+
+				});
+				//后台删除todo...
+			}
+		});
+
+
+
+	});
+</script>
+
+</html>
