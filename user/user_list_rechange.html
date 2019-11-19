@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>账户充值</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">支付渠道</label>
+                            <div class="layui-input-inline">
+                                <select id="FromName" name="FromName" lay-filter="FromName" lay-verify="required">
+                                  
+                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">充值金额</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" id="RechargeMoney" name="RechargeMoney" class="layui-input wd250" lay-verify="required|number" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">充值服务费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="RechargeLost" name="RechargeLost" autocomplete="off" class="layui-input wd250" lay-verify="required|number" />
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">到账金额</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="RechargeValue" name="RechargeValue" class="layui-input wd250" lay-verify="required|number">
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-block">
+                                <textarea id="zhaiyao" name="Remark" class="layui-textarea wd480"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-block">
+                                <span class="layui-btn" id="sub_btn" lay-submit="" lay-filter="sub_btn">
+                                    确认提交
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/jquery-3.4.0.min.js"></script>
+    <script src="../js/public.js"></script>
+    <script type="text/javascript" defer async>
+        publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+        var id;
+        layui.use(['form'], function() {
+            var form = layui.form;
+            //获取id
+            var id = publicMathod.getUrlParam("id");
+
+            //获取支付列表
+            publicMathod.post({
+
+                    url: "api/SystemPayconfig/GetList",
+                    success: function(result) {
+                        var str = "";
+                        for (var i = 0; i < result.Data.length; i++) {
+                            str += '<option  value="' + result.Data[i].MpName + "," + result.Data[i].MpMinre + '">' + result.Data[i]
+                                .PlaceName + '</option>';
+                        }
+                        $("#FromName").append(str);
+
+                        form.render(); //更新全部
+                        $("#RechargeLost").val($("#FromName").val().split(',')[1])
+
+
+                    }
+                })
+                // 确认提交
+            form.on('submit(sub_btn)', function(data) {
+                var data = data.field;
+
+                Submission(data, id);
+
+            });
+
+            // 监听手续费变动
+            form.on('select(FromName)', function(data) {
+
+                $("#RechargeLost").val(data.value.split(',')[1])
+            });
+
+        })
+
+
+        //监听服务费的修改
+        $('body').on('input mouseleave', '#RechargeLost', function() {
+            $('#RechargeValue').val($('#RechargeMoney').val() - $('#RechargeLost').val());
+        })
+
+        function Submission(data, id) {
+            layer.confirm('您确定提交审核？', {
+
+
+            }, function(index) {
+                //console.log(data);
+                layer.close(index);
+                publicMathod.post({
+                    url: 'api/User/AddRecharge',
+                    data: {
+                        "Id": 0, //ID
+                        "FollowId": parseInt(id), //充值ID
+                        "FromName": data.FromName.split(',')[0], //充值来源名称
+                        "RechargeMoney": Number(data.RechargeMoney), //充值金额
+                        "RechargeScreenshots": "", //充值截图
+                        "RechargeLost": Number(data.RechargeLost), //服务费
+                        "RechargeValue": Number(data.RechargeValue), //到账金额
+                        "RechargeFrom": data.RechargeFrom,
+                        "UkRemark": data.Remark, //备注
+                    },
+                    success: function(result) {
+                        if (result.Status == "1") {
+                            layer.msg(result.Msg, {
+                                icon: 1,
+                                shade: 0.4,
+                                time: 1000
+                            }, function() {
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                                return false;
+                            });
+
+
+                        } else {
+                            layer.msg(result.Msg, {
+                                icon: 5
+                            });
+                        }
+                    }
+                })
+            });
+            //layer.close(index);
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可
+        }
+    </script>
+</body>
+
+</html>

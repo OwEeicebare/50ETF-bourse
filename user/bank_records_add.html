@@ -1,0 +1,357 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>添加银行卡</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <a href="bank_records.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>银行卡记录</a>
+                    <span lay-separator="">/</span>
+                    <a><cite>添加银行卡</cite></a>
+                </div>
+                <div class="layui-card-body">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">用户ID</label>
+                            <div class="layui-input-inline">
+                                <select id="category_id" name="FllwId" lay-filter="userId">
+                                    <option value="" selected="selected">请选择用户Id</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">用户名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="UserName" id="UserName" autocomplete="off"
+                                    class="layui-input layui-btn-disabled" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户行</label>
+                            <div class="layui-input-inline">
+                                <select id="bank" name="BankName">
+                                    <option value="" selected="selected">请选择开户行</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                                <label class="layui-form-label">开户地区</label>
+                                <div class="layui-input-inline">
+                                    <select name="Province" lay-filter="Province" id="Province">
+                                        <option class="diqu" value="0">请选择省</option>
+    
+                                    </select>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <select name="City" lay-filter="City" id="City">
+                                        <option class="shiji" value="0">请选择市</option>
+    
+                                    </select>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <select name="Area" lay-filter="Area" id="Area">
+                                        <option class="xianqu" value="0">请选择区</option>
+                                    </select>
+                                </div>
+                            </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户支行</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="BankBranch" lay-verify="required|title" autocomplete="off" class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="BankAccountName" lay-verify="required|title" autocomplete="off" class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户手机</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="MobilePhone" lay-verify="number" autocomplete="off" class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户身份证</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="IdCard" lay-verify="required|ID" autocomplete="off" class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">银行卡号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="BankCard" lay-verify="required|check" autocomplete="off" class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-block">
+                                <textarea id="seo_description" name="Remark" class="layui-textarea wd480"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-block">
+                                <button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+                                    lay-filter="go">确认提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/jquery-3.4.0.min.js"></script>
+    <script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript">
+        publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+        layui.use(['layer', 'form', 'layedit', 'upload'], function () {
+            var layer = layui.layer;
+            var form = layui.form;
+            var layedit = layui.layedit;
+            var upload = layui.upload;
+
+             //省市区
+             var pid = 0;
+            var cid = 0;
+            var aid = 0;
+
+            ///获取用户Id列表
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: publicMathod.hosturl + 'api/User/GetUserId',
+                async: false,
+                headers: { "token": publicMathod.token },
+                error: function (request) {
+                    layer.msg("系统开小差了，请重试！", { icon: 5 })
+                },
+                success: function (data) {
+                    if (data.Status == "1") {
+                        $.each(data.Data, function (index, item) {
+                            $('#category_id').append(new Option(item.Id, item.Id));// 下拉菜单里添加元素
+                        });
+                        layui.form.render("select");
+                    }
+                    else { layer.msg("获取数据失败，请重试！", { icon: 5 }) }
+
+                },
+            });
+
+
+
+            //初始化银行列表
+            publicMathod.post({
+                url: "api/SystemBankList/GetList",
+                success: function (result) {
+                    var str = "";
+                    for (var i = 0; i < result.Data.length; i++) {
+                        str += '<option value="' + result.Data[i].Id + '">' + result.Data[i].Tile + '</option>';
+                    }
+                    $("#bank").append(str);
+                    form.render(); //更新全部
+                }
+            })
+
+
+
+
+
+            //初始化省
+            publicMathod.post({
+                url: "mobile/MobileArea/GetAist",
+                success: function (result) {
+                    var str = '';
+                    for (var i = 0; i < result.Data.length; i++) {
+                        str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+                    }
+                    $("#Province").append(str);
+
+                    form.render(); //更新全部
+                }
+            })
+
+
+            //点击获取用户名
+            form.on('select(userId)', function (data) {
+
+
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: publicMathod.hosturl + 'api/User/GetModel',
+                    data: { "Id": data.value },
+                    async: false,
+                    error: function (request) {
+                        layer.msg("系统开小差了，请重试！", { icon: 5 })
+                    },
+                    success: function (data) {
+                        if (data.Status == "1") {
+                            $("#UserName").val(data.Data.UName);
+                        }
+                        else { layer.msg("获取数据失败，请重试！", { icon: 5 }) }
+
+                    },
+                    
+                });
+
+            });
+
+             //监听省
+             form.on('select(Province)', function (data) {
+                var index = data.value;
+                if (index == pid) {
+                    //没有变化
+                } else {
+                    //更新市 
+                    pid = index;
+                    publicMathod.post({
+                        url: "mobile/MobileArea/GetAist?id=" + index,
+                        success: function (result) {
+                            $("#City").html("");
+                            var str = '<option value="0" selected="">请选择市</option>';
+                            for (var i = 0; i < result.Data.length; i++) {
+                                str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+                            }
+                            $("#City").append(str);
+
+                            form.render(); //更新全部
+                        }
+                    })
+
+                    //清空区
+                    $("#Area").html("");
+                    var str = '<option value="0" selected="">请选择区</option>';
+                    $("#Area").append(str);
+                    form.render(); 
+                }
+            });
+
+            //监听市
+            form.on('select(City)', function (data) {
+                var index = data.value;
+                if (index == cid) {
+                    //没有变化
+                } else {
+                    cid = index;
+                    publicMathod.post({
+                        url: "mobile/MobileArea/GetAist?id=" + index,
+                        success: function (result) {
+                            $("#Area").html("");
+                            var str = '<option value="0" selected="">请选择区</option>';
+                            for (var i = 0; i < result.Data.length; i++) {
+                                str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+                            }
+                            $("#Area").append(str);
+                            form.render(); //更新全部
+                        }
+                    })
+                }
+            })
+
+
+
+
+
+
+            //自定义验证规则
+            form.verify({
+                title: function(value, item){ //value：表单的值、item：表单的DOM对象
+				if (value.length > 20) {
+					return '开户支行长度不能超过20'
+				}
+            },
+        
+               ID:function(value, item){ //value：表单的值、item：表单的DOM对象
+                var reg = /^[1-9]d{5}[1-9]d{3}((0d)|(1[0-2]))(([0|1|2]d)|3[0-1])d{4}$/; 
+				if (reg.test(value)) {
+					return '身份证不合法'
+				}
+            },
+                check:function(value,item){
+                    var reg = /([\d]{4})([\d]{4})([\d]{4})([\d]{4})([\d]{0,})?/;   // 以19位数字开头，以19位数字结尾  
+                  if( !reg.test(value) ){
+                    return '银行卡格式错误'
+                  }  
+                }
+           
+            });
+            //监听提交
+            form.on('submit(sub_btn)', function (data) {
+                layedit.getContent(layedit_index); //获得富文本内容包括样式
+                layer.alert(JSON.stringify(data.field), {
+                    title: '最终的提交信息'
+                })
+                return false;
+            });
+            var lock = true
+            form.on('submit(go)', function (data) {
+
+                var data = data.field;
+                var BankAddress = $("#Province").find("option:selected").text() + "," + $("#City").find("option:selected").text() + "," + $("#Area").find("option:selected").text();
+
+                //var jsonObj = JSON.stringify(data.field);
+                //var jsonObj = $(".layui-form").serializeJson();
+                //jsonObj.BankAddress = JSON.stringify(imgList);
+                //jsonObj.Id = JSON.stringify(0);
+                //监听提交
+                if(lock){
+				lock = false
+                publicMathod.post({
+                    url: 'api/UserBank/Add',
+                    data: {
+                        "Id": 0,
+                        "Followid": parseInt(data.FllwId),
+                        "BankId": parseInt(data.BankName),
+                        "BankAddress": BankAddress,
+                        "BankName":data.BankName,
+                        "Province": data.Province,
+                        "City": data.City,
+                        "Area": data.Area,
+                        "BankBranch": data.BankBranch,
+                        "BankCard": data.BankCard,
+                        "BankAccountName": data.BankAccountName,
+                        "IdCard": data.IdCard,
+                        "MobilePhone": data.MobilePhone,
+                        "UserName": data.UserName,
+                        "Remark": data.Remark
+
+                    },
+                    success: function (result) {
+                        if (result.Status == 1) {
+                            layer.msg(result.Msg, { icon: 1, shade: 0.4, time: 1000 }, function () { window.location.href = "bank_records.html"; });
+
+                        } else {
+                            lock = true
+                            layer.msg("添加失败，请重试！", { icon: 5 });
+                        }
+                    }
+                })
+            }
+                return false;
+            });
+        });
+
+
+
+    </script>
+</body>
+
+</html>

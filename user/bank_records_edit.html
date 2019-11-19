@@ -1,0 +1,459 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>修改银行卡</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <a href="bank_records.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>银行卡记录</a>
+                    <span lay-separator="">/</span>
+                    <a><cite>修改银行卡</cite></a>
+                </div>
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="sub_form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">用户ID</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="FllwId" id="UserName" autocomplete="off"
+                                    class="layui-input layui-btn-disabled" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">用户名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="UserName" id="UserName" autocomplete="off"
+                                    class="layui-input layui-btn-disabled" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户行</label>
+                            <div class="layui-input-inline">
+                                <select id="bank" name="BankName">
+                                    <option value="" selected="selected">请选择</option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户地区</label>
+                            <div class="layui-input-inline">
+                                <select name="Province" lay-filter="Province" id="Province">
+                                    <option class="diqu" value="">请选择省</option>
+
+                                </select>
+                            </div>
+                            <div class="layui-input-inline">
+                                <select name="City" lay-filter="City" id="City">
+                                    <option class="shiji" value="">请选择市</option>
+
+                                </select>
+                            </div>
+                            <div class="layui-input-inline">
+                                <select name="Area" lay-filter="Area" id="Area">
+                                    <option class="xianqu" value="">请选择县/区</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户支行</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="BankBranch" lay-verify="required|title" autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="BankAccountName" lay-verify="required|title" autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户手机</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="MobilePhone" lay-verify="number" autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开户身份证</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="IdCard" lay-verify="required|ID" autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">银行卡号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="BankCard" lay-verify="required|check" autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-block">
+                                <textarea id="seo_description" name="Remark" class="layui-textarea wd480"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-block">
+                                <button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+                                    lay-filter="sub_btn">确认提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/jquery-3.4.0.min.js"></script>
+    <script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+        layui.use(['form', 'element'], function () {
+            var form = layui.form;
+            var element = layui.element;
+
+            //获取id值和上级代理
+            var id = publicMathod.getUrlParam("id");
+            //省市区
+            var pid = 0;
+            var cid = 0;
+            var aid = 0;
+
+            //自定义验证规
+            form.verify({
+                title: function (value, item) { //value：表单的值、item：表单的DOM对象
+                    if (value.length > 20) {
+                        return '开户支行长度不能超过20'
+                    }
+                },
+                ID: function (value, item) { //value：表单的值、item：表单的DOM对象
+                    var reg = /^[1-9]d{5}[1-9]d{3}((0d)|(1[0-2]))(([0|1|2]d)|3[0-1])d{4}$/;
+                    if (reg.test(value)) {
+                        return '身份证不合法'
+                    }
+                },
+                check: function (value, item) {
+                    var reg = /([\d]{4})([\d]{4})([\d]{4})([\d]{4})([\d]{0,})?/;   // 以19位数字开头，以19位数字结尾  
+                    if (!reg.test(value)) {
+                        return '银行卡格式错误'
+                    }
+                }
+
+            });
+            //初始化银行列表
+            publicMathod.post({
+                url: "api/Tool/GetUserBankType",
+                success: function (result) {
+                    var str = "";
+                    for (var i = 0; i < result.Data.length; i++) {
+                        str += '<option value="' + result.Data[i].Id + '">' + result.Data[i].Name + '</option>';
+                    }
+                    $("#bank").append(str);
+                    form.render(); //更新全部
+                }
+            })
+
+            //初始化省
+            publicMathod.post({
+                url: "mobile/MobileArea/GetAist",
+                success: function (result) {
+                    var str = '<option value="0" selected="">请选择省</option>';
+                    for (var i = 0; i < result.Data.length; i++) {
+                        str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+                    }
+                    $("#Province").append(str);
+                    form.render(); //更新全部
+                    initBankData();
+                },
+                error: function () {
+                    initBankData();
+                }
+            })
+
+
+            //监听省
+            form.on('select(Province)', function (data) {
+                var index = data.value;
+                if (index == pid) {
+                    //没有变化
+                } else {
+                    //更新市 
+                    pid = index;
+                    publicMathod.post({
+                        url: "mobile/MobileArea/GetAist?id=" + index,
+                        success: function (result) {
+                            $("#City").html("");
+                            var str = '<option value="0" selected="">请选择市</option>';
+                            for (var i = 0; i < result.Data.length; i++) {
+                                str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+                            }
+                            $("#City").append(str);
+
+                            form.render(); //更新全部
+                        }
+                    })
+
+                    //清空区
+                    $("#Area").html("");
+                    var str = '<option value="0" selected="">请选择区</option>';
+                    $("#Area").append(str);
+                    form.render();
+                }
+            });
+
+            //监听市
+            form.on('select(City)', function (data) {
+                var index = data.value;
+                if (index == cid) {
+                    //没有变化
+                } else {
+                    publicMathod.post({
+                        url: "mobile/MobileArea/GetAist?id=" + index,
+                        success: function (result) {
+                            $("#Area").html("");
+                            var str = '<option value="0" selected="">请选择区</option>';
+                            for (var i = 0; i < result.Data.length; i++) {
+                                str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+                            }
+                            $("#Area").append(str);
+                            form.render(); //更新全部
+                        }
+                    })
+                }
+            })
+
+
+
+            function initBankData() {
+                publicMathod.post({
+                    url: "api/UserBank/GetModel?id=" + id,
+                    success: function (data) {
+                        var addrss = data.Data.BankAddress.split(",")
+                        //console.log(addrss);
+                        // $(".diqu").text(addrss[0])
+                        // $(".diqu").attr("value",addrss[0])
+                        // $(".shiji").text(addrss[1])
+                        // $(".shiji").attr("value",addrss[1])
+                        // $(".xianqu").text(addrss[2])
+                        // $(".xianqu").attr("value",addrss[2])
+                        if (data.Status == "1") {
+                            ////表单初始化
+                            form.val("sub_form", {
+                                "FllwId": data.Data.Followid,
+                                "BankName": data.Data.BankId,
+                                "BankBranch": data.Data.BankBranch,
+                                "BankCard": data.Data.BankCard,
+                                "BankAccountName": data.Data.BankAccountName,
+                                "IdCard": data.Data.IdCard,
+                                "MobilePhone": data.Data.MobilePhone,
+                                "UserName": data.Data.UserName,
+                                "Remark": data.Data.Remark,
+                                "Province": data.Data.Province
+                            })
+                            pid = data.Data.Province;
+                            cid = data.Data.City;
+                            aid = data.Data.Area;
+
+                            form.render();
+
+
+                            //初始化市
+                            publicMathod.post({
+                                url: "mobile/MobileArea/GetAist?id=" + data.Data.Province,
+                                success: function (result) {
+                                    $("#City").html("");
+                                    var str = '<option value="0" selected="">请选择市</option>';
+                                    for (var i = 0; i < result.Data.length; i++) {
+                                        str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+                                    }
+                                    $("#City").append(str);
+
+                                    form.render(); //更新全部
+
+                                    form.val("sub_form", {
+                                        "City": data.Data.City
+                                    });
+                                    form.render(); //更新全部
+                                }
+                            })
+
+                            //初始化区
+                            publicMathod.post({
+                                url: "mobile/MobileArea/GetAist?id=" + data.Data.City,
+                                success: function (result) {
+                                    $("#Area").html("");
+                                    var str = '<option value="0" selected="">请选择区</option>';
+                                    for (var i = 0; i < result.Data.length; i++) {
+                                        str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+                                    }
+                                    $("#Area").append(str);
+                                    form.render(); //更新全部
+
+                                    form.val("sub_form", {
+                                        "Area": data.Data.Area
+                                    });
+                                    form.render(); //更新全部
+                                }
+                            })
+
+
+                        }
+                        else { layer.msg("获取数据失败，请重试！", { icon: 5 }) }
+                    }
+                });
+            }
+            // setTimeout(() => {
+            //     publicMathod.post({
+            //         url: "api/UserBank/GetModel?id=" + id,
+            //         success: function (data) {
+            //             var addrss = data.Data.BankAddress.split(",")
+            //             //console.log(addrss);
+            //             // $(".diqu").text(addrss[0])
+            //             // $(".diqu").attr("value",addrss[0])
+            //             // $(".shiji").text(addrss[1])
+            //             // $(".shiji").attr("value",addrss[1])
+            //             // $(".xianqu").text(addrss[2])
+            //             // $(".xianqu").attr("value",addrss[2])
+            //             if (data.Status == "1") {
+            //                 ////表单初始化
+            //                 form.val("sub_form", {
+            //                     "FllwId": data.Data.Followid,
+            //                     "BankName": data.Data.BankId,
+            //                     "BankBranch": data.Data.BankBranch,
+            //                     "BankCard": data.Data.BankCard,
+            //                     "BankAccountName": data.Data.BankAccountName,
+            //                     "IdCard": data.Data.IdCard,
+            //                     "MobilePhone": data.Data.MobilePhone,
+            //                     "UserName": data.Data.UserName,
+            //                     "Remark": data.Data.Remark,
+            //                     "Province": data.Data.Province
+            //                 })
+            //                 pid = data.Data.Province;
+            //                 cid = data.Data.City;
+            //                 aid = data.Data.Area;
+
+            //                 form.render();
+
+
+            //                 //初始化市
+            //                 publicMathod.post({
+            //                     url: "mobile/MobileArea/GetAist?id=" + data.Data.Province,
+            //                     success: function (result) {
+            //                         $("#City").html("");
+            //                         var str = '<option value="0" selected="">请选择市</option>';
+            //                         for (var i = 0; i < result.Data.length; i++) {
+            //                             str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+            //                         }
+            //                         $("#City").append(str);
+
+            //                         form.render(); //更新全部
+
+            //                         form.val("sub_form", {
+            //                             "City": data.Data.City
+            //                         });
+            //                         form.render(); //更新全部
+            //                     }
+            //                 })
+
+            //                 //初始化区
+            //                 publicMathod.post({
+            //                     url: "mobile/MobileArea/GetAist?id=" + data.Data.City,
+            //                     success: function (result) {
+            //                         $("#Area").html("");
+            //                         var str = '<option value="0" selected="">请选择区</option>';
+            //                         for (var i = 0; i < result.Data.length; i++) {
+            //                             str += '<option value="' + result.Data[i].Cder + '">' + result.Data[i].Nmet + '</option>';
+            //                         }
+            //                         $("#Area").append(str);
+            //                         form.render(); //更新全部
+
+            //                         form.val("sub_form", {
+            //                             "Area": data.Data.Area
+            //                         });
+            //                         form.render(); //更新全部
+            //                     }
+            //                 })
+
+
+            //             }
+            //             else { layer.msg("获取数据失败，请重试！", { icon: 5 }) }
+            //         }
+            //     });
+            // }, 100);
+
+
+
+
+            //自定义验证规则
+            form.verify({
+                zznumber: function (value) {
+                    if (value.toString().trim().length == 0) return;//如果为空可以提交
+                    if (!publicMathod.zznumber(value.toString().trim())) {
+                        return '必须填写非零正整数';
+                    }
+                }
+            });
+            //监听提交
+            var lock = true
+            form.on('submit(sub_btn)', function (data) {
+                var data = data.field;
+                var BankAddress = $("#Province").find("option:selected").text() + "," + $("#City").find("option:selected").text() + "," + $("#Area").find("option:selected").text();
+                if (lock) {
+                    lock = false
+                    publicMathod.post({
+                        url: "api/UserBank/Edit",
+                        data: {
+                            "Id": parseInt(publicMathod.getUrlParam("id")),
+                            "Followid": parseInt(data.FllwId),
+                            "BankId": parseInt(data.BankName),
+                            "BankName": data.BankName,
+                            "BankAddress": BankAddress,
+                            "Province": data.Province,
+                            "City": data.City,
+                            "Area": data.Area,
+                            "BankBranch": data.BankBranch,
+                            "BankCard": data.BankCard,
+                            "BankAccountName": data.BankAccountName,
+                            "IdCard": data.IdCard,
+                            "MobilePhone": data.MobilePhone,
+                            "UserName": data.UserName,
+                            "Remark": data.Remark
+                        },
+                        success: function (result) {
+                            if (result.Status == 1) {
+                                form.render();
+                                layer.msg(result.Msg, { icon: 1, shade: 0.4, time: 1000 }, function () { window.location.href = "bank_records.html"; });
+                            } else {
+                                lock = true
+                                //console.log(result)
+                            }
+                        }
+                    })
+                }
+                return false;
+            });
+
+
+        })
+
+    </script>
+</body>
+
+</html>

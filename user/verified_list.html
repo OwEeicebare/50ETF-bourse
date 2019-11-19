@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>实名认证</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+	</head>
+	<body>
+		<div id="app">
+			<div class="title_wrap">
+				<form class="layui-form">
+                    <div class="layui-form-item l_left">
+						<label class="layui-form-label">实名状态</label>
+						<div class="layui-input-block">
+							<select name="stru" id="stru" lay-filter="aihao">
+								<option value="0"  selected="">全部类型</option>
+								
+							</select>
+						</div>
+					</div>
+                    <div class="layui-form-item l_left">
+                        <label class="layui-form-label l_left">搜索关键字</label>
+                        <input type="text" name="SearchKey" id="SearchKey" lay-verify="title" autocomplete="off" placeholder="请输入用户名/手机号/身份证号" class="layui-input l_left" style="width: initial;min-width: 260px;">
+                        <span  class="layui-btn l_left" style="border-radius: 0;" id="search_go"  lay-submit lay-filter="search_go"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+                    </div>
+				</form>
+			</div>
+			<div class="table_wrap">
+                <table id="data_table" lay-filter="data_table"></table>
+                <script type="text/html" id="barDemo">
+
+					<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>审核</a>
+					
+				</script>
+			</div>
+		</div>
+        <script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../js/jquery-3.4.0.min.js"></script>
+        <script src="../js/public.js"type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+            publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+             //加载母账户
+				
+			layui.use(['form', 'table','laydate','jquery'], function() {
+				var form = layui.form;
+				var table = layui.table;
+				var $ = layui.jquery;
+                var laydate = layui.laydate;
+              	// 获取撤单类型
+			publicMathod.getDropdownList("api/Tool/GetMobileUserRealStatus", form, $("#stru"));
+
+                   // 执行搜索
+	
+                        
+                table.render({
+                    elem: '#data_table',
+                    url: publicMathod.hosturl + 'api/User/GetRealNamesList',
+                    method: 'post',
+                    contentType: "application/json; charset=UTF-8",
+                  
+                    contentType: "application/json; charset=UTF-8",
+					headers: {token: publicMathod.token},
+                    parseData: function (res) { //规定数据格式
+                        //console.log(res.Data)
+                        return {
+                            "code": res.Status, //解析接口状态
+                            "msg": res.Msg, //解析提示文本
+                            "count": res.Count, //解析数据长度
+                            "data": res.Data //解析数据列表
+                        };
+                    },
+                    response: {//规定响应成功状态码
+                        statusCode: 1
+                    },
+                    cols: [[
+                        {field: 'id',title: 'ID',sort: true}, 
+                        {field: 'poh',title: '用户手机',minWidth: 140}, 
+                        {field: 'Name',title: '用户姓名',minWidth: 140}, 
+                        {field: 'IdCrd',title: '身份证号码',minWidth: 200}, 
+                        {
+                            field: 'stus', title: '申请状态',minWidth: 140,
+                            templet: function (obj) {//0正常，1风控，2禁用
+                                    if (obj.stus === 1) {
+                                        return '<span class="layui-bg-blue" style="padding:3px;font-size:12px">已通过</span>';
+                                    } else if (obj.stus === 2){
+                                        return '<span class="layui-bg-orange" style="padding:3px;font-size:12px">待审核</span>';
+                                    } else if (obj.stus === 3){
+                                        return '<span class="layui-bg-black" style="padding:3px;font-size:12px">未通过</span>';
+                                    }
+                                }
+                        },
+                        {field: 'apptime',title: '申请时间',minWidth: 160,sort: true}, 
+                        {field: 'auttime',title: '审核时间',minWidth: 160,sort: true}, 
+                        {field: 'riamk',title: '备注',minWidth: 100},
+                        {title: '操作',width:100,fixed: 'right',
+                            templet: function (obj) {
+                                if (obj.stus == 1) {
+                                    return '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="audit1"><i class="layui-icon layui-icon-ok-circle"></i>查看</a>';
+                                } else if(obj.stus ==2){
+                                    return '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="audit"><i class="layui-icon layui-icon-ok-circle"></i>审核</a>';
+                                }else if(obj.stus ==3){
+                                    return '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="audit1"><i class="layui-icon layui-icon-ok-circle"></i>查看</a>'
+                                }
+                            },
+                        },
+                    ]],
+                    page: {
+						layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+					},
+                });
+                // 监听工具条
+                table.on('tool(data_table)', function(obj) {
+                var data = obj.data;
+              
+                
+                if (obj.event === 'audit') {//编辑
+                    
+                    var url='verified.html?id='+data.id
+                    open_adv("实名审核",url);
+                
+                } else if(obj.event === 'audit1'){
+                    var url='verified.html?id='+data.id+"&name="+data.Name
+                    open_adv("实名审核查看",url);
+                }
+                
+            });
+
+            function open_adv(type,url){
+                    layer.open({
+                        type: 2, 
+                        title:type,
+                        area: ['800px', '570px'],
+                        shade:0.8,
+                        content: [url,'no'] 
+                    });	
+                }
+
+                form.on("submit(search_go)", function (data) {
+			//console.log(data);
+			var formField = data.field;
+			table.reload('data_table',{
+				page: { curr: 1 },
+				where: formField
+			});
+			return false;
+        });
+        $('#SearchKey').bind('keyup', function(event) {
+				if (event.keyCode == "13") {
+					$("#search_go").click();
+					}
+			});
+				
+            })
+            
+			
+		</script>
+	</body>
+</html>

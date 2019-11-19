@@ -1,0 +1,265 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>资金流水</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="title_wrap">
+            <form class="layui-form">
+                <div class="layui-form-item l_left">
+                    <label class="layui-form-label">代理商</label>
+                    <div class="layui-input-block">
+                        <select name="AgentId" lay-filter="AgentId" id="AgentId">
+                            <option value="0" selected="">所有代理</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item l_left">
+                    <label class="layui-form-label">交易类型</label>
+                    <div class="layui-input-block">
+                        <select name="TranType" id="TranType" lay-filter="aihao">
+                            <option value="0" selected="">所有交易类型</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item l_left">
+                    <label class="layui-form-label">时间筛选</label>
+                    <div class="layui-input-block ">
+                        <input type="text" class="layui-input" id="time" name="Time" placeholder="请选择时间范围">
+                    </div>
+                </div>
+                <div class="layui-form-item l_left">
+                    <div class="layui-form-item l_left">
+                        <label class="layui-form-label l_left">搜索关键字</label>
+                        <input type="text" id="search_input" name="SearchKey" lay-verify="title" autocomplete="off"
+                            placeholder="请输入用户名/手机号/委托编号" class="layui-input l_left"
+                            style="width: initial;min-width: 320px;">
+                        <span class="layui-btn l_left" style="border-radius: 0;" id="search_go" lay-submit
+                            lay-filter="search_go"><i
+                                class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+                        <span class="layui-btn l_left" style="border-radius: 0;" id="exportExcel" lay-submit
+                            lay-filter="exportExcel">导出Excel</span>
+                        <a href="" download="download" style="display: none;" id="downloadExcel"></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="table_wrap">
+            <table id="data_table" lay-filter="data_table"></table>
+        </div>
+    </div>
+    <script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/jquery-3.4.0.min.js"></script>
+    <script src="../js/public.js"></script>
+    <script type="text/javascript">
+        publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+        layui.use(['form', 'table', 'laydate', 'jquery'], function () {
+
+            var form = layui.form;
+            var table = layui.table;
+            var $ = layui.jquery;
+            var laydate = layui.laydate;
+
+            laydate.render({
+                elem: '#time'
+                , type: 'datetime'
+                , range: true
+                , done: function (value, date, endDate) {
+
+                }
+            });
+
+
+            //加载交易类型
+            publicMathod.post({
+                url: "api/Tool/GetMobileUserTransactionType",
+                success: function (result) {
+                    var str = "";
+                    for (var i = 0; i < result.Data.length; i++) {
+                        str += '<option value="' + result.Data[i].Id + '">' + result.Data[i].Name + '</option>';
+                    }
+                    $("#TranType").append(str);
+                    form.render(); //更新全部
+                }
+            })
+
+            //加载所有代理商
+            publicMathod.getAllAgency("api/Agents/GetAllTree", form, $("#AgentId"));
+            var lock = true;
+            table.render({
+                elem: '#data_table',
+                url: publicMathod.hosturl + 'api/UserMoney/GetList', //数据接口
+                method: 'post',
+                contentType: "application/json; charset=UTF-8",
+                cellMinWidth: 100,
+                totalRow: true,
+                autoSort: false,
+                headers: { token: publicMathod.token },
+                page: {
+                    layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+                },
+                parseData: function (res) { //规定数据格式
+                    //console.log(res.Data)
+                    if (!res.Data) {
+                        layer.msg(res.Msg, { icon: 5 })
+                    } else {
+                        if (!res.Data.length) {
+                            return {
+                                "code": res.Status, //解析接口状态
+                                "msg": res.Msg, //解析提示文本
+                                "count": res.Count, //解析数据长度
+                                "data": res.Data //解析数据列表
+                            };
+                        }
+                        if (lock) {
+                            lock = false
+                            $(".layui-table-total table tbody ").after(`
+                            <tr><td data-field="Id" data-key="1-0-0" data-minwidth="80" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="UPhone" data-key="1-0-1" data-minwidth="130" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="UName" data-key="1-0-2" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="AName" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="DType" data-key="1-0-4" class=""><div class="layui-table-cell laytable-cell-1-0-4">全部合计：</div></td><td data-field="DMoney" data-key="1-0-5" class=""><div class="layui-table-cell laytable-cell-1-0-5">${(res.SumData.DMoney).toFixed(2)}</div></td><td data-field="MFee" data-key="1-0-6" class=""><div class="layui-table-cell laytable-cell-1-0-6">${(res.SumData.MFee).toFixed(2)}</div></td><td data-field="BeBegin" data-key="1-0-7" class=""><div class="layui-table-cell laytable-cell-1-0-7"></div></td><td data-field="BeMoney" data-key="1-0-8" class=""><div class="layui-table-cell laytable-cell-1-0-8"></div></td><td data-field="Timal" data-key="1-0-9" data-minwidth="160" class=""><div class="layui-table-cell laytable-cell-1-0-9"></div></td><td data-field="SCode" data-key="1-0-10" class=""><div class="layui-table-cell laytable-cell-1-0-10"></div></td><td data-field="SName" data-key="1-0-11" class=""><div class="layui-table-cell laytable-cell-1-0-11"></div></td><td data-field="DPrice" data-key="1-0-12" class=""><div class="layui-table-cell laytable-cell-1-0-12"></div></td><td data-field="DNum" data-key="1-0-13" class=""><div class="layui-table-cell laytable-cell-1-0-13">${res.SumData.DNum}</div></td><td data-field="AhNo" data-key="1-0-14" class=""><div class="layui-table-cell laytable-cell-1-0-14"></div></td><td data-field="DlNo" data-key="1-0-15" class=""><div class="layui-table-cell laytable-cell-1-0-15"></div></td><td data-field="Rark" data-key="1-0-16" class=""><div class="layui-table-cell laytable-cell-1-0-16"></div></td></tr>
+						`)
+                        }
+                    }
+                    return {
+                        "code": res.Status, //解析接口状态
+                        "msg": res.Msg, //解析提示文本
+                        "count": res.Count, //解析数据长度
+                        "data": res.Data //解析数据列表
+                    };
+
+                },
+                response: {//规定响应成功状态码
+                    statusCode: 1
+                },
+                cols: [[
+                    { field: 'Id', title: 'ID', sort: true, minWidth: 80 },
+                    { field: 'UPhone', title: '用户手机', minWidth: 130 },
+                    { field: 'UName', title: '用户姓名' },
+                    { field: 'AName', title: '代理商' },
+                    { field: 'DType', title: '交易类型', totalRowText: '本页合计:' },
+                    { field: 'DMoney', title: '发生金额', minWidth: 160, sort: true, totalRow: true },
+                    { field: 'MFee', title: '服务费', minWidth: 160, sort: true, totalRow: true },
+                    { field: 'BeBegin', title: '发生前余额', sort: true },
+                    { field: 'BeMoney', title: '发生后余额', sort: true },
+                    { field: 'Timal', title: '发生时间', sort: true, minWidth: 160 },
+                    { field: 'SCode', title: '合约代码' },
+                    { field: 'SName', title: '合约名称' },
+                    { field: 'DPrice', title: '成交价格', sort: true },
+                    { field: 'DNum', title: '成交数量', sort: true, totalRow: true },
+                    { field: 'AhNo', title: '委托编号' },
+                    { field: 'DlNo', title: '成交编号' },
+                    { field: 'Rark', title: '备注' }
+                ]]
+            });
+            //执行搜索
+            var data1;
+            form.on("submit(search_go)", function (data) {
+                //console.log(data);
+
+                var lock1 = true;
+                var formField = data.field;
+                table.reload('data_table', {
+                    page: { curr: 1 },
+                    where: formField,
+                    parseData: function (res) { //规定数据格式
+                        if (!res.Data) {
+                            layer.msg(res.Msg, { icon: 5 })
+                        } else {
+                            if (!res.Data.length) {
+                                return {
+                                    "code": res.Status, //解析接口状态
+                                    "msg": res.Msg, //解析提示文本
+                                    "count": res.Count, //解析数据长度
+                                    "data": res.Data //解析数据列表
+                                };
+                            }
+                            data1 = res;
+                            return {
+                                "code": res.Status, //解析接口状态
+                                "msg": res.Msg, //解析提示文本
+                                "count": res.Count, //解析数据长度
+                                "data": res.Data //解析数据列表
+                            };
+                        }
+                    },
+                    response: {//规定响应成功状态码
+                        statusCode: 1
+                    },
+                    done: function (res, curr, count) {
+                        // console.log('分页触发', res, curr, count);
+                        if (curr === 1 && lock1 && count) {
+                            lock1 = false;
+                            $(".layui-table-total table tbody ").after(`
+                            <tr><td data-field="Id" data-key="1-0-0" data-minwidth="80" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="UPhone" data-key="1-0-1" data-minwidth="130" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="UName" data-key="1-0-2" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="AName" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="DType" data-key="1-0-4" class=""><div class="layui-table-cell laytable-cell-1-0-4">全部合计：</div></td><td data-field="DMoney" data-key="1-0-5" class=""><div class="layui-table-cell laytable-cell-1-0-5">${(data1.SumData.DMoney).toFixed(2)}</div></td><td data-field="MFee" data-key="1-0-6" class=""><div class="layui-table-cell laytable-cell-1-0-6">${(data1.SumData.MFee).toFixed(2)}</div></td><td data-field="BeBegin" data-key="1-0-7" class=""><div class="layui-table-cell laytable-cell-1-0-7"></div></td><td data-field="BeMoney" data-key="1-0-8" class=""><div class="layui-table-cell laytable-cell-1-0-8"></div></td><td data-field="Timal" data-key="1-0-9" data-minwidth="160" class=""><div class="layui-table-cell laytable-cell-1-0-9"></div></td><td data-field="SCode" data-key="1-0-10" class=""><div class="layui-table-cell laytable-cell-1-0-10"></div></td><td data-field="SName" data-key="1-0-11" class=""><div class="layui-table-cell laytable-cell-1-0-11"></div></td><td data-field="DPrice" data-key="1-0-12" class=""><div class="layui-table-cell laytable-cell-1-0-12"></div></td><td data-field="DNum" data-key="1-0-13" class=""><div class="layui-table-cell laytable-cell-1-0-13">${data1.SumData.DNum}</div></td><td data-field="AhNo" data-key="1-0-14" class=""><div class="layui-table-cell laytable-cell-1-0-14"></div></td><td data-field="DlNo" data-key="1-0-15" class=""><div class="layui-table-cell laytable-cell-1-0-15"></div></td><td data-field="Rark" data-key="1-0-16" class=""><div class="layui-table-cell laytable-cell-1-0-16"></div></td></tr>
+						`)
+                        }
+                    }
+                });
+                return false;
+            });
+            //回车搜索
+            $('#search_input').bind('keyup', function (event) {
+                if (event.keyCode == "13") {
+                    $("#search_go").click();
+                }
+            });
+            //监听排序
+            table.on('sort(data_table)', function (obj) {
+                ////console.log(obj.field); //当前排序的字段名
+                ////console.log(obj.type); //当前排序类型：desc（降序）、asc（升序）、null（空对象，默认排序）
+                var TranType = $("#TranType").val();
+                var time = $("#time").val();
+                var agency_id = $("#AgentId").val();//获取代理商id
+                var search_val = $("#search_input").val();//获取搜索框的值
+
+                table.reload('data_table', {
+                    url: publicMathod.hosturl + 'api/UserMoney/GetList', //数据接口
+                    where: { //设定异步数据接口的额外参数
+                        "TranType": Number(TranType),
+                        "Time": time,
+                        "AgentId": Number(agency_id),
+                        "OrderKey": obj.field,
+                        "Sort": obj.type,
+                        "SearchKey": search_val
+                    },
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+
+
+            //导出
+            form.on("submit(exportExcel)", function (data) {
+                // console.log(data);
+                var formField1 = data.field;
+                var sendData = {
+                    AgentId: Number(formField1.AgentId),
+                    SearchKey: formField1.SearchKey,
+                    Time: formField1.Time,
+                    TranType: Number(formField1.TranType),
+                    AdminType: 0,
+                    AdminID: Number(localStorage.getItem('id'))
+                }
+
+                publicMathod.exportExcel('api/UserMoney/ExportExcelCapitalWater', '用户资金流水', sendData);
+
+            });
+
+        });
+
+
+    </script>
+</body>
+
+</html>

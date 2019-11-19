@@ -1,0 +1,313 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>充值审核</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+<style>
+    .click {
+        max-height: 570px;
+        left: 97%;
+        top: 57%;
+        transform: translate(-50%, -47%);
+        z-index: 200;
+        position: absolute;
+        border: solid rgb(0, 0, 0, 0.5);
+        border-width: 1000px;
+    }
+</style>
+
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card" style="box-shadow:none;">
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="sub_form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">支付渠道</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="FromName" autocomplete="off"
+                                    class="layui-input layui-btn-disabled wd250" disabled="disabled" />
+                                <span id="qi" style="font-size: small;color: #c2c2c2"> </span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">充值金额</label>
+                            <div class="layui-input-inline">
+                                <input type="text" autocomplete="off" name="RechargeMoney" class="layui-input wd250"
+                                    lay-verify="number" id="pre_money" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">充值服务费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="RechargeLost" autocomplete="off" lay-verify="number"
+                                    class="layui-input wd250" id="watchFee" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">到账金额</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="real_money" name="RechargeValue" lay-verify="number"
+                                    class="layui-input wd250">
+                                <!-- <input type="hidden" id="rechargeValue" name="rechargeValue" /> -->
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">截图</label>
+                            <div class="layui-input-inline">
+                                <img src="" id="screenshots" name="screenshots" style="max-height: 60px;">
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">用户备注</label>
+                            <div class="layui-input-block">
+                                <textarea id="UkRemark" name="UkRemark" class="layui-textarea wd480"
+                                    disabled="disabled"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-block">
+                                <textarea id="Remark" name="Remark" class="layui-textarea wd480"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-block">
+                                <span class="layui-btn" id="ysub_btn" lay-submit="" lay-filter="ysub_btn">通过</span>
+                                <span class="layui-btn" id="nsub_btn" lay-submit="" lay-filter="nsub_btn">未通过</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/jquery-3.4.0.min.js"></script>
+    <script src="../js/public.js"></script>
+    <script type="text/javascript" defer async>
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+        var id;
+        layui.use(['form', 'layer', 'jquery'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            id = publicMathod.getUrlParam("id");
+            var $ = layui.jquery;
+
+            var czje
+            var czsxf
+            var dzje
+
+            var xgczje
+            var xgczsxf
+            var xgdzje
+
+            var sxfl
+            var yuan
+            //获取代付列表
+
+            publicMathod.post({
+                url: "api/SystemPayconfig/GetList",
+                success: function (result) {
+                    var str = "";
+                    for (var i = 0; i < result.Data.length; i++) {
+                        str += '<option value="' + result.Data[i].Id + '">' + result.Data[i]
+                            .MpName + '</option>';
+                    }
+                    $("#FromName").append(str);
+                    form.render(); //更新全部
+                }
+            })
+            //通过id获取数据
+            publicMathod.post({
+                url: "api/UserRecharge/GetModel?id=" + id,
+
+                success: function (data) {
+                    var datas = data.Data;
+                    czje = datas.RechargeMoney
+                    czsxf = datas.RechargeLost
+                    dzje = datas.RechargeValue
+                    sxfl = datas.searge
+                    yuan = datas.micharge
+                    $("#qi").html("服务费率为:" + datas.searge + ",最低服务费为:" + datas.micharge)
+                    //表单初始化
+                    form.val("sub_form", {
+                        //"Id": datas.Id,
+                        "FromName": datas.FromName,
+                        "StatusName": datas.StatusName,
+                        "RechargeMoney": datas.RechargeMoney,
+                        "RechargeLost": datas.RechargeLost,
+                        "RechargeValue": datas.RechargeValue,
+                        "UkRemark": datas.UkRemark,
+                    })
+                    $('#real_money').val($('#pre_money').val() - $('#watchFee').val());
+                    $('#screenshots').attr('src', datas.ImgUrl);
+                },
+            });
+
+            var flg = false
+            // 图片的放大缩小
+            $("#screenshots").click(function () {
+                flg = !flg
+                if (flg) {
+                    $("#screenshots").removeAttr("style");
+                } else {
+                    $("#screenshots").attr("style", "max-height: 60px;")
+                }
+
+
+                $(this).toggleClass("click");
+
+            })
+
+            // 计算到账金额
+            $("body").on("input", "#pre_money", function () {
+                //console.log(yuan);
+
+                if ($("#pre_money").val() * sxfl / 100 > yuan) {
+                    $("#watchFee").val($("#pre_money").val() * sxfl / 100)
+                    $("#real_money").val($("#pre_money").val() - $("#pre_money").val() * sxfl / 100)
+                } else {
+                    $("#watchFee").val(yuan)
+                    $("#real_money").val($("#pre_money").val() - parseInt($("#watchFee").val()))
+                }
+            })
+            //监听服务费的修改
+            $('body').on('input mouseleave', '#watchFee', function () {
+                $('#real_money').val($('#pre_money').val() - $('#watchFee').val());
+            })
+            //监听服务费的修改
+            $('body').on('input', '#real_money', function () {
+                if ($("#real_money").val() === '') {
+                    $("#watchFee").val(0)
+                    $("#pre_money").val(0)
+                    return;
+                } 
+                if (parseInt($("#real_money").val()) / (1 - sxfl / 100) < parseInt($("#real_money")
+                        .val()) + yuan) {
+                    $("#watchFee").val(yuan)
+                    $("#pre_money").val(parseInt($("#real_money").val()) + yuan)
+                } else {
+                    $("#watchFee").val(parseInt($("#real_money").val()) / (1 - sxfl / 100) - $(
+                            "#real_money")
+                        .val())
+                    $("#pre_money").val(parseInt($("#real_money").val()) / (1 - sxfl / 100))
+                }
+
+            })
+            //通过提交
+
+
+            form.on('submit(ysub_btn)', function (data) {
+
+
+                var data = data.field;
+                var Type = 1;
+                var msg = "您确定通过审核吗?"
+
+                Submission(data, msg, Type, czje, czsxf, dzje);
+
+
+            });
+
+            //未通过提交
+            form.on('submit(nsub_btn)', function (data) {
+                var data = data.field;
+                var Type = 2;
+                var msg = "确认未通过，用户充值失败，需重新充值?"
+                Submission(data, msg);
+
+            });
+        })
+
+        function Submission(data, msg, Type, czje, czsxf, dzje) {
+
+            xgczje = data.RechargeMoney
+            xgczsxf = data.RechargeLost
+            xgdzje = data.RechargeValue
+            var lock = true;
+            layer.confirm(msg, {
+
+            }, function (index) {
+
+                if (lock) {
+
+                    if (Type == 1) {
+
+                        lock = !lock
+                        if (czje == xgczje && czsxf == xgczsxf && dzje == xgdzje) {
+                            var xianzai = $('#Remark').val()
+                        } else {
+                            var xian = $('#Remark').val()
+                            $('#Remark').val(xian + "##" + "原充值金额" + czje + "," + "现充值金额" + xgczje + "," +
+                                "原充值服务费" +
+                                czsxf + "," + "现充值服务费" + xgczsxf + "," + "原到账金额" + dzje + "," + "现到账金额" +
+                                xgdzje)
+                            var xianzai = $('#Remark').val()
+                        }
+
+                    } else {
+                        var xianzai = $('#Remark').val()
+                    }
+                    publicMathod.post({
+                        url: 'api/UserRecharge/Audit',
+                        data: {
+                            "Type": Number(Type),
+                            "Id": Number(id),
+                            "FollowId": 0,
+                            "UserName": "",
+                            "RechargeMoney": data.RechargeMoney,
+                            "RechargeScreenshots": "",
+                            "RechargeLost": data.RechargeLost,
+                            "RechargeValue": data.RechargeValue,
+                            "RechargeNo": "",
+                            "RechargeFrom": 0,
+                            "Status": 0,
+                            "IsRead": 0,
+                            "Remark": xianzai,
+                            "UkRemark": "",
+                            "AgentsId": 0,
+                            "AgentsName": "",
+                            "FromName": "",
+                            "StatusName": ""
+
+                        },
+                        success: function (result) {
+
+                            if (result.Status == "1") {
+                                var index = parent.layer.getFrameIndex(window.name);
+                                layer.msg("审核成功", {
+                                    icon: 5,
+                                    shade: 0.8,
+                                });
+                                parent.layer.close(index);
+                                parent.location.reload();
+
+                            } else {
+                                layer.msg(result.Msg, {
+                                    icon: 5
+                                });
+                            }
+                        }
+                    })
+                }
+
+            });
+            // layer.close(loadIndex);
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可
+
+        }
+    </script>
+</body>
+
+</html>
