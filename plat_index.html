@@ -1,0 +1,326 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>首页</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="css/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="css/admin.css" media="all">
+	</head>
+	<body class="layui-layout-body">
+		<div id="LAY_app">
+			<div class="layui-layout layui-layout-admin">
+				<div class="layui-header">
+					<ul class="layui-nav layui-layout-left">
+						<li class="layui-nav-item layadmin-flexible" lay-unselect>
+							<a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
+								<i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+							</a>
+						</li>
+						
+						<li class="layui-nav-item" lay-unselect>
+							<a href="javascript:;" layadmin-event="refresh" title="刷新">
+								<i class="layui-icon layui-icon-refresh-3"></i>
+							</a>
+						</li>
+					</ul>
+					<ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
+						<li class="layui-nav-item layui-hide-xs" lay-unselect>
+							<a href="http://www.layui.com/admin/" target="_blank" title="前台">
+								<i class="layui-icon layui-icon-website"></i>
+							</a>
+						</li>
+
+						<li class="layui-nav-item" lay-unselect>
+							<a lay-href="app/message/index.html" layadmin-event="message" lay-text="消息中心">
+								<i class="layui-icon layui-icon-notice"></i>
+								<!-- 如果有新消息，则显示小圆点 -->
+								<span class="layui-badge-dot"></span>
+							</a>
+						</li>
+						
+						<li class="layui-nav-item layui-hide-xs" lay-unselect>
+							<a href="javascript:;" layadmin-event="note">
+								<i class="layui-icon layui-icon-note"></i>
+							</a>
+						</li>
+						<li class="layui-nav-item layui-hide-xs" lay-unselect>
+							<a href="javascript:;" layadmin-event="fullscreen">
+								<i class="layui-icon layui-icon-screen-full"></i>
+							</a>
+						</li>
+						<li class="layui-nav-item" lay-unselect>
+							<a href="javascript:;">
+								<cite id="name">应该是要正确的</cite>
+							</a>
+							<dl class="layui-nav-child">
+								<dd><a onclick="window.location.href='/login/forget_pwd.html'">修改密码</a></dd>
+								<!-- <hr> -->
+								<dd style="text-align: center;" id="log_out"><a>退出</a></dd>
+							</dl>
+						</li>
+
+						<li class="layui-nav-item layui-hide-xs" lay-unselect>
+							<a href="javascript:;" ><i class="layui-icon layui-icon-more-vertical"></i></a>
+						</li>
+					</ul>
+				</div>
+
+				<!-- 侧边菜单 -->
+				<div class="layui-side layui-side-menu" id="left_nva">
+					<div class="layui-side-scroll">
+						<div class="layui-logo" lay-href="home/console.html">
+							<span>后台管理系统</span>
+						</div>
+
+						<ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
+							<!-- <li data-name="home" class="layui-nav-item layui-this" >
+								<a href="javascript:;" lay-href="home/user_info.html" lay-tips="用户概况" lay-direction="2">
+									<i class="layui-icon layui-icon-user"></i>
+									<cite>用户概况</cite>
+								</a>
+							</li>
+							<li data-name="content" class="layui-nav-item ">
+								<a href="javascript:;" lay-tips="内容管理" lay-direction="2">
+									<i class="layui-icon layui-icon-home"></i>
+									<cite>内容管理</cite>
+								</a>
+								<dl class="layui-nav-child">
+									<dd data-name="article"><a lay-href="content/article.html">文章管理</a></dd>
+									<dd data-name="slideshow"><a lay-href="content/slideshow.html">广告管理</a></dd>
+									<dd data-name="agreement"><a lay-href="content/agreement.html">协议管理</a></dd>
+									<dd data-name="help"><a lay-href="content/help.html">帮助管理</a></dd>
+									<dd data-name="notice"><a lay-href="content/notice.html">公告管理</a></dd>
+								</dl>
+							</li>
+							<li data-name="user" class="layui-nav-item ">
+								<a href="javascript:;" lay-tips="用户管理" lay-direction="2">
+									<i class="layui-icon layui-icon-user"></i>
+									<cite>用户管理</cite>
+								</a>
+								<dl class="layui-nav-child">
+									<dd data-name="user_list"><a lay-href="user/user_list.html">用户列表</a></dd>
+									<dd data-name="recharge_record"><a lay-href="user/recharge_record.html">充值记录</a></dd>
+									<dd data-name="cash"><a lay-href="user/cash.html">提现记录</a></dd>
+									<dd data-name="capital_flow"><a lay-href="user/capital_flow.html">资金流水</a></dd>
+									<dd data-name="bank_records"><a lay-href="user/bank_records.html">银行卡记录</a></dd>
+									<dd data-name="sms_record"><a lay-href="user/sms_record.html">短信记录</a></dd>
+									<dd data-name="user_log"><a lay-href="user/user_log.html">用户日志</a></dd>
+									<dd data-name="lock_user"><a lay-href="user/lock_user.html">锁定用户</a></dd>
+									<dd data-name="blacklist"><a lay-href="user/blacklist.html">黑名单用户</a></dd>
+								</dl>
+							</li>
+							<li data-name="transaction" class="layui-nav-item">
+								<a href="javascript:;" lay-tips="交易管理" lay-direction="2">
+									<i class="layui-icon layui-icon-flag"></i>
+									<cite>交易管理</cite>
+								</a>
+								<dl class="layui-nav-child">
+									<dd data-name='guess_up_down'><a lay-href="transaction/guess_up_down.html">猜涨猜跌</a></dd>
+									<dd data-name='entrust_day'><a lay-href="transaction/entrust_day.html">当日委托</a></dd>
+									<dd data-name='deal_day'><a lay-href="transaction/deal_day.html">当日成交</a></dd>
+									<dd data-name='entrust_history'><a lay-href="transaction/entrust_history.html">历史委托</a></dd>
+									<dd data-name='deal_history'><a lay-href="transaction/deal_history.html">历史成交</a></dd>
+									<dd data-name='position_contract'><a lay-href="transaction/position_contract.html">持仓合约</a></dd>
+									<dd data-name='manual_filling'><a lay-href="transaction/manual_filling.html">手动补仓</a></dd>
+								</dl>
+							</li>
+							<li data-name="agency" class="layui-nav-item">
+								<a href="javascript:;" lay-tips="代理管理" lay-direction="2">
+									<i class="layui-icon layui-icon-app"></i>
+									<cite>代理管理</cite>
+								</a>
+								<dl class="layui-nav-child">
+									<dd data-name='agency'><a lay-href="agency/agency.html">代理管理</a></dd>
+									<dd data-name='withdrawal_record'><a lay-href="agency/withdrawal_record.html">代理提现记录</a></dd>
+									<dd data-name='journal_account'><a lay-href="agency/journal_account.html">代理资金流水</a></dd>
+									<dd data-name='oem_agenry'><a lay-href="agency/oem_agency.html">贴牌代理</a></dd>
+								</dl>
+							</li>
+							<li data-name="staff" class="layui-nav-item">
+								<a href="javascript:;" lay-tips="平台员工" lay-direction="2">
+									<i class="layui-icon layui-icon-app"></i>
+									<cite>平台员工</cite>
+								</a>
+								<dl class="layui-nav-child">
+									<dd data-name='staff'><a lay-href="staff/staff.html">员工管理</a></dd>
+								</dl>
+							</li>
+							<li data-name="query" class="layui-nav-item ">
+								<a href="javascript:;" lay-tips="查询统计" lay-direction="2">
+									<i class="layui-icon layui-icon-senior"></i>
+									<cite>查询统计</cite>
+								</a>
+								<dl class="layui-nav-child">
+									<dd data-name='daily_report'><a lay-href="query/daily_report.html">当日报表</a></dd>
+									<dd data-name='history_report'><a lay-href="query/history_report.html">历史报表</a></dd>
+									<dd data-name='proxy_report'><a lay-href="query/proxy_report.html">代理业绩表</a></dd>
+									<dd data-name='staff_report'><a lay-href="query/staff_report.html">员工业绩表</a></dd>
+								</dl>
+							</li>
+							<li data-name="system" class="layui-nav-item ">
+								<a hrf="javascript:;" lay-tips="系统用户" lay-direction="2">
+									<i class="layui-icon layui-icon-group"></i>
+									<cite>系统用户</cite>
+								</a>
+								<dl class="layui-nav-child">
+									<dd><a lay-href="system/role.html">角色管理</a></dd>
+									<dd><a lay-href="system/administrators.html">管理员管理</a></dd>
+									<dd><a lay-href="system/management_log.html">管理日志</a></dd>
+								</dl>
+							</li>
+							<li data-name="set" class="layui-nav-item layui-nav-itemed">
+								<a href="javascript:;" lay-tips="设置管理" lay-direction="2">
+									<i class="layui-icon layui-icon-set"></i>
+									<cite>设置管理</cite>
+								</a>
+								<dl class="layui-nav-child">
+									<dd data-name='system'><a lay-href="set/system.html">系统设置</a></dd>
+									<dd data-name='bank'><a lay-href="set/bank.html">银行管理</a></dd>
+									<dd data-name='deal'><a lay-href="set/deal.html">交易设置</a></dd>
+									<dd data-name='account'><a lay-href="set/account.html">母账户配置</a></dd>
+									<dd data-name='option_list'><a lay-href="set/option_list.html">期权合约列表</a></dd>
+									<dd data-name='pay'><a lay-href="set/pay.html">支付提现设置</a></dd>
+									<dd data-name='file_up'><a lay-href="set/file_up.html">文件上传设置</a></dd>
+									<dd data-name='redis_clear'><a lay-href="set/redis_clear.html">Redis缓存清理</a></dd>
+									<dd data-name='sms'><a lay-href="set/sms.html">短信模板</a></dd>
+								</dl>
+							</li> -->
+						</ul>
+					</div>
+				</div>
+
+				<!-- 页面标签 -->
+				<div class="layadmin-pagetabs" id="LAY_app_tabs">
+					<div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
+					<div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
+					<div class="layui-icon layadmin-tabs-control layui-icon-down">
+						<ul class="layui-nav layadmin-tabs-select" lay-filter="layadmin-pagetabs-nav">
+							<li class="layui-nav-item" lay-unselect>
+								<a href="javascript:;"></a>
+								<dl class="layui-nav-child layui-anim-fadein">
+									<dd layadmin-event="closeThisTabs"><a href="javascript:;">关闭当前标签页</a></dd>
+									<dd layadmin-event="closeOtherTabs"><a href="javascript:;">关闭其它标签页</a></dd>
+									<dd layadmin-event="closeAllTabs"><a href="javascript:;">关闭全部标签页</a></dd>
+								</dl>
+							</li>
+						</ul>
+					</div>
+					<div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
+						<ul class="layui-tab-title" id="LAY_app_tabsheader">
+							<li lay-id="home/user_info.html" lay-attr="home/user_info.html" class="layui-this"><i class="layui-icon layui-icon-user"></i></li>
+						</ul>
+					</div>
+				</div>
+
+
+				<!-- 主体内容 -->
+				<div class="layui-body" id="LAY_app_body">
+					<div class="layadmin-tabsbody-item layui-show">
+							<!-- <iframe src="transaction/guess_up_down.html" frameborder="0" class="layadmin-iframe"></iframe> -->
+							<!-- <iframe src="home/user_info.html" frameborder="0" class="layadmin-iframe"></iframe>  -->
+				
+						<!-- <iframe src="set/deal_edit.html" frameborder="0" class="layadmin-iframe"></iframe> -->
+					</div>
+
+				</div>
+
+				<!-- 辅助元素，一般用于移动设备下遮罩 -->
+				<div class="layadmin-body-shade" layadmin-event="shade"></div>
+			</div>
+		</div>
+	<script src="css/layui/layui.js"></script>
+	<script src="js/public.js"></script>
+	<script src="js/jquery-3.4.0.min.js"></script>
+	<script>
+		// //console.log(sessionStorage.getItem('Token') == null);
+		publicMathod.staffToken = sessionStorage.getItem('Token') != null ? unescape(sessionStorage.getItem('Token')) : publicMathod.staffToken;
+		if (!publicMathod.staffToken) {//判断是否登录 未登录返回登录页面
+			parent.location.href = 'login.html';
+		}
+	
+		
+		$("#name").text(sessionStorage.getItem("userName"))
+		layui.config({
+			base:'../'
+		}).extend({
+			index: 'lib/index' //主入口模块
+		}).use(['index', 'element'], function () {
+			var element = layui.element;
+
+			var menuPlat = sessionStorage.getItem('menu') != null ? JSON.parse(unescape(sessionStorage.getItem('menu'))) : [];//平台管理员菜单
+			// 平台员工菜单
+			var staffMenu = [
+				{"Id":1,"Name":"员工管理","RName":"plat_staff","ChildrenNode":[
+					{"Id":10,"Name":"员工业绩表","RName":"staff_report","ChildrenNode":null},
+					{"Id":11,"Name":"代理业绩表","RName":"proxy_report","ChildrenNode":null}]
+				}
+			]
+
+			var menu = [];//存储当前菜单
+			//登录后获取身份,决定菜单
+			var idCard = sessionStorage.getItem('identity');
+			var identity = idCard;
+			if (identity === 'M'||identity === 'AM') {//管理员
+				menu = menuPlat;
+			} else if (identity === 'S' || identity === 'JS'||identity === 'AM') {//平台员工
+				menu = staffMenu;
+			} else {
+				menu = [];
+			}
+
+			// //console.log(menu);
+			//初始化菜单  平台员工
+			if (menu.length) {
+				for (let i = 0; i < menu.length; i++) {
+					var str = '';
+					if (menu[i].Id === 1 && menu[i].ChildrenNode == null) {
+						str = `<li data-name="${menu[i].RName}" class="layui-nav-item layui-this" >
+										<a href="javascript:;" lay-href="${menu[i].RName}/user_info.html?menuId=${menu[i].Id}" lay-tips="用户概况" lay-direction="2">
+											<i class="layui-icon layui-icon-user"></i>
+											<cite>${menu[i].Name}</cite>
+										</a>
+									</li>`;
+					} else {
+						str = `<li data-name="${menu[i].RName}" class="layui-nav-item ">
+									<a href="javascript:;" lay-tips="${menu[i].Name}" lay-direction="2">
+										<i class="layui-icon layui-icon-home"></i>
+										<cite>${menu[i].Name}</cite>
+									</a>
+									<dl class="layui-nav-child">`;
+					}
+					if (menu[i].ChildrenNode != null) {
+						for (let j = 0; j < menu[i].ChildrenNode.length; j++) {
+							str += `<dd data-name="${menu[i].ChildrenNode[j].RName}"><a lay-href="${menu[i].RName}/${menu[i].ChildrenNode[j].RName}.html?menuId=${menu[i].ChildrenNode[j].Id}">${menu[i].ChildrenNode[j].Name}</a></dd>`;
+						}
+						str += `</dl></li>`;
+					}
+					$('#LAY-system-side-menu').append(str);
+					element.init();
+					element.render('nav', 'layadmin-system-side-menu');
+				}
+
+				// 主体内容
+				var mainStr = menu[0].Id === 1 && menu[0].ChildrenNode == null ? `<iframe src="${menu[0].RName}/user_info.html" frameborder="0" class="layadmin-iframe"></iframe>` : `<iframe src="${menu[0].RName}/${menu[0].ChildrenNode[0].RName}.html" frameborder="0" class="layadmin-iframe"></iframe>`
+				$('#LAY_app_body > div').append(mainStr);
+			}
+
+			//退出
+			$('body').on('click', '#log_out', function () {
+				sessionStorage.removeItem('menu');
+				sessionStorage.removeItem('Token');
+				sessionStorage.removeItem('id');
+				sessionStorage.removeItem('AgentLevel');
+				sessionStorage.removeItem('aid');
+				sessionStorage.removeItem('identity');
+				sessionStorage.removeItem('Ipa');
+				sessionStorage.removeItem('userName');
+				sessionStorage.removeItem('login');
+				parent.location.href = '/login.html';
+			}) 
+		});
+	</script>
+    </body >
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>登录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="css/management_table.css" />
+</head>
+<style>
+    .notclic{
+        pointer-events: none;
+    }
+</style>
+<body>
+    <div class="layadmin-user-login-main">
+        <div class="layadmin-user-login-box layadmin-user-login-header">
+            <h2>后台管理系统登录</h2>
+        </div>
+        <form class="layadmin-user-login-box layadmin-user-login-body layui-form">
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-username"></label>
+                <input type="text" name="username" lay-verify="required" placeholder="手机号码" class="layui-input"
+                    id="tel">
+            </div>
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-password"></label>
+                <input type="password" name="password" lay-verify="required" placeholder="密码" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-row">
+                    <div class="layui-col-xs7">
+                        <label class="layadmin-user-login-icon layui-icon layui-icon-vercode"></label>
+                        <input type="text" id="vercode" name="vercode" lay-verify="required" placeholder="图形验证码" class="layui-input">
+                    </div>
+                    <div class="layui-col-xs5">
+                        <div style="margin-left: 10px;">
+                            <img src="" class="layadmin-user-login-codeimg" id="v_img">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-row">
+                    <div class="layui-col-xs7">
+                        <label class="layadmin-user-login-icon layui-icon layui-icon-vercode"></label>
+                        <input type="text" name="telcode" lay-verify="required" placeholder="手机验证码" class="layui-input">
+                    </div>
+                    <div class="layui-col-xs5">
+                        <div style="margin-left: 10px;line-height: 38px;text-align: center; border: 1px solid #d0d0d0;box-sizing: border-box;height: 38px;"
+                            id="get_code">获取验证码</div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login">登入</button>
+            </div>
+            <div class="layui-form-item" style="text-align: right;">
+                <!-- <a style="float: left;color: #009688;cursor: pointer;" onclick="window.location.href='/login.html'">管理员登录</a> -->
+                <a onclick="window.location.href='/login/forget_pwd.html'">忘记密码</a>
+            </div>
+            <!-- <input type="text" id="aa" /><input type="button" id="btnAa" value="设置" /><input type="button" id="btnGet"
+                value="获取" /> -->
+        </form>
+    </div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/md5.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+    layui.use(['form'], function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        var timeLimit = 60;
+        var timer = null;
+        var telVer = false;
+
+        var platStaff = publicMathod.getUrlParam('platStaff');//平台员工跳转登录
+        if (platStaff != null) {
+            $.ajax({
+                type: "post",
+                url: publicMathod.hosturl + 'api/User/PlatformStaffLoginRewrite',
+                data: JSON.stringify({
+                    "Uphe": platStaff,
+                    "Ap": '1',
+                    "Pc": '1',
+                    "Mc": '1',
+                    "IsSimulateLogin": true
+                }),
+                xhrFields: {
+                    withCredentials: true
+                },
+                contentType: "application/json; charset=UTF-8",
+                crossDomain: true,
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+              
+                    if (data.Status !== '1') {
+                        layer.msg(data.Msg, { icon: 5 });
+                        return false;
+                    }
+                    sessionStorage.setItem('login',JSON.stringify(data.Data));
+                    sessionStorage.setItem('userName',data.Data.UserName);
+                    var menu = escape(JSON.stringify(data.Data.LeftMenu));
+                    sessionStorage.setItem('menu', menu);
+                    sessionStorage.setItem('Token', escape(data.Data.Token));
+                    sessionStorage.setItem('id', data.Data.UserId);
+                    sessionStorage.setItem('AgentLevel', data.Data.AgentLevel);
+                    sessionStorage.setItem('aid', data.Data.AgentsId);
+                    var identity = getIdentity(data.Data.AccountType);
+                    sessionStorage.setItem('identity', identity);
+                    sessionStorage.setItem('Ipa', data.Data.Ipa);//1为贴牌
+                    layer.msg(data.Msg, { icon: 1 });
+                    window.location.href = 'plat_index.html';
+                },
+                error: function (data) {
+                  
+                }
+            })
+        }
+
+        //初始化图片验证码
+        $.ajax({
+            url: publicMathod.hosturl + "api/User/GetCodeImage",
+            data: {},
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
+            type: "get",
+            cache: false,
+            success: function (r) {
+              
+                $('#v_img').attr('src', r);
+            }
+        });
+
+
+        //图形验证码
+        $('body').on('click', '#v_img', function () {
+            var num = (new Date()).getTime();//生成一个随机数（防止缓存）
+            $.ajax({
+                url: publicMathod.hosturl + "api/User/GetCodeImage?" + num,
+                data: {},
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                type: "get",
+                cache: false,
+                success: function (r) {
+                    $('#v_img').attr('src', r);
+                }
+            });
+        })
+
+        //自定义验证规则
+        form.verify({
+
+        });
+
+        //监听填写手机号输入框失焦时验证当前手机号码是否输入正确
+        $('body').on('blur', '#tel', function () {
+            var reg = /^1[3,4,5,6,7,8,9][0-9]{9}$/;
+            if ($('#tel').val()) {
+                if (!reg.test($('#tel').val())) {
+                    telVer = false;
+                    layer.msg("手机号输入有误", { icon: 5 })
+                } else {
+                    telVer = true;
+                }
+            } else {
+                telVer = false;
+                layer.msg("请输入手机号", { icon: 5 })
+            }
+        })
+
+        // 监听获取验证码
+        $('body').on('click', '#get_code', function () {
+            if($("#vercode").val()==''){
+                layer.msg("图形验证码必填", { icon: 5 })
+            }else{
+                $(this).addClass('notclic');
+            if (telVer) {//验证手机号
+              
+                if (timeLimit === 60) {
+                    getVertify($('#tel').val());
+                    timer = setInterval(function () { //倒计时
+                        $('#get_code').text('重新获取' + timeLimit + 's');
+                        if (timeLimit <= 0) {
+                            $('#get_code').removeClass('notclic');
+                            timeLimit = 60;
+                            $('#get_code').text('获取验证码');
+                          
+                            clearInterval(timer);
+                        } else {
+                            timeLimit--;
+                        }
+                    }, 1000);
+                } else {
+                   
+                    return;
+                }
+            } else {
+                layer.msg("请先检查输入的手机号码", { icon: 5 })
+            }
+        }
+        })
+
+        function getVertify(mobile) {//获取验证码
+            $.ajax({
+                url: publicMathod.hosturl + "api/User/GetCodeSms",
+                data: mobile,
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                type: "post",
+                cache: false,
+                contentType: "application/json; charset=UTF-8",
+                success: function (data) {
+                    // //console.log(r);
+                    if (data.Status === '1') {
+                        layer.msg('发送成功', { icon: 1 });
+                    } else {
+                        layer.msg(data.Msg, { icon: 5 });
+                    }
+                }
+            })
+        }
+
+        //监听提交
+        form.on('submit(login)', function (data) {
+         
+            $.ajax({
+                // url: publicMathod.hosturl + "api/User/ManagerLogin",
+                url: publicMathod.hosturl + "api/User/PlatformStaffLoginRewrite",//9.11
+                data: JSON.stringify({
+                    "Uphe": data.field.username,
+                    "Ap": data.field.password,
+                    "Pc": data.field.vercode,
+                    "Mc": data.field.telcode,
+                    "IsSimulateLogin": false
+                }),
+                xhrFields: {
+                    withCredentials: true
+                },
+                contentType: "application/json; charset=UTF-8",
+                crossDomain: true,
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    if (data.Status === '1') {
+                       if (getIdentity(data.Data.AccountType) === 'JS' || getIdentity(data.Data.AccountType) === 'S') {
+                            sessionStorage.setItem('login',JSON.stringify(data.Data));
+                            sessionStorage.setItem('userName',data.Data.UserName);
+                            var menu = escape(JSON.stringify(data.Data.LeftMenu));
+                            sessionStorage.setItem('menu', menu);
+                            sessionStorage.setItem('Token', escape(data.Data.Token));
+                            sessionStorage.setItem('id', data.Data.UserId);
+                            sessionStorage.setItem('AgentLevel', data.Data.AgentLevel);
+                            sessionStorage.setItem('aid', data.Data.AgentsId);
+                            var identity = getIdentity(data.Data.AccountType);
+                            sessionStorage.setItem('identity', identity);
+                            sessionStorage.setItem('Ipa', data.Data.Ipa);//1为贴牌
+                            layer.msg(data.Msg, { icon: 1 });
+                            window.location.href = 'plat_index.html';
+                        }
+                    } else {
+                        layer.msg(data.Msg, { icon: 5 });
+                    }
+                }
+            })
+            return false;
+        });
+
+        function getIdentity (num) {
+            switch (num) {
+                case 1:
+                    return 'M';
+                case 2: 
+                    return 'JS';
+                case 3: 
+                    return 'S';
+                case 4: 
+                    return 'AM';
+                case 5: 
+                    return 'AJ';
+                case 6: 
+                    return 'AS';
+                default: 
+                    break;
+            }
+        }
+
+
+        // $.ajax({
+            //     type: "post",
+            //     url: publicMathod.hosturl + 'api/User/PlatformManagerLogin',
+            //     data: JSON.stringify({Uphe: platStaff}),
+            //     dataType: 'json',
+            //     contentType: "application/json; charset=UTF-8",
+            //     success: function (data) {
+              
+            //         if (data.Status !== '1') {
+            //             layer.msg(data.Msg, { icon: 5 });
+            //             return false;
+            //         }
+            //         sessionStorage.setItem('login',JSON.stringify(data.Data));
+            //         sessionStorage.setItem('userName',data.Data.UserName);
+            //         var menu = escape(JSON.stringify(data.Data.LeftMenu));
+            //         sessionStorage.setItem('menu', menu);
+            //         sessionStorage.setItem('Token', escape(data.Data.Token));
+            //         sessionStorage.setItem('id', data.Data.UserId);
+            //         sessionStorage.setItem('AgentLevel', data.Data.AgentLevel);
+            //         sessionStorage.setItem('aid', data.Data.AgentsId);
+            //         var identity = getIdentity(data.Data.AccountType);
+            //         sessionStorage.setItem('identity', identity);
+            //         sessionStorage.setItem('Ipa', data.Data.Ipa);//1为贴牌
+            //         layer.msg(data.Msg, { icon: 1 });
+            //         window.location.href = 'plat_index.html';
+            //     },
+            //     error: function (data) {
+                  
+            //     }
+            // })
+    })
+</script>
+
+</html>
