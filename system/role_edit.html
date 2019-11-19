@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>添加角色</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <a href="role.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>角色管理</a>
+                    <span lay-separator="">/</span>
+                    <a><cite>编辑角色</cite></a>
+                </div>
+                <div class="layui-card-body">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">角色名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="title" id="roleName" autocomplete="off" class="layui-input "
+                                    lay-verify="title" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">管理权限</label>
+                            <div class="layui-input-inline">
+                                <table id="data_table" lay-filter="data_table"></table>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-block">
+                                <button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+                                    lay-filter="sub_btn">确认提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+    layui.use(['form', 'table'], function () {
+        var form = layui.form;
+        var table = layui.table;
+
+        //实例化数据表格
+        table.render({
+            elem: '#data_table',
+            //url: '../json/role.json', //数据接口
+            url: publicMathod.hosturl + 'api/SystemRole/GetSetPage',
+            method: 'post',
+            contentType: "application/json; charset=UTF-8",
+			headers: {token: publicMathod.token},
+            parseData: function (res) { //规定数据格式
+                return {
+                    "code": res.Status, //解析接口状态
+                    "msg": res.Msg, //解析提示文本
+                    "count": res.Count, //解析数据长度
+                    "data": res.Data //解析数据列表
+                };
+            },
+            response: {//规定响应成功状态码
+                statusCode: 1
+            },
+            cols: [[
+                {
+                    field: 'name', title: '导航名称', width: 400,
+                    templet: function (obj) {
+                        if (obj.pid === -1) {
+                            return '<span><i class=" layui-icon layui-icon-triangle-d"></i><i class="layui-icon layui-icon-layer" style="margin:0 5px;"></i>' + obj.name + '</span>';
+                        } else {
+                            return '<span>&emsp;<i class="layui-icon layui-icon-file" style="margin:0 5px;"></i>' + obj.name + '</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'type', title: '权限分配', width: 600,
+                    templet: function (obj) {
+                        str = '';
+                        if (obj.pid === -1) {//如果是一级目录的权限，添加监听复选框监听事件
+                            str += "<input type='checkbox' name=" + obj.english + "  title=" + obj.jur[0].name + " data-mid=" + obj.id + " data-id=" + obj.jur[0].id + " data-pid=" + obj.pid + " data-child=" + obj.id + " lay-filter='root_check'>&emsp;";
+                        } else {
+                            for (var i = 0; i < obj.jur.length; i++) {
+                                str += "<input type='checkbox' name=" + obj.english + " title=" + obj.jur[i].name + " data-mid=" + obj.id + " data-id=" + obj.jur[i].id + " data-pid=" + obj.pid + " lay-filter='this_check'>&emsp;";
+                            }
+                        }
+                        return str;
+                    }
+                },
+                {
+                    field: 'all', title: '全选', width: 130,
+                    templet: function (obj) {
+                        if (obj.pid === -1) {
+                            return ''
+                        } else {
+                            return '<input type="checkbox" name="' + obj.english + '"   title="全选" data-pid=' + obj.pid + ' lay-filter="all">';
+                        }
+                    }
+                }
+            ]]
+        });
+
+        //绑定页面数据
+        var id = publicMathod.getUrlParam("id");
+
+        //数据提交
+        publicMathod.post({
+            url: "api/SystemRole/GetModel",
+            data: {"RId":id},
+            success: function (result) {
+                if (result.Status == "0") {
+                    //失败
+                    layer.msg(result.Msg, { icon: 5 });
+                } else if (result.Status == "-1") {
+                    //程序异常
+                    layer.msg("获取角色信息失败！", { icon: 5 });
+                } else {
+                    //查询成功，绑定数据
+                    //绑定角色名
+                    $("#roleName").val(result.Data.RName);
+                    //绑定勾选权限
+                    var srList = result.Data.SrList;
+                    for (var i = 0; i < srList.length; i++) {
+                        var name='';
+                        var menuCheck = $("input[type=checkbox][data-mid=" + srList[i].MId + "]");
+                        var fidList = srList[i].FIds.split(',');
+                        for (var j = 0; j < fidList.length; j++) {
+                            menuCheck.each(function () {
+                                if ($(this).data("id") == fidList[j]) {
+                                    $(this).prop("checked", true);
+                                    name = $(this).attr("name");
+                                };
+                            })
+                        }
+                        //全选验证
+                        var all_len = $("input[type=checkbox][name=" + name + "]").not("[lay-filter=all]").length;//获取该组权限个数
+                        var check_len = $("input[type=checkbox][name=" + name + "]:checked").not("[lay-filter=all]").length;//获取选中个数
+                        if (check_len === all_len) {
+                            $("input[type=checkbox][name=" + name + "][lay-filter=all]").prop("checked", true);
+                        } else {
+                            $("input[type=checkbox][name=" + name + "][lay-filter=all]").prop("checked", false);
+                        }
+
+
+                    }
+
+
+                    form.render('checkbox');
+
+                }
+            },
+            error: function (result) {
+            }
+        });
+
+
+
+        //监听所有全选复选框
+        form.on('checkbox(all)', function (data) {
+            //=================全选勾选二级目录
+            var name = $(data.elem)[0].name;//获取该级别名称
+            if ($(this).is(':checked')) {//如果选中
+                $("input[type=checkbox][name=" + name + "]").prop("checked", true);
+
+            } else {
+                $("input[type=checkbox][name=" + name + "]").prop("checked", false);
+            }
+            //=================是否勾选一级查看复选框
+            var this_pid = $(data.elem).data("pid");//获取勾选的一级目录id
+            var child_check_len = $("input[type=checkbox][data-pid=" + this_pid + "]:checked").length;//该一级目录被勾选个数
+            if (child_check_len === 0) {//如果为0则取消根目录查看复选框
+                $("input[type=checkbox][data-child=" + this_pid + "]").prop("checked", false);
+            } else {//反之勾选根目录查看复选框
+                $("input[type=checkbox][data-child=" + this_pid + "]").prop("checked", true);
+            }
+            //重新渲染表格
+            form.render('checkbox');
+        });
+        //监听单个（根目录）复选框
+        form.on('checkbox(root_check)', function (data) {
+            if ($(this).is(':checked') === false) {//一级目录查看取消操作
+                var this_child = $(data.elem).data("child");
+                var child_check_len = $("input[type=checkbox][data-pid=" + this_child + "]:checked").length;
+                if (child_check_len != 0) {
+                    $(this).prop("checked", true);
+                    layer.msg("请先取消勾选该目录下相关权限");
+                }
+            }
+            form.render('checkbox');
+        })
+        //监听单个复选框
+        form.on('checkbox(this_check)', function (data) {
+            //=================是否勾选一级查看复选框
+            //获取一级目录id
+            var _pid = $(data.elem).data("pid");
+            if ($(this).is(':checked')) {//如果选中则一级目录也选中
+                $("input[type=checkbox][data-child=" + _pid + "]").prop("checked", true);
+            } else {//如果不是选中个数是否为0，如果为0则取消一级目录选中状态
+                var this_len = $("input[type=checkbox][data-pid=" + _pid + "]:checked").length;
+                if (this_len === 0) {
+                    $("input[type=checkbox][data-child=" + _pid + "]").prop("checked", false);
+                }
+            }
+            //=================是否勾选全选
+
+            var name = $(data.elem)[0].name;//获取操作复选框所在组
+            var all_len = $("input[type=checkbox][name=" + name + "]").not("[lay-filter=all]").length;//获取该组权限个数
+            var check_len = $("input[type=checkbox][name=" + name + "]:checked").not("[lay-filter=all]").length;//获取选中个数
+            if (check_len === all_len) {
+                $("input[type=checkbox][name=" + name + "][lay-filter=all]").prop("checked", true);
+            } else {
+                $("input[type=checkbox][name=" + name + "][lay-filter=all]").prop("checked", false);
+            }
+            form.render('checkbox');
+        })
+
+        //监听提交 - 编辑
+        form.on('submit(sub_btn)', function (data) {
+
+            //选中的checkbox
+            var checkTotal = $('input[type=checkbox]:checked');
+
+            //array 菜单Id + 权限Id
+            var totalArray = new Array();
+            //array 菜单Id
+            var mArray = new Array();
+
+            for (var i = 0; i < checkTotal.length; i++) {
+                //菜单Id
+                var mid = $(checkTotal[i]).data("mid");
+                //权限Id
+                var fid = $(checkTotal[i]).data("id");
+                //排除全选checkbox
+                if (mid == undefined || fid == undefined) {
+                    continue;
+                }
+
+                mArray.push(mid);
+                totalArray.push({ mid, fid });
+            }
+
+
+            // array 菜单 去重
+            var mArray = publicMathod.arrayRemoveItem(mArray);
+
+
+            //整理之后的数组
+            var finalArray = new Array();
+            for (var i = 0; i < mArray.length; i++) {
+                var MId = mArray[i];
+                var tempFidArr = new Array();
+                for (var j = 0; j < totalArray.length; j++) {
+                    if (totalArray[j].mid == MId) {
+                        tempFidArr.push(totalArray[j].fid);
+                    }
+                }
+                var FIds = tempFidArr.join(',');
+                finalArray.push({ MId, FIds });
+            }
+
+
+
+
+
+            //数据封装
+            var request_data = {
+                "Rid": publicMathod.getUrlParam("id"),
+                "RName": data.field.title,
+                "SrList": finalArray
+            };
+
+
+            //数据提交
+            publicMathod.post({
+                url: "api/SystemRole/Edit",
+                data: request_data,
+                success: function (result) {
+                    if (result.Status == "0") {
+                        //失败
+                        layer.msg(result.Msg, { icon: 5 });
+                    } else if (result.Status == "-1") {
+                        //程序异常
+                        layer.msg("添加失败！", { icon: 5 });
+                    } else {
+                        //添加成功
+                        window.location.href = "role.html";
+                    }
+                },
+                error: function (result) {
+                }
+            });
+
+
+        });
+    })
+
+</script>
+
+</html>

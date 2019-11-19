@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>编辑管理员</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-body">
+					<form class="layui-form" lay-filter="sub_form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">账号</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Ren" lay-verify="Ren" placeholder="请输入账号" autocomplete="off"
+									class="layui-input" lay-verify="required">
+							</div>
+							<div class="layui-form-mid layui-word-aux">*账号必须是6-32位的字母数字或者下划线组成</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">登录密码</label>
+							<div class="layui-input-inline">
+								<input type="password" name="Pa" lay-verify="Pa" placeholder="请设置密码" autocomplete="off"
+									class="layui-input">
+							</div>
+							<div class="layui-form-mid layui-word-aux">*密码必须以字母开头包含数字并且要高于6位</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">姓名</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Un" lay-verify="Un|required" placeholder="请输入真实姓名" autocomplete="off"
+									class="layui-input">
+							</div>
+							<div class="layui-form-mid layui-word-aux">*姓名必须由2-6位的中文字符组成</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">手机</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Te" lay-verify="Te|required" placeholder="请输入手机号码" autocomplete="off"
+									class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">邮箱</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Em" lay-verify="Em|required" placeholder="请输入邮箱" autocomplete="off"
+									class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">用户状态</label>
+							<div class="layui-input-inline">
+								<input type="checkbox" name="Lo" lay-filter="Lo" lay-skin="switch" lay-text="正常|禁用"
+									checked="checked">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<div class="layui-inline">
+								<label class="layui-form-label">管理角色</label>
+								<div class="layui-input-inline">
+									<select name="RId" id="RId" lay-verify="required">
+										
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">隐藏用户</label>
+							<div class="layui-input-inline" id="Ie">
+							</div>
+							<div class="layui-form-mid layui-word-aux">是否隐藏用户关键信息</div>
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label"></label>
+							<div class="layui-input-block">
+								<button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+									lay-filter="sub_btn">确认提交</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript" defer async>
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'upload', 'jquery'], function () {
+		var form = layui.form;
+
+		//角色
+		publicMathod.getDropdownList("api/Tool/GetSysRoleType", form, $("#RId"));
+		//单选按钮
+		publicMathod.getRadio("api/Tool/GetSysManagerHidePhone", form, $("#Ie"), "Ie");
+
+
+		//绑定数据
+		var id = publicMathod.getUrlParam("id");
+		if (id > 0) {
+			setTimeout(() => {
+				//编辑，需要绑定数据
+				//通过id获取数据
+				publicMathod.post({
+					url: "api/SystemManager/GetModel",
+					data: id,
+					success: function (data) {
+						var data = data.Data;
+						//表单初始化
+						form.val("sub_form", {
+							"Ren": data.Ren//账号
+							, "Pa": data.Pa//登录密码
+							, "Un": data.Un//姓名
+							, "Te": data.Te//手机
+							, "Em": data.Em//邮箱
+							, "Lo": data.Lo == 1//用户状态
+							, "RId": data.RId//管理角色
+							, "Ie": data.Ie.toString()//隐藏用户  
+						})
+						form.render();
+					}
+				});
+			}, 100);
+			
+		}
+
+
+
+		
+
+		//自定义验证规则
+		form.verify({
+			title: function (value) {
+				if (value.length < 5) {
+					return '标题至少得5个字符啊';
+				}
+			},
+			Pa: function(value) {
+                    var par = /^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){5,19}$/;
+					if (!par.exec(value)) {
+						return '密码必须以字母开头包含数字并且要高于6位';
+					}
+				}
+		});
+		//监听提交
+		form.on('submit(sub_btn)', function (data) {
+
+			// layer.alert(JSON.stringify(data.field), {
+			// 	title: '最终的提交信息'
+			// })
+
+			var urls = "";
+			if(id>0){
+				//编辑
+				urls="api/SystemManager/Edit";
+			}else{
+				//新增
+				urls="api/SystemManager/Add";
+			}
+
+			var data = data.field;
+			publicMathod.post({
+				url: urls,
+				data: {
+					"Id": parseInt(id),
+					"Ren": data.Ren,
+					"Pa": data.Pa,
+					"Un": data.Un,
+					"Te": data.Te,
+					"Em": data.Em,
+					"RId": parseInt(data.RId),
+					"Lo": data.Lo == "on" ? 1 : 2,
+					"Ie": parseInt(data.Ie)
+				},
+				success: function (result) {
+					if (result.Status == 1) {
+						//关闭窗口，刷新表格
+						var index = parent.layer.getFrameIndex(window.name);
+						parent.layer.close(index);
+						
+
+
+					} else if(result.Status == 2){
+						layer.msg(result.Data[0].Msg, { icon: 5, shade: 0.5, });
+						
+					}else{
+						layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+					}
+				}
+			})
+			return false;
+
+
+
+			//先得到当前iframe层的索引然后关闭
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+			return false;
+		});
+	})
+
+</script>
+
+</html>
