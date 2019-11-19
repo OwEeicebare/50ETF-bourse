@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>忘记密码</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+    <div class="layadmin-user-login-main">
+        <!-- <div class="logo"><img src="../images/login_logo.png" /></div> -->
+        <div class="layadmin-user-login-box layadmin-user-login-header">
+            <h2>忘记密码</h2>
+        </div>
+        <div class="layadmin-user-login-box layadmin-user-login-body ">
+            <form class="layui-form form_wrap">
+                <div class="layui-form-item">
+                    <label class="layadmin-user-login-icon layui-icon layui-icon-username"></label>
+                    <input type="text" name="username" lay-verify="required" placeholder="请输入手机号" class="layui-input"
+                        id="tel">
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-row">
+                        <div class="layui-col-xs7">
+                            <label class="layadmin-user-login-icon layui-icon layui-icon-vercode"></label>
+                            <input type="text" name="vercode" lay-verify="required" placeholder="图形验证码"
+                                class="layui-input">
+                        </div>
+                        <div class="layui-col-xs5">
+                            <div style="margin-left: 10px;">
+                                <img src="" class="layadmin-user-login-codeimg" id="v_img">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-row">
+                        <div class="layui-col-xs7">
+                            <label class="layadmin-user-login-icon layui-icon layui-icon-vercode"></label>
+                            <input type="text" name="telcode" lay-verify="required" placeholder="手机验证码"
+                                class="layui-input">
+                        </div>
+                        <div class="layui-col-xs5">
+                            <div style="margin-left: 10px;">
+                                <div style="margin-left: 10px;line-height: 38px;text-align: center; border: 1px solid #d0d0d0;box-sizing: border-box;height: 38px;"
+                                    id="get_code">获取验证码</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="next">下一步</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+    layui.use(['form', 'jquery'], function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        var timeLimit = 60;
+        var timer = null;
+        var telVer = false;
+        var telForget = '';
+
+        //初始化图形验证码
+        $.ajax({
+            url: publicMathod.hosturl + "api/User/GetPwdCodeImage",
+            data: {},
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
+            type: "get",
+            cache: false,
+            success: function (r) {
+                // //console.log(r);
+                $('#v_img').attr('src', r);
+            }
+        });
+
+        //图形验证码
+        $('body').on('click', '#v_img', function () {
+            var num = (new Date()).getTime();//生成一个随机数（防止缓存）
+            $.ajax({
+                url: publicMathod.hosturl + "api/User/GetPwdCodeImage?" + num,
+                data: {},
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                type: "get",
+                cache: false,
+                success: function (r) {
+                    $('#v_img').attr('src', r);
+                }
+            });
+        })
+
+        //监听填写手机号输入框失焦时验证当前手机号码是否输入正确
+        $('body').on('blur', '#tel', function () {
+            var reg = /^1[3,4,5,6,7,8,9][0-9]{9}$/;
+            if ($('#tel').val()) {
+                if (!reg.test($('#tel').val())) {
+                    telVer = false;
+                    layer.msg("手机号输入有误", { icon: 5 })
+                } else {
+                    telVer = true;
+                }
+            } else {
+                telVer = false;
+                layer.msg("请输入手机号", { icon: 5 })
+            }
+        })
+
+        // 监听获取验证码
+        $('body').on('click', '#get_code', function () {
+            if (telVer) {//验证手机号
+                if (timeLimit === 60) {
+                    getVertify($('#tel').val());
+                    timer = setInterval(function () { //倒计时
+                        $('#get_code').text('重新获取' + timeLimit + 's');
+                        if (timeLimit <= 0) {
+                            timeLimit = 60;
+                            $('#get_code').text('获取验证码');
+                            clearInterval(timer);
+                        } else {
+                            timeLimit--;
+                        }
+                    }, 1000);
+                } else {
+                    return;
+                }
+            } else {
+                layer.msg("请先检查输入的手机号码", { icon: 5 })
+            }
+        })
+
+        function getVertify(mobile) {//获取验证码
+            // publicMathod.post({
+            //     url: "api/User/GetCodeSms",
+            //     data: mobile,
+            //     success: function (data) {
+            //         // //console.log(data);
+            //         layer.msg(data.Msg, { icon: 1 });
+            //     }
+            // })
+            $.ajax({
+                url: publicMathod.hosturl + "api/User/GetPwdCodeSms",
+                data: mobile,
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                type: "post",
+                cache: false,
+                contentType: "application/json; charset=UTF-8",
+                success: function (data) {
+                    // //console.log(r);
+                    if (data.Status === '1') {
+                        layer.msg('发送成功', { icon: 1 });
+                    } else {
+                        layer.msg(data.Msg, { icon: 5 });
+                    }
+                }
+            })
+        }
+
+        //自定义验证规则
+        form.verify({
+
+        });
+        //监听下一步
+        form.on('submit(next)', function (data) {
+           
+            telForget = data.field.username;
+            $.ajax({
+                url: publicMathod.hosturl + "api/User/CheckChangePwdAbroad",
+                data: JSON.stringify({
+                    "Mobile": data.field.username,
+                    "ImgCode": data.field.vercode,
+                    "SmsCode": data.field.telcode
+                }),
+                xhrFields: {
+                    withCredentials: true
+                },
+                // headers: { "token": publicMathod.token },
+                contentType: "application/json; charset=UTF-8",
+                crossDomain: true,
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    if (data.Status === '1') {
+                        // layer.closeAll();
+                        var str = `
+                            <div class="layui-form-item">
+                            <label class="layadmin-user-login-icon layui-icon layui-icon-password"></label>
+                            <input type="password" name="newPassword1" autocomplete="off" id="newPassword1" lay-verify="password" placeholder="请输入新密码" class="layui-input">
+                            </div>
+                            <div class="layui-form-item">
+                            <label class="layadmin-user-login-icon layui-icon layui-icon-password"></label>
+                            <input type="password" name="newPassword2" autocomplete="off" id="newPassword2" lay-verify="password" placeholder="请确认新密码" class="layui-input">
+                            </div>
+                            <div class="layui-form-item">
+                            <span class="layui-btn"  id="finishSet">完成设置</span>
+                            </div>`;
+                        $(".layadmin-user-login-header>h2").html("重设密码");
+                        $(".layadmin-user-login-body").html(str);
+                    } else {
+                        layer.msg(data.Msg, { icon: 5 });
+                    }
+                }
+            })
+            return false;
+        });
+        form.verify({
+				password: function(value) {
+                    var par = /^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){5,19}$/;
+					if (!par.exec(value)) {
+						return '密码必须以字母开头包含数字并且要高于6位';
+					}
+				}
+			});
+        //完成设置
+        $('body').on('click', '#finishSet', function () {
+            var pwd = $("#newPassword1").val();
+            var pwd1 = $("#newPassword2").val();
+            localStorage.setItem('pwd', pwd);
+            localStorage.setItem('telForget', telForget);
+            if (pwd === pwd1) {
+                if (!pwd) {
+                    layer.msg("请输入新密码", { icon: 5 });
+                    return;
+                }
+                $.ajax({
+                    type: "post",
+                    url: publicMathod.hosturl + 'api/User/ChangePwdAbroad',
+                    data: JSON.stringify({
+                        "password": pwd,
+                        "Mobile": telForget
+                    }),
+                    dataType: 'json',
+                    timeout: 20000,
+                    contentType: "application/json; charset=UTF-8",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        
+                    },
+                    complete: function (XMLHttpRequest, textStatus) {
+                        // //console.log('请求状态', textStatus);
+                    },
+                    success: function (data) {
+                        if (data.Status == 1) {
+                            layer.msg("修改成功跳转登录", { icon: 5 });
+                            parent.location.href = "/login.html"
+                        } else {
+                            layer.msg(data.Msg, { icon: 5 });
+                        }
+                    }
+                });
+                return;
+            } else {
+                layer.msg("两次输入的密码不一致", { icon: 5 });
+                return;
+            }
+            return;
+
+        })
+
+    });
+
+
+</script>
+
+</html>
