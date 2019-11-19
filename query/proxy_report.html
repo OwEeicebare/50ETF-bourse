@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>代理业绩报表</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+<style>
+	.layui-table-view .layui-table td {
+		height: 50px;
+		padding: 0;
+		line-height: 25px;
+	}
+
+	.layui-table-cell {
+		height: unset;
+		line-height: unset;
+	}
+
+	.layui-icon-file:before,
+	.layui-icon-triangle-r:before,
+	.layui-icon-triangle-d::before {
+		margin-right: 5px;
+	}
+
+	.layui-icon-levelTwo:before {
+		margin-left: 20px;
+	}
+
+	.layui-icon-levelThree::before {
+		margin-left: 35px;
+	}
+
+	.new-report {
+		overflow: hidden;
+		position: relative;
+		top: -83px;
+	}
+
+	.new-report>div {
+		overflow: scroll;
+	}
+
+
+	#report-table tbody td,
+	#report-table thead th,
+	#bottom-table thead th {
+		padding: 10px;
+	}
+
+	#bottom-table {
+		margin-bottom: 42px;
+	}
+
+	#report-table {
+		margin: 0 0 5px 0;
+	}
+
+	#report-table thead th {
+		position: relative;
+	}
+
+	.bottom-header::-webkit-scrollbar {
+		display: none;
+	}
+
+	.bottom-header {
+		position: relative;
+		top: 83px;
+		z-index: 100;
+	}
+
+	.hover-div {
+		position: absolute;
+		left: -68%;
+		/* max-width: 200px; */
+		/* width: 240px; */
+		min-width: 320px;
+		max-width: 400px;
+		top: 35px;
+		border: 1px solid #f0f0f0;
+		border-radius: 4px;
+		padding: 3px 5px;
+		font-size: 12px;
+		background-color: #fff;
+		display: none;
+		color: #999;
+	}
+
+	.hover-content {
+		position: relative;
+	}
+
+	.hover-content::before {
+		content: '';
+		margin-left: 50%;
+		width: 0;
+		height: 0;
+		font-size: 0;
+		border-width: 6px;
+		border-style: dashed dashed solid dashed;
+		border-color: transparent transparent #fff transparent;
+		position: absolute;
+		left: 48%;
+		top: -15px;
+		margin: unset;
+	}
+
+	.control-open {
+		position: relative;
+		z-index: 101;
+	}
+
+	.update-data {
+		margin-left: 10px;
+	}
+</style>
+
+<body>
+	<div class="layui-fluid" id="root">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="title_wrap control-open">
+					<div class="layui-card-header">
+						<div class="clear">
+							<div class="layui-btn-group l_left">
+								<a href="javascript:;" style="margin-left: 1px;"><button
+										class="layui-btn layui-btn-normal" id="btn-expand">全部展开</button></a>
+								<a href="javascript:;" style="margin-left: 1px;"><button
+										class="layui-btn layui-btn-normal" id="btn-fold">全部折叠</button></a>
+								<!-- <a href="javascript:;" style="margin-left: 1px;"><button class="layui-btn layui-btn-normal"
+									id="agence-detail">代理详细报表</button></a> -->
+							</div>
+							<form class="layui-form" lay-filter="filter_form">
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label">代理商</label>
+									<div class="layui-input-block">
+										<select name="AnId" id="AnId">
+											<option value="0" selected="selected">全部代理商</option>
+										</select>
+									</div>
+								</div>
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label l_left">筛选时间</label>
+									<div class="layui-input-block">
+										<input type="text" class="layui-input" id="time" name="Time"
+											placeholder="请选择时间范围">
+									</div>
+								</div>
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label l_left">搜索关键字</label>
+									<input type="text" name="SearchKey" lay-verify="title" autocomplete="off"
+										placeholder="请输入代理ID/名称" class="layui-input l_left"
+										style="width: initial;min-width: 320px;">
+									<span class="layui-btn l_left" style="border-radius: 0;" id="search_go" lay-submit
+										lay-filter="search_go"><i
+											class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+									<span class="layui-btn l_left" style="border-radius: 0;" id="exportExcel" lay-submit
+										lay-filter="exportExcel">导出Excel</span>
+									<a href="" download="download" style="display: none;" id="downloadExcel"></a>
+									<span class="layui-btn l_left update-data" style="border-radius: 0;" id="updateData"
+										lay-submit lay-filter="updateData">更新数据</span>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<!-- <div class="layui-card-body">
+					<table id="table1" class="layui-table" lay-filter="table1"></table>
+				</div> -->
+				<div class="title_wrap">
+					<div class="layui-card-body new-report">
+						<div class="bottom-header">
+							<table class="layui-table" id="bottom-table">
+								<thead>
+									<tr>
+										<th>代理ID</th>
+										<th>代理商</th>
+										<th>代理等级</th>
+										<th>归属员工</th>
+										<th>用户累计充值<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+									" onmouseover="showIllustrate('recharge')" onmouseout="hiddenIllustrate('recharge')"></i>
+											<div class="hover-div" id="recharge">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，共充值多少金额</p>
+												</div>
+											</div>
+										</th>
+										<th>用户累计提现<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('withdraw')" onmouseout="hiddenIllustrate('withdraw')"></i>
+											<div class="hover-div" id="withdraw">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，共提现多少金额</p>
+												</div>
+											</div>
+										</th>
+										<th>用户可用余额<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('ableMoney')" onmouseout="hiddenIllustrate('ableMoney')"></i>
+											<div class="hover-div" id="ableMoney">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间内可用余额合计，在时间筛选，筛选的是时间段时，不显示筛选结果</p>
+												</div>
+											</div>
+										</th>
+										<th>用户开仓金额<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('openMoney')" onmouseout="hiddenIllustrate('openMoney')"></i>
+											<div class="hover-div" id="openMoney">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，通过买入开仓共支出多少金额=开仓成交张数x成交价格x合约单位</p>
+												</div>
+											</div>
+										</th>
+										<th>用户平仓金额<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('closeMoney')" onmouseout="hiddenIllustrate('closeMoney')"></i>
+											<div class="hover-div" id="closeMoney">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，通过卖出平仓共收入多少金额=平仓成交张数x成交价格x合约单位</p>
+												</div>
+											</div>
+										</th>
+										<th>用户延期服务费<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('delayFee')" onmouseout="hiddenIllustrate('delayFee')"></i>
+											<div class="hover-div" id="delayFee">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，共支付多少追加延期服务费</p>
+												</div>
+											</div>
+										</th>
+										<th>用户平仓服务费<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('closeFee')" onmouseout="hiddenIllustrate('closeFee')"></i>
+											<div class="hover-div" id="closeFee">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，共支付多少平仓服务费</p>
+												</div>
+											</div>
+										</th>
+										<th>用户开仓服务费<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('openFee')" onmouseout="hiddenIllustrate('openFee')"></i>
+											<div class="hover-div" id="openFee">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，共支付多少开仓服务费</p>
+												</div>
+											</div>
+										</th>
+										<th>用户延期张数<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('delayNum')" onmouseout="hiddenIllustrate('delayNum')"></i>
+											<div class="hover-div" id="delayNum">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，共有多少张合约延期</p>
+												</div>
+											</div>
+										</th>
+										<th>用户开仓张数<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('openNum')" onmouseout="hiddenIllustrate('openNum')"></i>
+											<div class="hover-div" id="openNum">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，共买入开仓成交多少张合约</p>
+												</div>
+											</div>
+										</th>
+										<th>用户平仓张数<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('closeNum')" onmouseout="hiddenIllustrate('closeNum')"></i>
+											<div class="hover-div" id="closeNum">
+												<div class="hover-content">
+													<p>代理的所有用户，在选定的时间或时间段内，共卖出平仓成交多少张合约</p>
+												</div>
+											</div>
+										</th>
+										<th>代理延期服务费收益<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('agenceDelayGet')" onmouseout="hiddenIllustrate('agenceDelayGet')"></i>
+											<div class="hover-div" id="agenceDelayGet">
+												<div class="hover-content">代理的所有用户支付的延期服务费 - 延期服务费成本</div>
+											</div>
+										</th>
+										<th>代理开仓服务费收益<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('agenceOpenGet')" onmouseout="hiddenIllustrate('agenceOpenGet')"></i>
+											<div class="hover-div" id="agenceOpenGet">
+												<div class="hover-content">代理的所有用户支付的开仓服务费 - 开仓服务费成本</div>
+											</div>
+										</th>
+										<th>代理平仓服务费收益<i class="layui-icon layui-icon-about" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;
+										" onmouseover="showIllustrate('agenceCloseGet')" onmouseout="hiddenIllustrate('agenceCloseGet')"></i>
+											<div class="hover-div" id="agenceCloseGet">
+												<div class="hover-content">代理的所有用户支付的平仓服务费 - 平仓服务费成本</div>
+											</div>
+										</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+						<div style="height: 650px" class="report-wrap">
+							<table id="report-table" class="layui-table">
+								<thead style="visibility: hidden;">
+									<tr>
+										<th>代理ID</th>
+										<th>代理商</th>
+										<th>代理等级</th>
+										<th>归属员工</th>
+										<th>用户累计充值</th>
+										<th>用户累计提现</th>
+										<th>用户可用余额</th>
+										<th>用户开仓金额</th>
+										<th>用户平仓金额</th>
+										<th>用户延期服务费</th>
+										<th>用户平仓服务费</th>
+										<th>用户开仓服务费</th>
+										<th>用户延期张数</th>
+										<th>用户开仓张数</th>
+										<th>用户平仓张数</th>
+										<th>代理延期服务费收益</th>
+										<th>代理开仓服务费收益</th>
+										<th>代理平仓服务费收益</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td colspan="19" style="padding: 20px 0 20px 50%;"><i
+												class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"
+												style="font-size: 28px;"></i></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div style="color: #f44336; font-size: 12px;">
+							<p>注：1、由于一二级代理均有两条数据记录，第一条记录，合计本级和所有下级代理的用户数据；第二条记录，为代理的直属用户的数据；</p>
+							<p><span style="opacity: 0">注：</span>2、
+								表格后三列的代理收益，第一条为合计本级的直属用户收益、及所有下级代理获得的抽成（抽成=（下级代理的成本-本级代理的成本）x张数）之和；第二条：本级代理的收益=直属用户收益+下级代理抽成；
+							</p>
+							<p><span style="opacity: 0">注：</span>3、交易日下午三点开始结算当日数据，结算时间约为1小时。
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js"></script>
+	<!-- <script type="text/javascript">
+		publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+		layui.use(['form', 'laydate', 'table'], function () {
+			var form = layui.form;
+			var table = layui.table;
+			var laydate = layui.laydate;
+			var $ = layui.jquery;
+
+			// 获取代理商列表
+			publicMathod.getAllAgency("api/Agents/GetAllTree", form, $("#AnId"));
+
+			laydate.render({
+				elem: '#time'
+				, type: 'datetime'
+				, range: true
+			});
+
+			//实例化数据表格
+			table.render({
+				elem: '#table1',
+				url: publicMathod.hosturl + 'api/ReportAgents/GetListaSumOne',
+				method: 'post',
+				contentType: "application/json; charset=UTF-8",
+				cellMinWidth: 100,
+				autoSort: false,
+				headers: { token: publicMathod.token },
+				page: false,
+				parseData: function (res) { //规定数据格式
+					// //console.log(res);
+					return {
+						"code": res.Status, //解析接口状态
+						"msg": res.Msg, //解析提示文本
+						"count": res.Count, //解析数据长度
+						"data": res.Data //解析数据列表
+					};
+				},
+				response: {//规定响应成功状态码
+					statusCode: 1
+				},
+				cols: [[
+					// { field: 'id', title: 'ID', width: 100 },
+					{ field: 'agents_id', title: '代理ID', width: 100, },
+					{
+						field: 'AgentsName', title: '代理商', minWidth: 200, templet: function (data) {
+							if (data.LevalSum == 1) {
+								if (data.Agentslayer == 1) {
+									return `<span class="layui-icon layui-icon-triangle-r" data-id="${data.agents_id}" lay-event="open" onclick="openNext(${data.agents_id}, ${data.Agentslayer}, ${data.Agentspareid})">${data.AgentsName}</span>`;
+
+								} else if (data.Agentslayer == 2) {
+									return `<span class="layui-icon layui-icon-triangle-r" data-id="${data.agents_id}" lay-event="open" onclick="openNext(${data.agents_id}, ${data.Agentslayer}, ${data.Agentspareid})">&nbsp;&nbsp;${data.AgentsName}</span>`;
+								}
+							} else {
+								if (data.Agentslayer == 1) {
+									return `<span class="layui-icon layui-icon-file">${data.AgentsName}</span>`
+								} else if (data.Agentslayer == 2) {
+									return `<span class="layui-icon layui-icon-file">&nbsp;&nbsp;${data.AgentsName}</span>`
+								} else if (data.Agentslayer == 3) {
+									return `<span class="layui-icon layui-icon-file">&nbsp;&nbsp;&nbsp;&nbsp;${data.AgentsName}</span>`
+								}
+							}
+						}
+					},
+					{ field: 'Agentslayer', title: '代理等级', minWidth: 100 },
+					{ field: 'origin', title: '归属员工', minWidth: 100 },
+					{ field: 'Rney', title: '用户累计充值', minWidth: 150 },
+					{ field: 'Caney', title: '用户累计提现', minWidth: 150 },
+					{ field: 'Usney', title: '用户可用余额', minWidth: 150 },
+					{ field: 'Ujney', title: '用户交易金额', minWidth: 150 },
+					{ field: 'Bee', title: '用户开仓金额', minWidth: 150 },
+					{ field: 'SaFee', title: '用户平仓金额', minWidth: 150 },
+					{ field: 'NiFee', title: '用户延期服务费', minWidth: 150 },
+					{ field: 'Buoney', title: '用户开仓服务费', minWidth: 150 },
+					{ field: 'Saney', title: '用户平仓服务费', minWidth: 150 },
+					{ field: 'Numsev', title: '用户延期张数', minWidth: 150 },
+					{ field: 'Numbuy', title: '用户开仓张数', minWidth: 150 },
+					{ field: 'Numsale', title: '用户平仓张数', minWidth: 150 },
+					{ field: 'agNumsev', title: '代理延期服务费收益', minWidth: 180 },
+					{ field: 'agNumbuy', title: '代理开仓服务费收益', minWidth: 180 },
+					{ field: 'agNumsale', title: '代理平仓服务费收益', minWidth: 180 },
+				]]
+			});
+			// 执行搜索
+			form.on("submit(search_go)", function (data) {
+				// //console.log(data);
+				var formField = data.field;
+				// //console.log(formField);
+				formField.AnId = Number(formField.AnId);
+				table.reload('table1', {
+					where: formField,
+					page: 1,
+					limit: 100
+				});
+				return false;
+			});
+
+		})
+	</script>
+	<script type="text/javascript">
+		var preId = [];//一级pid
+		var preId_tow = [];//二级pid
+		var layer = layui.layer;
+		function openNext(id, level, pid) {
+			var pid = pid ? pid : -1;
+			// //console.log(pid);
+			if (preId.indexOf(id) !== -1) {
+				$(`.layui-table-body table tbody tr.child${id}`).remove();
+				$(`.layui-table-body table tbody tr.zChildren${id}`).remove();
+				$(`.layui-table-body table tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-d');
+				$(`.layui-table-body table tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-r');
+				let index = preId.indexOf(id);
+				preId.splice(index, 1);
+				return;
+			} else if (level === 1) {
+				$(`.layui-table-body table tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-r');
+				$(`.layui-table-body table tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-d');
+				preId.push(id);
+			}
+
+			if (preId_tow.indexOf(id) !== -1) {
+				$(`.layui-table-body table tbody tr.child${id}`).remove();
+				$(`.layui-table-body table tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-d');
+				$(`.layui-table-body table tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-r');
+				let index = preId_tow.indexOf(id);
+				preId_tow.splice(index, 1);
+				return;
+			} else if (level === 2) {
+				$(`.layui-table-body table tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-r');
+				$(`.layui-table-body table tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-d');
+				// //console.log(id);
+				preId_tow.push(id);
+			}
+			// //console.log(preId_tow, id);
+
+			// //console.log(id, level);
+			if (level == 1) {
+				var index = layer.load(1, {
+					shade: [0.1, '#000'] //0.1透明度的白色背景
+				});
+				publicMathod.post({  //展开二级
+					url: 'api/ReportAgents/GetListaTwo',
+					data: {
+						"AnId": id,
+						"SearchKey": "",
+						"page": 0,
+						"limit": 0,
+						"Time": ""
+					},
+					success: function (data) {
+						if (data.Status == '1') {
+							let strHtml = "";
+
+							// //console.log(data.Data);
+							data.Data.sort((a, b) => {
+								return a.agents_id - b.agents_id;
+							})
+							$.each(data.Data, function (i, v) {
+								// var cls = v.agents_class_list.replace(',' + v.agents_id + ',', ' ').replace(/,/ig, ' ');
+								if (v.Agentspareid === 0) {//自己的数据
+									strHtml += "<tr data-index='" + v.agents_id + "' class='child" + id + "'>";
+								} else {//二级的数据
+									strHtml += "<tr data-index='" + v.agents_id + "' class='child" + v.Agentspareid + "'>";
+								}
+								strHtml += "<td><div class='layui-table-cell'>" + v.agents_id + "</div></td>";
+								// strHtml += "<td><div class='layui-table-cell'>" + v.AgentsName + "</div></td>";
+								if (v.LevalSum == 1) {
+									strHtml += `<td><div class='layui-table-cell'><span class='layui-icon layui-icon-triangle-r layui-icon-levelTwo' data-id="${v.agents_id}" onclick="openNext(${v.agents_id}, ${v.Agentslayer}, ${v.Agentspareid})"> ${v.AgentsName} </span></div></td>`;
+								} else {
+									strHtml += "<td><div class='layui-table-cell'><span class='layui-icon layui-icon-file layui-icon-levelTwo'>" + v.AgentsName + "</span></div></td>";
+								}
+								strHtml += "<td><div class='layui-table-cell'>" + v.Agentslayer + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.origin + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Rney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Caney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Usney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Ujney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Bee + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.SaFee + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.NiFee + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Buoney + "</div></td>";
+								//strHtml += "<td><div class='layui-table-cell'>" + v.money_ref + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Saney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Numsev + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Numbuy + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Numsale + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.agNumsev + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.agNumbuy + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.agNumsale + "</div></td>";
+								strHtml += "</tr>";
+							});
+							//添加下级元素
+							$(`.layui-table-body table tr td span[data-id="${id}"]`).parent().parent().parent().after(strHtml);
+							layer.close(index);
+						} else {
+							layer.close(index);
+							layer.Msg(data.Msg, { icon: 5 });
+						}
+					},
+					error: function (error) {
+						layer.close(index);
+						layer.Msg('服务器错误', { icon: 5 });
+					}
+				})
+			} else if (level == 2) {
+				var index = layer.load(1, {
+					shade: [0.1, '#000'] //0.1透明度的白色背景
+				});
+				publicMathod.post({  //展开三级
+					url: 'api/ReportAgents/GetListaThree',
+					data: {
+						"AnId": id,
+						"SearchKey": "",
+						"page": 0,
+						"limit": 0,
+						"Time": ""
+					},
+					success: function (data) {
+						if (data.Status == '1') {
+							let strHtml = "";
+							data.Data.sort((a, b) => {
+								return a.agents_id - b.agents_id;
+							})
+							data.Data[0].Agentspareid = data.Data[data.Data.length - 1].Agentspareid;
+							$.each(data.Data, function (i, v) {
+								// var cls = v.agents_class_list.replace(',' + v.agents_id + ',', ' ').replace(/,/ig, ' ');
+								if (v.Agentspareid === 0) {//自己的数据
+									strHtml += "<tr data-index='" + v.agents_id + "' class='child" + id + " zChildren'" + pid + "'>";
+								} else {//二级的数据
+									strHtml += "<tr data-index='" + v.agents_id + "' class='child" + id + " zChildren" + pid + "'>";
+								}
+								strHtml += "<td><div class='layui-table-cell'>" + v.agents_id + "</div></td>";
+								// strHtml += "<td><div class='layui-table-cell'>" + v.AgentsName + "</div></td>";
+								if (v.LevalSum == 1) {
+									strHtml += "<td><div class='layui-table-cell'><span class='layui-icon layui-icon-triangle-r layui-icon-levelThree'>" + v.AgentsName + "</span></div></td>";
+								} else {
+									strHtml += "<td><div class='layui-table-cell'><span class='layui-icon layui-icon-file layui-icon-levelThree'>" + v.AgentsName + "</span></div></td>";
+								}
+								strHtml += "<td><div class='layui-table-cell'>" + v.Agentslayer + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.origin + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Rney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Caney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Usney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Ujney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Bee + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.SaFee + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.NiFee + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Buoney + "</div></td>";
+								//strHtml += "<td><div class='layui-table-cell'>" + v.money_ref + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Saney + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Numsev + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Numbuy + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.Numsale + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.agNumsev + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.agNumbuy + "</div></td>";
+								strHtml += "<td><div class='layui-table-cell'>" + v.agNumsale + "</div></td>";
+								strHtml += "</tr>";
+							});
+							//添加下级元素
+							$(`.layui-table-body table tr td span[data-id="${id}"]`).parent().parent().parent().after(strHtml);
+							layer.close(index);
+						} else {
+							layer.close(index);
+							layer.Msg(data.Msg, { icon: 5 });
+						}
+					},
+					error: function (error) {
+						layer.close(index);
+						layer.Msg('服务器错误', { icon: 5 });
+					}
+				})
+			}
+		}
+	</script> -->
+
+
+	<script type="text/javascript">
+		layui.use(['form', 'layer', 'laydate', 'table'], function () {
+			publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+			var form = layui.form;
+			var table = layui.table;
+			var laydate = layui.laydate;
+			var $ = layui.jquery;
+			var layer = layui.layer;
+			var thWidth = [60, 300, 100, 100, 150, 150,
+				150, 150, 150, 150, 150, 150, 150, 150, 150, 180, 180, 180];
+			var tableWidth = 0;
+			var screenWidth = $('#report-table').parent().width();
+			// //console.log(screenWidth);
+			$.each(thWidth, function (i, v) {
+				tableWidth += v;
+			});
+			// //console.log(tableWidth);
+			$('#report-table').width(tableWidth)
+			$('#bottom-table').width(tableWidth)
+
+			//初始化表格宽度
+			$.each($('#report-table thead tr th'), function (i, v) {
+				$.each(thWidth, function (j, w) {
+					if (i === j) {
+						$(v).width(w);
+					}
+				})
+			})
+
+			// 获取代理商列表
+			publicMathod.getAllAgency("api/Agents/GetAllTree", form, $("#AnId"));
+
+			laydate.render({
+				elem: '#time'
+				, type: 'datetime'
+				, range: true
+			});
+			reTable({ page: 1 });
+			function concatTr(level, data, two, three) {
+				var trStr = '';
+				if (data == null && level < 3) {
+					return trStr;
+				}
+				if (level === 1) {
+					trStr += `<tr>`;
+					trStr += "<td class='agent-Id'>" + data.agents_id + "</td>";
+					if (data.ReportAgents) {
+						trStr += `<td class='agent-Name'><span class="layui-icon layui-icon-triangle-d layui-icon-levelOne" data-id="${data.agents_id}" lay-event="open" onclick="openNext(${data.agents_id}, ${data.Agentslayer}, ${data.Agentspareid})">${data.AgentsName}</span></td>`;
+					} else {
+						trStr += "<td class='agent-Name'><span class='layui-icon layui-icon-file layui-icon-levelOne'>" + data.AgentsName + "</span></td>";
+					}
+					trStr += "<td>" + data.Agentslayer + "</td>";
+					trStr += "<td>" + data.origin + "</td>";
+					trStr += "<td>" + data.Rney + "</td>";
+					trStr += "<td>" + Math.abs(data.Caney) + "</td>";
+					trStr += "<td>" + data.Usney + "</td>";
+					// trStr += "<td>" + data.Ujney + "</td>";
+					trStr += "<td>" + data.Bee + "</td>";
+					trStr += "<td>" + data.SaFee + "</td>";
+					trStr += "<td>" + data.NiFee + "</td>";
+					trStr += "<td>" + data.Buoney + "</td>";
+					trStr += "<td>" + data.Saney + "</td>";
+					trStr += "<td>" + data.Numsev + "</td>";
+					trStr += "<td>" + data.Numbuy + "</td>";
+					trStr += "<td>" + data.Numsale + "</td>";
+					trStr += "<td>" + data.agNumsev + "</td>";
+					trStr += "<td>" + data.agNumbuy + "</td>";
+					trStr += "<td>" + data.agNumsale + "</td>";
+					trStr += "</tr>";
+				} else if (level === 2) {
+					trStr += `<tr class="child${two}">`;
+					trStr += "<td class='agent-Id'>" + data.agents_id + "</td>";
+					if (data.ReportAgents) {
+						trStr += `<td class='agent-Name'><span class='layui-icon layui-icon-triangle-d layui-icon-levelTwo' data-id="${data.agents_id}" onclick="openNext(${data.agents_id}, ${data.Agentslayer}, ${data.Agentspareid})"> ${data.AgentsName} </span></td>`;
+					} else {
+						trStr += "<td class='agent-Name'><span class='layui-icon layui-icon-file layui-icon-levelTwo'>" + data.AgentsName + "</span></td>";
+					}
+					trStr += "<td>" + data.Agentslayer + "</td>";
+					trStr += "<td>" + data.origin + "</td>";
+					trStr += "<td>" + data.Rney + "</td>";
+					trStr += "<td>" + Math.abs(data.Caney) + "</td>";
+					trStr += "<td>" + data.Usney + "</td>";
+					// trStr += "<td>" + data.Ujney + "</td>";
+					trStr += "<td>" + data.Bee + "</td>";
+					trStr += "<td>" + data.SaFee + "</td>";
+					trStr += "<td>" + data.NiFee + "</td>";
+					trStr += "<td>" + data.Buoney + "</td>";
+					trStr += "<td>" + data.Saney + "</td>";
+					trStr += "<td>" + data.Numsev + "</td>";
+					trStr += "<td>" + data.Numbuy + "</td>";
+					trStr += "<td>" + data.Numsale + "</td>";
+					trStr += "<td>" + data.agNumsev + "</td>";
+					trStr += "<td>" + data.agNumbuy + "</td>";
+					trStr += "<td>" + data.agNumsale + "</td>";
+					trStr += "</tr>";
+				} else if (level === 3) {
+					trStr += `<tr class="child${two} zChildren${three}">`;
+					trStr += "<td class='agent-Id'>" + data.agents_id + "</td>";
+					trStr += "<td class='agent-Name'><span class='layui-icon layui-icon-file layui-icon-levelThree'>" + data.AgentsName + "</span></td>";
+					trStr += "<td>" + data.Agentslayer + "</td>";
+					trStr += "<td>" + data.origin + "</td>";
+					trStr += "<td>" + data.Rney + "</td>";
+					trStr += "<td>" + Math.abs(data.Caney) + "</td>";
+					trStr += "<td>" + data.Usney + "</td>";
+					// trStr += "<td>" + data.Ujney + "</td>";
+					trStr += "<td>" + data.Bee + "</td>";
+					trStr += "<td>" + data.SaFee + "</td>";
+					trStr += "<td>" + data.NiFee + "</td>";
+					trStr += "<td>" + data.Buoney + "</td>";
+					trStr += "<td>" + data.Saney + "</td>";
+					trStr += "<td>" + data.Numsev + "</td>";
+					trStr += "<td>" + data.Numbuy + "</td>";
+					trStr += "<td>" + data.Numsale + "</td>";
+					trStr += "<td>" + data.agNumsev + "</td>";
+					trStr += "<td>" + data.agNumbuy + "</td>";
+					trStr += "<td>" + data.agNumsale + "</td>";
+					trStr += "</tr>";
+				}
+				return trStr;
+			}
+
+
+			function reTable(requestData) {
+				publicMathod.post({
+					url: 'api/ReportAgents/GetAgentStatement',
+					data: requestData,
+					success: function (data) {
+						// //console.log('代理业绩表', data);
+						if (data.Status === '1') {
+							if (data.Data == null || data.Data.length === 0) {
+								$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>无数据</td></tr>`);
+								return;
+							}
+							var reportStr = '';
+							$.each(data.Data, function (i, v) {//一级
+								reportStr += concatTr(1, v);
+								if (v.ReportAgents != null) {
+									$.each(v.ReportAgents, function (a, b) {//二级
+										reportStr += concatTr(2, b, v.agents_id);
+										if (b.ReportAgents != null) {
+											$.each(b.ReportAgents, function (x, y) {//三级
+												reportStr += concatTr(3, y, v.agents_id, b.agents_id);
+											})
+										}
+									})
+								}
+							})
+							// //console.log(reportStr);
+							$('#report-table tbody').html(reportStr);
+
+							//初始化表格宽度
+							$.each($('#report-table thead tr th'), function (i, v) {
+								$.each($('#bottom-table thead tr th'), function (j, w) {
+									if (i === j) {
+										$(w).width($(v).width());
+									}
+								})
+							})
+						} else {
+							$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>${data.Msg}</td></tr>`);
+							layer.msg(data.Msg, { icon: 5 });
+						}
+					},
+					error: function (err) {
+						$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>数据请求异常</td></tr>`);
+						layer.msg('数据请求异常', { icon: 5 });
+					}
+				})
+			}
+			// 执行搜索
+			form.on("submit(search_go)", function (data) {
+				var field = data.field;
+				// console.log(field);
+				var type = '';
+				// var agentName = publicMathod.getSelectText('AnId');
+				if (!field.Time && !field.SearchKey && !field.AnId) {
+					return;
+				}
+				if (!field.Time && (field.SearchKey || field.AnId)) {
+					// console.log('搜索', (/^\d+$/).test(field.SearchKey))
+					clear_search()
+					if (field.AnId != 0) {
+						type = '.agent-Id';
+						search_go(field.AnId, type);
+					} else if (field.SearchKey) {
+						if ((/^\d+$/).test(field.SearchKey)) {//搜索员工Id
+							type = '.agent-Id';
+						} else {
+							type = '.agent-Name';
+						}
+						search_go(field.SearchKey, type);
+					}
+					return;
+				}
+				reTable({ page: 1, AnId: Number(field.AnId), SearchKey: field.SearchKey, Time: field.Time })
+				return false;
+			});
+
+			$('#report-table').parent().on('scroll', function () {
+				$('#bottom-table').parent().scrollLeft($('#report-table').parent()[0].scrollLeft)
+				if ($('#report-table').parent()[0].scrollLeft > ($('#report-table').parent()[0].scrollWidth - $('#report-table').parent()[0].offsetWidth - 10)) {
+					// console.log('开始禁止',$('#report-table').parent()[0].scrollLeft)
+					$('#bottom-table').parent().scrollLeft($('#report-table').parent()[0].scrollWidth - $('#report-table').parent()[0].offsetWidth - 10)
+					$('#report-table').parent().scrollLeft($('#report-table').parent()[0].scrollWidth - $('#report-table').parent()[0].offsetWidth - 10) //1752 1015 2767
+				}
+			})
+
+			function search_go(key, type) {
+				// console.log(key, type);
+				var hasResult = false;
+
+				$(type).each(function () {
+					var text = $(this).text();
+					// console.log(type, text, key);
+					if (type === '.agent-Id' && text === key) {
+						hasResult = true;
+						$(this).parent().css('background-color', 'rgba(250,230,160,0.5)');
+						$('html,body,.report-wrap').animate({ scrollTop: $(this).offset().top - 150 }, 500);
+					} else if (type === '.agent-Name' && text.indexOf(key) >= 0) {
+						hasResult = true;
+						$(this).parent().css('background-color', 'rgba(250,230,160,0.5)');
+						$('html,body, .report-wrap').animate({ scrollTop: $(this).offset().top - 150 }, 500);
+					}
+
+				})
+
+				if (!hasResult) {
+					layer.msg('未查询到结果', { icon: 5 });
+				}
+			}
+
+			function clear_search() {
+				$('#report-table').find('tbody tr').each(function () {//清空选中样式
+					$(this).css('background-color', 'transparent');
+				})
+			}
+
+			//导出
+			form.on("submit(exportExcel)", function (data) {
+				// console.log(data);
+				var formField1 = data.field;
+				var sendData = {
+					SearchKey: formField1.SearchKey,
+					Time: formField1.Time,
+					AnId: Number(formField1.AnId),
+					AdminType: 0,
+					AdminID: Number(localStorage.getItem('id'))
+				}
+				publicMathod.exportExcel('api/ReportAgents/ExcelAgentStatement', '代理业绩报表', sendData);
+			});
+
+
+			//更新数据
+			form.on("submit(updateData)", function (data) {
+				var updateIndex = layer.load(1, { shade: 0.4 });
+				publicMathod.post({
+					url: 'api/AgentMoneyList/CloseAgentAccounts',
+					success: function (data) {
+						// console.log(data);
+						layer.close(updateIndex);
+						if (data.Status === '1') {
+							layer.confirm('更新数据成功', { btn: ['确定'] }, function (index) {
+								layer.close(index);
+								form.val("filter_form", {
+									AnId: '0',
+									Time: '',
+									SearchKey: ''
+								})
+								reTable({ page: 1 });
+							});
+						} else {
+							layer.confirm(data.Msg, { btn: ['确定'] }, function (index) {
+								layer.close(index);
+							});
+						}
+					},
+					error: function (err) {
+						layer.close(updateIndex);
+						layer.msg('更新数据失败', { icon: 5 });
+					}
+				})
+				return false;
+			});
+		})
+
+
+		function showIllustrate(e) {
+			// console.log(e);
+			var illustrate = document.getElementById(e);
+			// console.log(illustrate)
+			illustrate.style.display = "block";
+		}
+		function hiddenIllustrate(e) {
+			// console.log(e);
+			var illustrate = document.getElementById(e);
+			illustrate.style.display = "none";
+		}
+
+
+	</script>
+	<script type="text/javascript">
+		var preId = [];//一级pid
+		var preId_tow = [];//二级pid
+		var layer = layui.layer;
+		function openNext(id, level, pid) {
+			var pid = pid ? pid : -1;
+			if (preId.indexOf(id) !== -1) {//展开
+				$(`#report-table tbody tr.child${id}`).css('display', 'table-row');
+				$(`#report-table tbody tr.zChildren${id}`).css('display', 'table-row');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-r');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-d');
+				$(`#report-table tbody tr.child${id} td.agent-Name`).each(function () {
+					if (!($(this).children().hasClass('layui-icon-file'))) {
+						$(this).children(".layui-icon-levelTwo").removeClass('layui-icon-triangle-r');
+						$(this).children(".layui-icon-levelTwo").addClass('layui-icon-triangle-d');
+						var pIndex = preId_tow.indexOf(Number($(this).children(".layui-icon-levelTwo").attr('data-id')));
+						preId_tow.splice(pIndex, 1);
+					}
+				})
+				let index = preId.indexOf(id);
+				preId.splice(index, 1);
+				return;
+			} else if (level === 1) {//折叠
+				$(`#report-table tbody tr.child${id}`).css('display', 'none');
+				$(`#report-table tbody tr.zChildren${id}`).css('display', 'none');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-d');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-r');
+				$(`#report-table tbody tr.child${id} td.agent-Name`).each(function () {
+					if (!($(this).children().hasClass('layui-icon-file'))) {
+						$(this).children(".layui-icon-levelTwo").removeClass('layui-icon-triangle-d');
+						$(this).children(".layui-icon-levelTwo").addClass('layui-icon-triangle-r');
+						var fId = Number($(this).children(".layui-icon-levelTwo").attr('data-id'));
+						if (preId_tow.indexOf(fId) === -1) {
+							preId_tow.push(fId);
+						}
+					}
+				})
+				preId.push(id);
+			}
+
+			if (preId_tow.indexOf(id) !== -1) {//展开
+				$(`#report-table tbody tr.zChildren${id}`).css('display', 'table-row');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-r');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-d');
+				let index = preId_tow.indexOf(id);
+				preId_tow.splice(index, 1);
+				return;
+			} else if (level === 2) {//折叠
+				$(`#report-table tbody tr.zChildren${id}`).css('display', 'none');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-d');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-r');
+				preId_tow.push(id);
+			}
+		}
+
+		//全部展开
+		$('#btn-expand').click(function () {
+			$('#report-table tbody tr td.agent-Name').each(function () {
+				if (!($(this).children().hasClass('layui-icon-file'))) {
+					$(this).children(".layui-icon-levelOne").removeClass('layui-icon-triangle-r');
+					$(this).children(".layui-icon-levelOne").addClass('layui-icon-triangle-d');
+					$(this).children(".layui-icon-levelTwo").removeClass('layui-icon-triangle-r');
+					$(this).children(".layui-icon-levelTwo").addClass('layui-icon-triangle-d');
+				}
+			})
+			preId.splice(0, preId.length);
+			preId_tow.splice(0, preId_tow.length);
+			$("tr[class^='child']").css('display', 'table-row');
+		})
+		//全部折叠
+		$('#btn-fold').click(function () {
+			$('#report-table tbody tr td.agent-Name').each(function () {
+				if (!($(this).children().hasClass('layui-icon-file'))) {
+					$(this).children(".layui-icon-levelOne").removeClass('layui-icon-triangle-d');
+					$(this).children(".layui-icon-levelOne").addClass('layui-icon-triangle-r');
+					$(this).children(".layui-icon-levelTwo").removeClass('layui-icon-triangle-d');
+					$(this).children(".layui-icon-levelTwo").addClass('layui-icon-triangle-r');
+					var OId = Number($(this).children(".layui-icon-levelOne").attr('data-id'));
+					var TId = Number($(this).children(".layui-icon-levelTwo").attr('data-id'));
+					if ($(this).children(".layui-icon-levelOne").length && preId.indexOf(OId) === -1) {
+						preId.push(OId);
+					}
+					if ($(this).children(".layui-icon-levelTwo").length && preId_tow.indexOf(TId) === -1) {
+						preId_tow.push(TId);
+					}
+				}
+			})
+			$("tr[class^='child']").css('display', 'none');
+		})
+
+	</script>
+</body>
+
+</html>

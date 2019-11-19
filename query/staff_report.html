@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>员工业绩表</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+<style>
+	.layui-table-view .layui-table td {
+		height: 50px;
+		padding: 0;
+		line-height: 25px;
+	}
+
+	.layui-table-cell {
+		height: unset;
+		line-height: unset;
+	}
+
+	.layui-icon-file:before,
+	.layui-icon-triangle-r:before,
+	.layui-icon-triangle-d::before {
+		margin-right: 5px;
+	}
+
+	.layui-icon-levelTwo:before {
+		margin-left: 20px;
+	}
+
+	.layui-icon-levelThree::before {
+		margin-left: 35px;
+	}
+
+	.new-report {
+		overflow: hidden;
+	}
+
+	.new-report>div {
+		overflow: scroll;
+	}
+
+
+	#report-table tbody td,
+	#report-table thead th {
+		padding: 9px 10px;
+	}
+
+	.wd-self {
+		width: 300px;
+	}
+</style>
+
+<body>
+	<div class="layui-fluid" id="root">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="title_wrap">
+					<div class="layui-card-header">
+						<div class="clear">
+							<div class="layui-btn-group l_left">
+								<a href="javascript:;" style="margin-left: 1px;"><button
+										class="layui-btn layui-btn-normal" id="btn-expand">全部展开</button></a>
+								<a href="javascript:;" style="margin-left: 1px;"><button
+										class="layui-btn layui-btn-normal" id="btn-fold">全部折叠</button></a>
+							</div>
+							<form class="layui-form">
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label l_left">筛选时间</label>
+									<div class="layui-input-block wd-self">
+										<input type="text" class="layui-input" id="Time" name="Time"
+											placeholder="请选择时间范围">
+									</div>
+								</div>
+								<div class="layui-form-item l_left">
+									<label class="layui-form-label l_left">搜索关键字</label>
+									<input type="text" name="SearchKey" lay-verify="SearchKey" autocomplete="off"
+										placeholder="请输入员工ID/名称" class="layui-input l_left"
+										style="width: initial;min-width: 320px;">
+									<span class="layui-btn l_left" style="border-radius: 0;" id="search_go" lay-submit
+										lay-filter="search_go"><i
+											class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+									<span class="layui-btn l_left" style="border-radius: 0;" id="exportExcel" lay-submit
+										lay-filter="exportExcel">导出Excel</span>
+									<a href="" download="download" style="display: none;" id="downloadExcel"></a>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<!-- <div class="layui-card-body">
+					<table id="table1" class="layui-table" lay-filter="table1"></table>
+				</div> -->
+				<div class="title_wrap">
+					<div class="layui-card-body new-report">
+						<div>
+							<table id="report-table" class="layui-table">
+								<thead>
+									<tr>
+										<th>员工ID</th>
+										<th>员工姓名</th>
+										<th>用户累计充值</th>
+										<th>用户累计提现</th>
+										<th>用户可用余额</th>
+										<!-- <th>用户交易金额</th> -->
+										<th>用户开仓金额</th>
+										<th>用户平仓金额</th>
+										<th>用户延期服务费</th>
+										<th>用户开仓服务费</th>
+										<th>用户平仓服务费</th>
+										<th>用户延期张数</th>
+										<th>用户开仓张数</th>
+										<th>用户平仓张数</th>
+										<th>员工延期服务费收益</th>
+										<th>员工开仓服务费收益</th>
+										<th>员工平仓服务费收益</th>
+
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td colspan="19" style="padding: 20px 0 20px 50%;"><i
+												class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"
+												style="font-size: 28px;"></i></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js"></script>
+
+
+	<script type="text/javascript">
+		layui.use(['form', 'layer', 'laydate', 'table'], function () {
+			publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+			var form = layui.form;
+			var table = layui.table;
+			var laydate = layui.laydate;
+			var $ = layui.jquery;
+			var layer = layui.layer;
+			var thWidth = [60, 250, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 180, 180, 180];
+			var tableWidth = 0;
+			var screenWidth = $('#report-table').parent().width();
+			// //console.log(screenWidth);
+			$.each(thWidth, function (i, v) {
+				tableWidth += v;
+			});
+			// //console.log(tableWidth);
+			$('#report-table').width(tableWidth)
+
+			//初始化表格宽度
+			$.each($('#report-table thead tr th'), function (i, v) {
+				$.each(thWidth, function (j, w) {
+					if (i === j) {
+						$(v).width(w);
+					}
+				})
+			})
+
+			laydate.render({
+				elem: '#Time'
+				, type: 'datetime'
+				, range: true
+			});
+			publicMathod.post({
+				url: 'api/ReportStaff/GetStaffyReport',
+				data: {
+					page: 1
+				},
+				success: function (data) {
+					// //console.log('代理业绩表', data);
+					if (data.Status === '1') {
+						if (data.Data == null || data.Data.length === 0) {
+							$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>无数据</td></tr>`);
+							return;
+						}
+						var reportStr = '';
+						$.each(data.Data, function (i, v) {//一级
+							reportStr += concatTr(1, v);
+							if (v.ReportStaffs != null) {
+								$.each(v.ReportStaffs, function (a, b) {//二级
+									reportStr += concatTr(2, b, v.id);
+								})
+							}
+						})
+						// //console.log(reportStr);
+						$('#report-table tbody').html(reportStr);
+					} else {
+						$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>${data.Msg}</td></tr>`);
+						layer.msg(data.Msg, { icon: 5 });
+					}
+				},
+				error: function (err) {
+					$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>数据请求异常</td></tr>`);
+					layer.msg('数据请求异常', { icon: 5 });
+				}
+			})
+			function concatTr(level, data, two, three) {
+				var trStr = '';
+				if (data == null && level < 3) {
+					return trStr;
+				}
+				if (level === 1) {
+					trStr += `<tr>`;
+					trStr += "<td class='staff-Id'>" + data.id + "</td>";
+					if (data.ReportStaffs) {
+						trStr += `<td class='staff-Name'><span class="layui-icon layui-icon-triangle-d layui-icon-levelOne" data-id="${data.id}" lay-event="open" onclick="openNext(${data.id}, ${data.parent_id})">${data.staff_name}</span></td>`;
+					} else {
+						trStr += "<td class='staff-Name'><span class='layui-icon layui-icon-file layui-icon-levelOne'>" + data.staff_name + "</span></td>";
+					}
+					trStr += "<td>" + data.Rney + "</td>";
+					trStr += "<td>" + Math.abs(data.Caney) + "</td>";
+					trStr += "<td>" + data.Usney + "</td>";
+					// trStr += "<td>" + data.Ujney + "</td>";
+					trStr += "<td>" + data.Bee + "</td>";
+					trStr += "<td>" + data.SaFee + "</td>";
+					trStr += "<td>" + data.NiFee + "</td>";
+					trStr += "<td>" + data.Buoney + "</td>";
+					trStr += "<td>" + data.Saney + "</td>";
+					trStr += "<td>" + data.Numsev + "</td>";
+					trStr += "<td>" + data.Numbuy + "</td>";
+					trStr += "<td>" + data.Numsale + "</td>";
+					trStr += "<td>" + data.agNumsev + "</td>";
+					trStr += "<td>" + data.agNumbuy + "</td>";
+					trStr += "<td>" + data.agNumsale + "</td>";
+					trStr += "</tr>";
+				} else if (level === 2) {
+					trStr += `<tr class="child${two}">`;
+					trStr += "<td class='staff-Id'>" + data.id + "</td>";
+					if (data.ReportStaffs) {
+						trStr += `<td class='staff-Name'><span class='layui-icon layui-icon-triangle-d layui-icon-levelTwo' data-id="${data.id}" onclick="openNext(${data.id}, ${data.parent_id})"> ${data.staff_name} </span></td>`;
+					} else {
+						trStr += "<td class='staff-Name'><span class='layui-icon layui-icon-file layui-icon-levelTwo'>" + data.staff_name + "</span></td>";
+					}
+					trStr += "<td>" + data.Rney + "</td>";
+					trStr += "<td>" + Math.abs(data.Caney) + "</td>";
+					trStr += "<td>" + data.Usney + "</td>";
+					// trStr += "<td>" + data.Ujney + "</td>";
+					trStr += "<td>" + data.Bee + "</td>";
+					trStr += "<td>" + data.SaFee + "</td>";
+					trStr += "<td>" + data.NiFee + "</td>";
+					trStr += "<td>" + data.Buoney + "</td>";
+					trStr += "<td>" + data.Saney + "</td>";
+					trStr += "<td>" + data.Numsev + "</td>";
+					trStr += "<td>" + data.Numbuy + "</td>";
+					trStr += "<td>" + data.Numsale + "</td>";
+					trStr += "<td>" + data.agNumsev + "</td>";
+					trStr += "<td>" + data.agNumbuy + "</td>";
+					trStr += "<td>" + data.agNumsale + "</td>";
+					trStr += "</tr>";
+				}
+				return trStr;
+			}
+
+			// 执行搜索
+			form.on("submit(search_go)", function (data) {
+				var field = data.field;
+				var type = '';
+				if (!field.Time && !field.SearchKey) {
+					return;
+				}
+				if (!field.Time && field.SearchKey) {
+					// console.log('搜索', (/^\d+$/).test(field.SearchKey))
+					if ((/^\d+$/).test(field.SearchKey)) {//搜索员工Id
+						type = '.staff-Id';
+					} else {
+						type = '.staff-Name';
+					}
+					clear_search()
+					search_go(field.SearchKey, type);
+					return;
+				}
+				publicMathod.post({
+					url: 'api/ReportStaff/GetStaffyReport',
+					data: {
+						page: 1,
+						SearchKey: field.SearchKey,
+						Time: field.Time
+					},
+					success: function (data) {
+						// //console.log('代理业绩表', data);
+						if (data.Status === '1') {
+							if (data.Data == null || data.Data.length === 0) {
+								$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>无数据</td></tr>`);
+								return;
+							}
+							var reportStr = '';
+							$.each(data.Data, function (i, v) {//一级
+								reportStr += concatTr(1, v);
+								if (v.ReportStaffs != null) {
+									$.each(v.ReportStaffs, function (a, b) {//二级
+										reportStr += concatTr(2, b, v.id);
+									})
+								}
+							})
+							// //console.log(reportStr);
+							$('#report-table tbody').html(reportStr);
+							if (field.SearchKey.trim().length === 0) {
+								return;
+							}
+							if ((/^\d+$/).test(field.SearchKey)) {//搜索员工Id
+								type = '.staff-Id';
+							} else {
+								type = '.staff-Name'
+							}
+							clear_search()
+							search_go(field.SearchKey, type);
+
+						} else {
+							$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>${data.Msg}</td></tr>`);
+							layer.msg(data.Msg, { icon: 5 });
+						}
+					},
+					error: function (err) {
+						$('#report-table tbody').html(`<tr><td colspan='19' style='padding: 20px 0 20px ${tableWidth > screenWidth ? screenWidth / 2 : tableWidth / 2}px;'>数据请求异常</td></tr>`);
+						layer.msg('数据请求异常', { icon: 5 });
+					}
+				})
+				return false;
+			});
+
+
+			function search_go(key, type) {
+				var hasResult = false;
+				// console.log(key, type);
+				$(type).each(function () {
+					var text = $(this).text();
+					// console.log(text);
+					if (type === '.staff-Id' && text === key) {
+						hasResult = true;
+						$(this).parent().css('background-color', 'rgba(250,230,160,0.5)');
+						$('html,body').animate({ scrollTop: $(this).offset().top - 150 }, 500);
+					} else if (type === '.staff-Name' && text.indexOf(key) >= 0) {
+						hasResult = true;
+						$(this).parent().css('background-color', 'rgba(250,230,160,0.5)');
+						$('html,body').animate({ scrollTop: $(this).offset().top - 150 }, 500);
+					}
+				})
+
+				if (!hasResult) {
+					layer.msg('未查询到结果', { icon: 5 });
+				}
+			}
+
+			function clear_search() {
+				$('#report-table').find('tbody tr').each(function () {//清空选中样式
+					$(this).css('background-color', 'transparent');
+				})
+			}
+
+			//导出
+			form.on("submit(exportExcel)", function (data) {
+				// console.log(data);
+				var formField1 = data.field;
+				var sendData = {
+					SearchKey: formField1.SearchKey,
+					Time: formField1.Time,
+					AdminType: 0,
+					AdminID: Number(localStorage.getItem('id'))
+				}
+				publicMathod.exportExcel('api/ReportStaff/GetTerraceStaffPortReport', '员工业绩表', sendData);
+			});
+		})
+	</script>
+	<script type="text/javascript">
+		var preId = [];//一级pid
+		var preId_tow = [];//二级pid
+		var layer = layui.layer;
+		function openNext(id, level, pid) {
+			var pid = pid ? pid : -1;
+			if (preId_tow.indexOf(id) !== -1) {
+				$(`#report-table tbody tr.child${id}`).css('display', 'table-row');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-r');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-d');
+				let index = preId_tow.indexOf(id);
+				preId_tow.splice(index, 1);
+				return;
+			} else {
+				$(`#report-table tbody tr.child${id}`).css('display', 'none');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).removeClass('layui-icon-triangle-d');
+				$(`#report-table tbody tr td span[data-id="${id}"]`).addClass('layui-icon-triangle-r');
+				// //console.log(id);
+				preId_tow.push(id);
+			}
+		}
+		//全部展开
+		$('#btn-expand').click(function () {
+			$('#report-table tbody tr td.staff-Name').each(function () {
+				if (!($(this).children().hasClass('layui-icon-file'))) {
+					$(this).children(".layui-icon-levelOne").removeClass('layui-icon-triangle-r');
+					$(this).children(".layui-icon-levelOne").addClass('layui-icon-triangle-d');
+					$(this).children(".layui-icon-levelTwo").removeClass('layui-icon-triangle-r');
+					$(this).children(".layui-icon-levelTwo").addClass('layui-icon-triangle-d');
+				}
+			})
+			preId.splice(0, preId.length);
+			preId_tow.splice(0, preId_tow.length);
+			$("tr[class^='child']").css('display', 'table-row');
+		})
+		//全部折叠
+		$('#btn-fold').click(function () {
+			$('#report-table tbody tr td.staff-Name').each(function () {
+				if (!($(this).children().hasClass('layui-icon-file'))) {
+					$(this).children(".layui-icon-levelOne").removeClass('layui-icon-triangle-d');
+					$(this).children(".layui-icon-levelOne").addClass('layui-icon-triangle-r');
+					$(this).children(".layui-icon-levelTwo").removeClass('layui-icon-triangle-d');
+					$(this).children(".layui-icon-levelTwo").addClass('layui-icon-triangle-r');
+					var OId = Number($(this).children(".layui-icon-levelOne").attr('data-id'));
+					var TId = Number($(this).children(".layui-icon-levelTwo").attr('data-id'));
+					if ($(this).children(".layui-icon-levelOne").length && preId.indexOf(OId) === -1) {
+						preId.push(OId);
+					}
+					if ($(this).children(".layui-icon-levelTwo").length && preId_tow.indexOf(TId) === -1) {
+						preId_tow.push(TId);
+					}
+				}
+			})
+			$("tr[class^='child']").css('display', 'none');
+		})
+	</script>
+</body>
+
+</html>

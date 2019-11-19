@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>当日报表</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div id="app">
+		<div class="title_wrap">
+			<form class="layui-form">
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label">代理商</label>
+					<div class="layui-input-block">
+						<select name="AnId" id="AnId">
+							<option value="0" selected="selected">全部代理商</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label l_left">搜索关键字</label>
+					<input type="text" name="SearchKey" autocomplete="off" placeholder="请输入用户名/手机号/用户ID" id="SearchKey"
+						class="layui-input l_left" style="width: initial;min-width: 320px;">
+					<span class="layui-btn l_left" style="border-radius: 0;" id="search_go" lay-submit
+						lay-filter="search_go"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+					<span class="layui-btn l_left" style="border-radius: 0;" id="exportExcel" lay-submit
+						lay-filter="exportExcel">导出Excel</span>
+					<a href="" download="download" style="display: none;" id="downloadExcel"></a>
+				</div>
+			</form>
+		</div>
+		<div class="table_wrap">
+			<table id="data_table" lay-filter="data_table"></table>
+		</div>
+	</div>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js"></script>
+	<script type="text/javascript">
+		publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+		layui.use(['form', 'table'], function () {
+			var form = layui.form;
+			var table = layui.table;
+			var $ = layui.jquery;
+			var lockTotal = true;
+
+
+			// 获取代理商列表
+			publicMathod.getAllAgency("api/Agents/GetAllTree", form, $("#AnId"));
+			//实例化数据表格
+			table.render({
+				elem: '#data_table',
+
+				url: publicMathod.hosturl + "api/ReportApplyDay/GetList", //数据接口
+				cellMinWidth: 100,
+				totalRow: true,
+				headers: { token: publicMathod.token },
+				parseData: function (res) { //规定数据格式
+					if (res.Data == null || !res.Data) {
+						layer.msg(res.Msg, { icon: 5 })
+					} else {
+						if (lockTotal) {
+							lockTotal = false;
+							$(".layui-table-total table tbody ").after(`
+						<tr><td data-field="id" data-key="1-0-0" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="FoID" data-key="1-0-1" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="Usone" data-key="1-0-2" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="UserName" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="AName" data-key="1-0-4" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-4"></div></td><td data-field="Cuate" data-key="1-0-5" data-minwidth="180" class=""><div class="layui-table-cell laytable-cell-1-0-5">全部合计:</div></td><td data-field="Rney" data-key="1-0-6" data-minwidth="160" class=""><div class="layui-table-cell laytable-cell-1-0-6">${res.SumData.Rney}</div></td><td data-field="Caney" data-key="1-0-7" data-minwidth="160" class=""><div class="layui-table-cell laytable-cell-1-0-7">${res.SumData.Caney}</div></td><td data-field="Usney" data-key="1-0-8" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-8">${res.SumData.Usney}</div></td><td data-field="Dyney" data-key="1-0-9" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-9">${res.SumData.Dyney}</div></td><td data-field="s_balane" data-key="1-0-10" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-10">${res.SumData.Nowoney + res.SumData.Usney}</div></td><td data-field="Nowoney" data-key="1-0-11" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-11">${res.SumData.Nowoney}</div></td><td data-field="Proney" data-key="1-0-12" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-12">${res.SumData.Proney}</div></td><td data-field="NightMoney" data-key="1-0-13" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-13">${res.SumData.NightMoney}</div></td><td data-field="Buoney" data-key="1-0-14" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-14">${res.SumData.Buoney}</div></td><td data-field="Saney" data-key="1-0-15" data-minwidth="130" class=""><div class="layui-table-cell laytable-cell-1-0-15">${res.SumData.Saney}</div></td><td data-field="Buney" data-key="1-0-16" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-16">${res.SumData.Buney}</div></td><td data-field="Saloney" data-key="1-0-17" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-17">${res.SumData.Saloney}</div></td>
+						<td data-field="NightNumber" data-key="1-0-18" data-minwidth="130" class=""><div class="layui-table-cell laytable-cell-1-0-18">${res.SumData.NightNumber}</div></td><td data-field="BuyNumber" data-key="1-0-19" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-19">${res.SumData.BuyNumber}</div></td><td data-field="SaleNumber" data-key="1-0-20" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-20">${res.SumData.SaleNumber}</div></td></tr>`)
+						}
+						return {
+							"code": res.Status, //解析接口状态
+							"msg": res.Msg, //解析提示文本
+							"count": res.Count, //解析数据长度
+							"data": res.Data //解析数据列表
+						};
+					}
+				},
+				response: {//规定响应成功状态码
+					statusCode: 1
+				},
+				method: 'post',
+				contentType: "application/json; charset=UTF-8",
+				page: {
+					layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'],//自定义分页布局
+				},
+				cols: [[
+					{ field: 'id', title: 'ID', width: 80, sort: true },
+					{ field: 'FoID', title: '用户ID' },
+					{ field: 'Usone', title: '用户手机', minWidth: 120 },
+					{ field: 'UserName', title: '用户姓名' },
+					{ field: 'AName', title: '代理商', minWidth: 120 },
+					{ field: 'Cuate', title: '统计时间', totalRowText: '本页合计:', minWidth: 180 },
+					{ field: 'Rney', title: '今日累计充值', minWidth: 160, totalRow: true, sort: true },
+					{ field: 'Caney', title: '今日累计提现', minWidth: 160, totalRow: true, sort: true },
+					{ field: 'Usney', title: '可用余额', totalRow: true, sort: true, minWidth: 120 },
+					{ field: 'Dyney', title: '冻结资产', totalRow: true, sort: true, minWidth: 120 },
+					{
+						field: 's_balane', title: '动态资产', sort: true, minWidth: 120, totalRow: true, templet: function (obj) {
+							return obj.Nowoney + obj.Usney;
+						}
+					},    //
+					// {field: 's_balane',title: '交易金额', totalRow: true}, 	
+					{ field: 'Nowoney', title: '持仓市值', minWidth: 120, totalRow: true, sort: true },
+					{ field: 'Proney', title: '持仓盈亏', minWidth: 120, totalRow: true, sort: true },
+					{ field: 'NightMoney', title: '追加延期服务费', minWidth: 150, totalRow: true },
+					{ field: 'Buoney', title: '开仓服务费', minWidth: 120, totalRow: true },
+					{ field: 'Saney', title: '平仓服务费', minWidth: 130, totalRow: true },
+					{ field: 'Buney', title: '买入交易金额', minWidth: 150, totalRow: true },
+					{ field: 'Saloney', title: '平仓交易金额', minWidth: 150, totalRow: true },
+					{ field: 'NightNumber', title: '追加延期张数', minWidth: 150, totalRow: true },
+					{ field: 'BuyNumber', title: '开仓张数', minWidth: 120, totalRow: true },
+					{ field: 'SaleNumber', title: '平仓张数', minWidth: 130, totalRow: true },
+
+				]]
+			});
+			//搜索重载表格
+			// 执行搜索
+			var data1;
+			form.on("submit(search_go)", function (data) {
+				var lock1 = true;
+				var formField = data.field;
+				formField.AnId = Number(formField.AnId);
+				table.reload('data_table', {
+					page: { curr: 1 },
+					where: formField,
+					parseData: function (res) { //规定数据格式
+						if (res.Data == null || !res.Data) {
+							layer.msg(res.Msg, { icon: 5 })
+						} else {
+							data1 = res;
+							return {
+								"code": res.Status, //解析接口状态
+								"msg": res.Msg, //解析提示文本
+								"count": res.Count, //解析数据长度
+								"data": res.Data //解析数据列表
+							};
+						}
+					},
+					done: function (res, curr, count) {
+						// console.log('分页触发', res, curr, count);
+						if (curr === 1 && lock1 && count) {
+							lock1 = false;
+							$(".layui-table-total table tbody ").after(`
+						<tr><td data-field="id" data-key="1-0-0" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="FoID" data-key="1-0-1" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="Usone" data-key="1-0-2" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="UserName" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="AName" data-key="1-0-4" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-4"></div></td><td data-field="Cuate" data-key="1-0-5" data-minwidth="180" class=""><div class="layui-table-cell laytable-cell-1-0-5">全部合计:</div></td><td data-field="Rney" data-key="1-0-6" data-minwidth="160" class=""><div class="layui-table-cell laytable-cell-1-0-6">${data1.SumData.Rney}</div></td><td data-field="Caney" data-key="1-0-7" data-minwidth="160" class=""><div class="layui-table-cell laytable-cell-1-0-7">${data1.SumData.Caney}</div></td><td data-field="Usney" data-key="1-0-8" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-8">${data1.SumData.Usney}</div></td><td data-field="Dyney" data-key="1-0-9" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-9">${data1.SumData.Dyney}</div></td><td data-field="s_balane" data-key="1-0-10" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-10">${data1.SumData.Nowoney + data1.SumData.Usney}</div></td><td data-field="Nowoney" data-key="1-0-11" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-11">${data1.SumData.Nowoney}</div></td><td data-field="Proney" data-key="1-0-12" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-12">${data1.SumData.Proney}</div></td><td data-field="NightMoney" data-key="1-0-13" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-13">${data1.SumData.NightMoney}</div></td><td data-field="Buoney" data-key="1-0-14" data-minwidth="120" class=""><div class="layui-table-cell laytable-cell-1-0-14">${data1.SumData.Buoney}</div></td><td data-field="Saney" data-key="1-0-15" data-minwidth="130" class=""><div class="layui-table-cell laytable-cell-1-0-15">${data1.SumData.Saney}</div></td><td data-field="Buney" data-key="1-0-16" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-16">${data1.SumData.Buney}</div></td><td data-field="Saloney" data-key="1-0-17" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-17">${data1.SumData.Saloney}</div></td>
+						<td data-field="NightNumber" data-key="1-0-18" data-minwidth="130" class=""><div class="layui-table-cell laytable-cell-1-0-18">${data1.SumData.NightNumber}</div></td><td data-field="BuyNumber" data-key="1-0-19" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-19">${data1.SumData.BuyNumber}</div></td><td data-field="SaleNumber" data-key="1-0-20" data-minwidth="150" class=""><div class="layui-table-cell laytable-cell-1-0-20">${data1.SumData.SaleNumber}</div></td></tr>`)
+						}
+					}
+
+				});
+				return false;
+			});
+			$('#SearchKey').bind('keyup', function (event) {
+
+				if (event.keyCode == "13") {
+					$("#search_go").click();
+				}
+			})
+
+			//导出
+			form.on("submit(exportExcel)", function (data) {
+				// console.log(data);
+				var formField1 = data.field;
+				var sendData = {
+					SearchKey: formField1.SearchKey,
+					AnId: Number(formField1.AnId),
+					AdminType: 0,
+					AdminID: Number(localStorage.getItem('id'))
+				}
+				publicMathod.exportExcel('api/ReportApplyDay/ExcelTodayStatement', '当日报表', sendData);
+			});
+		});
+	</script>
+</body>
+
+</html>
