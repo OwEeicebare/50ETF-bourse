@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>历史委托</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div id="app">
+		<div class="title_wrap">
+			<form class="layui-form">
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label">母账户</label>
+					<div class="layui-input-block">
+						<select name="MID" id="MID" lay-filter="MID">
+							<option value="-1" selected="">全部母账户</option>
+
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label">挂单时间</label>
+					<div class="layui-input-block ">
+						<input type="text" name="GTime" class="layui-input" id="GTime" placeholder="请选择时间范围">
+					</div>
+				</div>
+				<div class="layui-form-item l_left">
+					<label class="layui-form-label l_left">搜索关键字</label>
+					<input type="text" id="search_input" name="SearchKey" lay-verify="title" autocomplete="off"
+						placeholder="合约代码查询" class="layui-input l_left"
+						style="width: initial;min-width: 320px;">
+					<span class="layui-btn l_left" style="border-radius: 0;" id="search_go" lay-submit
+						lay-filter="search_go"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+					<span class="layui-btn l_left" style="border-radius: 0;" id="exportExcel" lay-submit
+						lay-filter="exportExcel">导出Excel</span>
+					<a href="" download="download" style="display: none;" id="downloadExcel"></a>
+				</div>
+			</form>
+		</div>
+		<div class="table_wrap">
+			<table id="data_table" lay-filter="data_table"></table>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script type="text/javascript">
+
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'table', 'laydate', 'jquery'], function () {
+		var form = layui.form;
+		var table = layui.table;
+		var $ = layui.jquery;
+		var laydate = layui.laydate;
+
+		laydate.render({
+			elem: '#GTime'
+			, type: 'datetime'
+			, range: true
+		});
+
+		// 获取母账户列表
+		publicMathod.getDropdownList("api/Tool/GetMasterList", form, $("#MID"));
+
+		//实例化数据表格
+		var lock = true;
+		table.render({
+			elem: '#data_table',
+			cellMinWidth: 100,
+			totalRow: true,
+			url: publicMathod.hosturl + 'api/Master/GetAdminHistoryStock', //数据接口
+			headers: { token: publicMathod.token },
+			method: 'post',
+			contentType: "application/json; charset=UTF-8",
+			page: {
+				layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+			},
+			parseData: function (res) { //规定数据格式
+				if (!res.Data) {
+					layer.msg(res.Data.length ? res.Msg : '无数据', { icon: 5 });
+				} else {
+					if (lock) {
+						lock = false;
+						$(".layui-table-total table tbody ").after(`<tr><td data-field="ID" data-key="1-0-0" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="MasterID" data-key="1-0-1" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="StockCode" data-key="1-0-2" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="StockName" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="DeclTypeName" data-key="1-0-4" class=""><div class="layui-table-cell laytable-cell-1-0-4">全部合计:</div></td><td data-field="DeclNum" data-key="1-0-5" class=""><div class="layui-table-cell laytable-cell-1-0-5">${res.SumData.DeclNum}</div></td><td data-field="DeclPrice" data-key="1-0-6" class=""><div class="layui-table-cell laytable-cell-1-0-6"></div></td><td data-field="AddTime" data-key="1-0-7" class=""><div class="layui-table-cell laytable-cell-1-0-7"></div></td><td data-field="DealNum" data-key="1-0-8" class=""><div class="layui-table-cell laytable-cell-1-0-8">${res.SumData.DealNum}</div></td><td data-field="DealPrice" data-key="1-0-9" class=""><div class="layui-table-cell laytable-cell-1-0-9"></div></td><td data-field="AuthNo" data-key="1-0-10" class=""><div class="layui-table-cell laytable-cell-1-0-10"></div></td><td data-field="StatusName" data-key="1-0-11" class=""><div class="layui-table-cell laytable-cell-1-0-11"></div></td></tr>`)
+						
+					}
+					return {
+						"code": res.Status, //解析接口状态
+						"msg": res.Msg, //解析提示文本
+						"count": res.Count, //解析数据长度
+						"data": res.Data //解析数据列表
+					};
+				}
+			},
+			response: {//规定响应成功状态码
+				statusCode: 1
+			},
+			cols: [[
+				{ field: 'ID', title: 'ID', width: 70 },
+				{ field: 'MasterID', title: '母账户ID', width: 120 },
+				{ field: 'StockCode', title: '合约代码' },
+				{ field: 'StockName', title: '合约名称' },
+				{ field: 'DeclTypeName', title: '交易类型', totalRowText: '本页合计:' },
+				// { field: 'TakeType', title: '持仓类型', width: 100, totalRowText: '本页合计:' },
+				{ field: 'DeclNum', title: '委托数量', totalRow: true },
+				{ field: 'DeclPrice', title: '委托价格', width: 120 },
+				{ field: 'AddTime', title: '挂单时间', width: 160 },
+				{ field: 'DealNum', title: '成交数量', totalRow: true },
+				{ field: 'DealPrice', title: '成交价格', width: 120 },
+				{ field: 'AuthNo', title: '委托编号' }, //未知
+				{ field: 'StatusName', title: '状态', width: 100 },
+			]]
+		});
+
+		// 执行搜索
+		var data1;
+		form.on("submit(search_go)", function (data) {
+			var lock1 = true;
+			var formField = data.field;
+			table.reload('data_table', {
+				page: { curr: 1 },
+				where: formField,
+				parseData: function (res) { //规定数据格式
+					if (!res.Data) {
+						layer.msg(res.Data.length ? res.Msg : '无数据', { icon: 5 });
+					} else {
+						data1 = res;
+					}
+					return {
+						"code": res.Status, //解析接口状态
+						"msg": res.Msg, //解析提示文本
+						"count": res.Count, //解析数据长度
+						"data": res.Data //解析数据列表
+					};
+				},
+				done: function (res, curr, count) {
+					// console.log('分页触发', res, curr, count);
+					if (curr === 1 && lock1 && count) {
+						lock1 = false;
+						$(".layui-table-total table tbody ").after(`<tr><td data-field="ID" data-key="1-0-0" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="MasterID" data-key="1-0-1" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="StockCode" data-key="1-0-2" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="StockName" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="DeclTypeName" data-key="1-0-4" class=""><div class="layui-table-cell laytable-cell-1-0-4">全部合计:</div></td><td data-field="DeclNum" data-key="1-0-5" class=""><div class="layui-table-cell laytable-cell-1-0-5">${data1.SumData.DeclNum}</div></td><td data-field="DeclPrice" data-key="1-0-6" class=""><div class="layui-table-cell laytable-cell-1-0-6"></div></td><td data-field="AddTime" data-key="1-0-7" class=""><div class="layui-table-cell laytable-cell-1-0-7"></div></td><td data-field="DealNum" data-key="1-0-8" class=""><div class="layui-table-cell laytable-cell-1-0-8">${data1.SumData.DealNum}</div></td><td data-field="DealPrice" data-key="1-0-9" class=""><div class="layui-table-cell laytable-cell-1-0-9"></div></td><td data-field="AuthNo" data-key="1-0-10" class=""><div class="layui-table-cell laytable-cell-1-0-10"></div></td><td data-field="StatusName" data-key="1-0-11" class=""><div class="layui-table-cell laytable-cell-1-0-11"></div></td></tr>`)
+					}
+				}
+			});
+			return false;
+		});
+		$('#search_input').bind('keyup', function (event) {
+
+			if (event.keyCode == "13") {
+				$("#search_go").click();
+			}
+		});
+
+
+		//导出
+		form.on("submit(exportExcel)", function (data) {
+			// console.log(data);
+			var formField1 = data.field;
+			var sendData = {
+				MID: Number(formField1.MID),
+				SearchKey: formField1.SearchKey,
+				GTime: formField1.GTime,
+			}
+
+			publicMathod.exportExcel('api/Master/ExcelAdminHistoryStock', '历史委托校准', sendData);
+		});
+	});
+
+</script>
+
+</html>

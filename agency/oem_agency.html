@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <title>贴牌代理</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="title_wrap">
+            <form class="layui-form">
+                <div class="layui-form-item l_left">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <select name="PsId" id="PsId">
+                            <option value="0" selected="">全部状态</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item l_left">
+                    <label class="layui-form-label l_left">搜索关键字</label>
+                    <input type="text" name="SearchKey" id="SearchKey" lay-verify="title" autocomplete="off"
+                        placeholder="请输入代理商/代理编号" class="layui-input l_left" style="width: initial;min-width: 260px;">
+                    <span class="layui-btn l_left" style="border-radius: 0;" id="search_go" lay-submit
+                        lay-filter="search_go"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></span>
+                </div>
+            </form>
+        </div>
+        <div class="table_wrap">
+            <table id="data_table" lay-filter="data_table"></table>
+        </div>
+    </div>
+
+    
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script>
+    publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+
+    layui.use(['form', 'table'], function () {
+
+        var form = layui.form;
+        var table = layui.table;
+
+        //筛选来源
+        publicMathod.post({
+            url: "api/Tool/EnumOemAuditTpye",
+            success: function (result) {
+                var str = "";
+                for (var i = 0; i < result.Data.length; i++) {
+                    str += '<option value="' + result.Data[i].Id + '">' + result.Data[i].Name + '</option>';
+                }
+                $("#PsId").append(str);
+                form.render(); //更新全部
+            }
+        })
+        //实例化数据表格
+        table.render({
+            elem: '#data_table',
+            headers: { "token": publicMathod.token },
+            contentType: "application/json; charset=UTF-8",
+            method: 'post',
+            url: publicMathod.hosturl + 'api/AgentMoneyCashType/GetList',
+            parseData: function (res) { //规定数据格式
+                return {
+                    "code": res.Status, //解析接口状态
+                    "msg": res.Msg, //解析提示文本
+                    "count": res.Count, //解析数据长度
+                    "data": res.Data //解析数据列表
+                };
+            },
+            response: {//规定响应成功状态码
+                statusCode: 1
+            },
+
+
+            cols: [[
+                { field: 'Id', title: 'ID', width: 70, sort: true },
+                { field: 'AgNum', title: '代理编号', width: 120 },
+                { field: 'AgId', title: '代理账号', width: 100 },
+                { field: 'AgName', title: '代理商', width: 140 },
+                { field: 'MoApp', title: '归属员工', width: 100 },
+                { field: 'ContactName', title: '主要联系人', width: 100 },
+                { field: 'ContactMobile', title: '联系电话', width: 100 },
+                {
+                    field: 'ClassLayer', title: '等级',
+                    templet: function (obj) {
+                        var style = "padding:3px 5px;font-size:12px;";
+                        if (obj.Status == 0) {
+                            return '<span style="' + style + '">运营中心</span>';
+                        } else {
+                            return '<span style="' + style + '">运营单位</span>';
+                        }
+                    }, sort: true, width: 180
+                },
+                {
+                    field: 'Status', title: '状态',
+                    templet: function (obj) {
+                        var style = "color:#fff;padding:3px 5px;font-size:12px;";
+                        if (obj.Status == 1) {
+                            return '<span style="' + style + 'background:#009688;">申请贴牌</span>';
+                        } else if (obj.Status == 3) {
+                            return '<span style="' + style + 'background:#ffc800;">申请修改</span>';
+                        } else if (obj.Status == 2) {
+                            return '<span style="' + style + 'background:#1e9fff">已通过</span>';
+                        } else if (obj.Status == 4) {
+                            return '<span style="' + style + 'background:#FF5722">未通过</span>';
+                        }
+                    }, width: 100
+                },
+                { field: 'TimeAdd', title: '申请时间', sort: true, width: 180 },
+                { field: 'Remark', title: '备注', width: 182 },
+                {
+                    field: 'Status', title: '操作', width: 80, fixed: 'right',
+                    templet: function (obj) {
+                        var style = "color:#fff;padding:3px 5px;font-size:12px;";
+                        if (obj.Status == 4 || obj.Status == 2) {
+                            return '<span class="layui-btn layui-bg-gray layui-btn-xs" style="cursor:not-allowed;color:#fff;">审核</span>';
+                        } else if (obj.Status == 3 || obj.Status == 1) {
+                            return '<a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="check">审核</a>';
+                        }
+                    }, width: 80
+                }
+            ]]
+        }),
+
+            //监听工具条
+            table.on('tool(data_table)', function (obj) {
+                var data = obj.data
+                window.location.href = "oem_agency_check.html?id=" + data.Id
+                // window.location.href="edit_agency.html?id="+data.id;
+            })
+        // 执行搜索
+        form.on("submit(search_go)", function (data) {
+            console.log(data);
+            var formField = data.field;
+            data.field.PsId = Number(data.field.PsId);
+            table.reload('data_table', {
+                page: { curr: 1 },
+                where: formField
+            });
+            return false;
+        });
+
+        $('#SearchKey').bind('keyup', function (event) {
+
+            if (event.keyCode == "13") {
+                $("#search_go").click();
+            }
+        })
+    })
+
+
+</script>
+
+</html>

@@ -1,0 +1,145 @@
+
+{
+	"code": 0,
+	"msg": "",
+	"count": 10,
+	"data": [{
+        "id":1,
+        "pid":-1,
+        "name": "内容管理",
+        "english":"content",
+        "type": ""
+    },{
+        "id":1,
+        "pid":1,
+        "name": "文章管理",
+        "english":"article",
+        "type": ["查看","添加","修改","删除","栏目管理"]
+    },{
+        "id":2,
+        "pid":1,
+        "name": "广告管理",
+        "english":"slideshow",
+        "type": ["查看","添加","修改","删除"]
+    },{
+        "id":3,
+        "pid":1,
+        "name": "协议管理",
+        "english":"agreement",
+        "type": ["查看","添加","修改","删除"]
+    },{
+        "id":4,
+        "pid":1,
+        "name": "帮助管理",
+        "english":"help",
+        "type": ["查看","添加","修改","删除","栏目管理"]
+    },{
+        "id":2,
+        "pid":-1,
+        "name": "用户管理",
+        "english":"user",
+        "type": ""
+    },{
+        "id":5,
+        "pid":2,
+        "name": "用户列表",
+        "english":"user_list",
+        "type": ["查看","充值","编辑","登录","注销","导出"]
+    },{
+        "id":6,
+        "pid":2,
+        "name": "充值记录",
+        "english":"recharge_record",
+        "type": ["查看","审核","导出"]
+    },{
+        "id":7,
+        "pid":2,
+        "name": "提现记录",
+        "english":"cash",
+        "type": ["查看","审核","导出"]
+    },{
+        "id":8,
+        "pid":2,
+        "name": "资金流水",
+        "english":"capital_flow",
+        "type": ["查看","导出"]
+    },{
+        "id":9,
+        "pid":2,
+        "name": "银行卡记录",
+        "english":"bank_records",
+        "type": ["查看","添加","编辑","删除","导出"]
+    },{
+        "id":10,
+        "pid":2,
+        "name": "短信记录",
+        "english":"sms_record",
+        "type": ["查看"]
+    },{
+        "id":11,
+        "pid":2,
+        "name": "用户日志",
+        "english":"user_log",
+        "type": ["查看"]
+    },{
+        "id":12,
+        "pid":2,
+        "name": "锁定用户",
+        "english":"lock_user",
+        "type": ["查看","锁定"]
+    },{
+        "id":13,
+        "pid":2,
+        "name": "黑名单用户",
+        "english":"blacklist",
+        "type": ["查看","添加","编辑","删除"]
+    },{
+        "id":3,
+        "pid":-1,
+        "name":"交易管理",
+        "english":"transaction",
+        "type":""
+    },{
+        "id":14,
+        "pid":3,
+        "name":"猜涨跌",
+        "english":"guess_up_down",
+        "type":["查看","导出","查看用户"]
+    },{
+        "id":15,
+        "pid":3,
+        "name":"当日委托",
+        "english":"entrust_day",
+        "type":["查看","导出","补仓"]
+    },{
+        "id":16,
+        "pid":3,
+        "name":"单日成交",
+        "english":"deal_day",
+        "type":["查看","导出"]
+    },{
+        "id":17,
+        "pid":3,
+        "name":"历史委托",
+        "english":"entrust_history",
+        "type":["查看","导出"]
+    },{
+        "id":18,
+        "pid":3,
+        "name":"历史成交",
+        "english":"deal_history",
+        "type":["查看","导出"]
+    },{
+        "id":19,
+        "pid":3,
+        "name":"持仓合约",
+        "english":"position_contract",
+        "type":["查看","导出"]
+    },{
+        "id":20,
+        "pid":3,
+        "name":"手动补入持仓",
+        "english":"manual_filling_fill",
+        "type":["查看","补入持仓"]
+    }]
+}

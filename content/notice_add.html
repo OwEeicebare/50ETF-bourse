@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <title>添加公告</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+    <style>
+        .layui-form-item .layui-input-inline{
+            min-width: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <a href="notice.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>公告管理</a> 
+                    <span lay-separator="">/</span>
+                    <a><cite>添加公告</cite></a>
+                </div>
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="sub_form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公告标题</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="title" name="title" class="layui-input wd480" lay-verify="title|required" >
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">显示状态</label>
+                            <div class="layui-input-inline">
+                                <input type="radio" name="cst" value="1" title="显示"  checked>
+                                <input type="radio" name="cst" value="2" title="隐藏">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">排序</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="sort" name="sort" class="layui-input" lay-verify="number">
+                            </div>
+                        </div>
+                        <!-- <div class="layui-form-item">
+                            <label class="layui-form-label">来源</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="source" name="source" class="layui-input">
+                            </div>
+                        </div> -->
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公告类型</label>
+                            <div class="layui-input-inline">
+                                <input type="radio" name="ct" value="1" title="普通公告"  checked>
+                                <input type="radio" name="ct" value="2" title="弹窗公告">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">时间段</label>
+                            <div class="layui-input-block ">
+                                <input type="text" class="layui-input wd250" id="time" name="Time" placeholder="请选择时间范围">
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">详细内容</label>
+                            <div class="layui-input-block">
+                                <textarea id="rich_text" lay-verify="content" style="display: none;" name="rich_text"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item ">
+                            <label class="layui-form-label"></label>
+                            <a href="javascript:;" class="layui-btn" lay-submit lay-filter="sub-btn">确认添加</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+
+<script src="../js/public.js"></script>
+<script>
+    publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+    layui.use(['form','laydate','layedit'],function(){
+        var form=layui.form
+        var laydate = layui.laydate;
+        var layedit = layui.layedit;
+        laydate.render({
+            elem: '#time'
+            , type: 'date'
+            , range: true
+            ,done: function(value, date, endDate){
+              
+            }
+        });
+        //创建一个富文本框编辑器
+        var editIndex = layedit.build("rich_text",{
+            uploadImage:{
+                url: publicMathod.upload, //接口url  ,
+                type: 'psot' //默认post
+            }
+        })
+
+        form.verify({
+            title: function(value, item){ //value：表单的值、item：表单的DOM对象
+                if (value.length > 50) {
+                    return '标题长度不能超过50'
+                }
+            },
+            number: function (value) {
+                if (value > 999) {
+                    return '排序最大值不能超过999'
+                }
+            },
+            content: function (value) {
+					if(layedit.getContent(editIndex).length==0){
+						return "详细内容必填"
+					} 
+				},
+        });    
+
+        //表单提交
+        var lock = true
+        form.on('submit(sub-btn)',function(data){
+            data.field.rich_text = layedit.getContent(editIndex);
+            var Datas = data.field;
+       
+            if(lock){
+				lock = false
+            publicMathod.post({
+                url:"api/ContentNotice/Add",
+                header:{"token":publicMathod.token},
+                data:{
+                    "Id":0,
+                    "Ti":Datas.title,
+                    "Cst":parseInt(Datas.cst),
+                    "Cs":Datas.sort?parseInt(Datas.sort):0,
+                    "Cf": 1,
+                    "Ct":parseInt(Datas.ct),
+                    "St":Datas.Time.split(" - ")[0],
+                    "Et":Datas.Time.split(" - ")[1],
+                    "Cc":Datas.rich_text
+                },
+                success:function(result){
+                    if(result.Status == 1){
+                        window.location.href = "notice.html";
+                    }else{
+                        lock = true
+                        layer.msg(result.Msg,{icon:5,shade:0.8,});
+                    }   
+                }
+            })
+        }
+            return false;
+        })
+        
+    })
+</script>
+</html>

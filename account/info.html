@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>账户信息</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/agency.css"/>
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row">
+				<div class="layui-card">
+					<div class="layui-card-body">
+						<div class="layui-tab">
+							<ul class="layui-tab-title">
+								<li class="layui-this">基础信息</li>
+								<li>详细信息</li>
+							</ul>
+							<div class="layui-tab-content">
+								<!-- 基础信息 -->
+								<div class="layui-tab-item layui-show">
+                                    <div>基本信息</div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">登录账号</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">登录账号</label>
+                                            <button class="layui-btn layui-btn-primary" id="change_account">更换账号</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">登录密码</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">******</label>
+                                            <button class="layui-btn layui-btn-primary" id="change_pass">更换密码</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">代理商</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">代理商</label>
+                                            <button class="layui-btn layui-btn-primary" id="change_name">更换姓名</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">代理类型</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">公司代理</label>
+                                            <button class="layui-btn layui-btn-primary" id="change_type">更换类型</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">公司名称</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">公司名称</label>
+                                            <button class="layui-btn layui-btn-primary" id="change_company">更换名称</button>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">其他联系方式</label>
+                                        <div class="layui-input-inline">
+                                            <button class="layui-btn layui-btn-primary" id="change_link">更改联系</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">联系人姓名</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">联系人姓名</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">联系电话</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">187 7703 6173</label>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">提现银行卡</label>
+                                        <div class="layui-input-inline">
+                                            <button class="layui-btn layui-btn-primary" id="change_card">更改卡号</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">开户银行</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">开户银行</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">开户支行</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">开户支行</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">开户名称</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">开户名称</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">银行卡号</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">6228 1734 2684 9513</label>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">我的客服</label>
+                                        <div class="layui-input-inline">
+                                            <button class="layui-btn layui-btn-primary" id="change_service">更改客服</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">QQ</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">QQ</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">微信</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">微信</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">手机</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">手机</label>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">交易服务费</label>
+                                        <div class="layui-input-inline">
+                                            <button class="layui-btn layui-btn-primary" id="change_fee">调整费用</button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">开仓服务费</label>
+                                        <div class="layui-input-inline">
+                                            <label class="layui-form-label">开仓服务费</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label">平仓服务费</label>
+                                        <div class="layui-input-block">
+                                            <label class="layui-form-label">平仓服务费</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label">追加延期服务费</label>
+                                        <div class="layui-input-block">
+                                            <label class="layui-form-label">追加延期服务费</label>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label"></label>
+                                        <div class="layui-input-block">
+                                            <button  type="button" class="layui-btn" id="base_btn" lay-submit="" lay-filter="sub_btn">确认修改</button>
+                                        </div>
+                                    </div>
+								</div>
+								<!-- 详细信息 -->
+								<div class="layui-tab-item">
+                                    <form class="layui-form">
+                                        <div>签约条件</div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">开仓服务费成本</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">开仓服务费成本</label>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">平仓服务费成本</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">平仓服务费成本</label>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">追加延期服务费成本</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">追加延期服务费成本</label>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">签约认证</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">签约认证</label>
+                                                <button class="layui-btn layui-btn-primary" id="scan" style="border: none">查看</button>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div>招商客服</div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">客服QQ</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">客服QQ</label>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">客服微信</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">客服微信</label>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">客服电话</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">客服电话</label>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div>我的代理信息</div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">我的推广码</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">我的推广码</label>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">推广链接</label>
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label">推广链接</label>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">推广二维码</label>
+                                            <div class="layui-input-inline">
+                                                <img src="" alt="">
+                                            </div>
+                                        </div>
+                                    </form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+    <script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		layui.use(['form', 'upload',  'jquery', 'element', 'layer'], function() {
+			var form = layui.form;
+			var upload = layui.upload;
+			var $ = layui.jquery;
+			var element = layui.element;
+			var url = ""; //存储上传的图片
+            var layer = layui.layer;
+
+            function change (id, page, title) {
+                $(id).click(function () {
+                    layer.open({
+                        type: 2,
+                        title: title,
+                        area: ['800px', '500px'],
+                        shade: 0.8,
+                        content: [page, 'no']
+                    })
+                })
+            }
+
+           
+
+            change('#change_account', 'change_account.html', '更改账号');
+            change('#change_pass', 'change_pass.html', '更改密码');
+            change('#change_name', 'change_name.html', '更改姓名');
+            change('#change_type', 'change_type.html', '更改代理类型');
+            change('#change_company', 'change_company.html', '更改公司名称');
+            change('#change_link', 'change_link.html', '更改其他联系方式');
+            change('#change_card', 'change_card.html', '更改银行卡号');
+            change('#change_service', 'change_service.html', '更改我的客服');
+            change('#change_fee', 'change_fee.html', '更改交易服务费');
+            var uploadUrl = publicMathod.upload;
+			function uploadImg (btnEle, uploadUrl, inputID) {
+				//图片上传初始化
+				upload.render({
+					elem: btnEle,
+					url: uploadUrl //上传接口
+					,accept: 'images' //只允许上传图片类型
+					,auto: false //不自动上传
+					,size: 3072 //限制文件大小，单位 KB
+					,choose: function(obj) { //选择文件触发
+						obj.preview(function(index, file, result) {
+							$(inputID).val(file.name);
+							url = file;
+						})
+					},
+					done: function(res) { //上传时触发
+						
+					},
+				});
+			}
+
+			uploadImg("#upload_img_url", "/upload/", "#qrcode");
+			uploadImg("#upload_logo_url", "/upload/", "#logo");
+
+
+			//监听提交
+			// form.on('submit(sub_btn)', function(data) {
+			// 	layer.alert(JSON.stringify(data.field), {
+			// 		title: '最终的提交信息'
+			// 	})
+			// 	return false;
+			// });
+		})
+		
+	</script>
+</html>

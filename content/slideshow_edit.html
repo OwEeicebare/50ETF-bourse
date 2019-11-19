@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>轮播图添加</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row">
+				<div class="layui-card">
+					<div class="layui-card-body">
+						<form class="layui-form" lay-filter="sub_form">
+							<div class="layui-form-item">
+								<label class="layui-form-label">广告位置</label>
+								<div class="layui-input-inline">
+									<select id="category_id"  lay-filter="category_id" name="PId" >
+										<option value="0" selected="selected">选择广告位置</option>
+										<option value="1">首页轮播图</option>
+									</select>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">标题</label>
+								<div class="layui-input-inline">
+									<input type="text" name="Ti" autocomplete="off" class="layui-input wd480" lay-verify="required|title" />
+									<span class="Validform_checktip"></span>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">状态</label>
+								<div class="layui-input-inline">
+									<input type="checkbox" name="Lo" lay-filter="is_lock_status" lay-skin="switch" lay-text="正常|锁定" checked>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">排序</label>
+								<div class="layui-input-inline">
+									<input type="text" name="SId" lay-verify="number" class="layui-input" />
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">链接地址</label>
+								<div class="layui-input-inline">
+									<input type="text" id="Lu" name="Lu" class="layui-input wd480" />
+									<span class="Validform_checktip">*以http开头</span>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label">封面图片</label>
+								<div class="layui-input-inline">
+									<input type="text" id="Wl" name="Wl" placeholder="请上传图片" autocomplete="off"
+										class="layui-input wd340" disabled="disabled" >
+								</div>
+								<div id="img_view_2"
+									style="display: none;position: fixed;left: 0;right: 0;top: 0;bottom: 0;z-index: 100;background: rgba(0, 0, 0, 0.5);">
+									<img 
+										style="width: 700px; position: relative;left: 50%;top: 50%;transform: translate(-50%, -50%);"></div>
+								<button style="float: left;" type="button" class="layui-btn"
+									id="upload_img_url_2">上传图片</button>
+								<button style="float: left;margin-left: 10px;" type="button" class="layui-btn"
+									id="show_view_2">预览</button>
+							</div>
+							<div class="layui-form-item layui-form-text">
+								<label class="layui-form-label"></label>
+								<div class="layui-input-block">
+									<button  type="button" lay-submit="" class="layui-btn" id="sub_btn" lay-filter="sub_btn">确认提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery-3.4.0.min.js"></script>
+	<script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" defer async>
+		publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+		layui.use(['form', 'upload'], function() {
+			var form = layui.form;
+			var upload = layui.upload;
+			var $ = layui.jquery;
+			var url = ""; //存储上传的图片
+			var lock = "1"; //switch开关,默认正常
+		
+		  //获取id值
+		   var id = publicMathod.getUrlParam("id") ? publicMathod.getUrlParam("id") : 0;
+		   $("input[name=Lo]").attr("checked",true)
+			if(id>0){
+				publicMathod.post({
+					url: "api/ContentAdInfo/GetModel?id=" + id,   
+					success: function (data) {
+						if (data.Status == "1") {
+							
+							////表单初始化
+							$('#img_view_2>img').attr('src', data.Data.ImgUrl);
+							form.val("sub_form", {
+								"PId": data.Data.PId,
+								"Ti": data.Data.Ti,
+								"SId": data.Data.SId,
+								"Wl": data.Data.Iu,
+								"Lu": data.Data.Lu,
+								"Lo": data.Data.Lo === 1 ? true : false //
+							})
+							 $("input[name=Lo]").attr("checked",data.Data.Lo==0?true:false)
+						}
+						else { layer.msg("获取数据失败，请重试！", { icon: 5 }) }
+					},
+				});
+			}
+			//监听指定开关
+			form.on('switch(is_lock_status)', function(data) {
+				
+				lock = data.elem.checked ? 1 : 2;//取值
+			});
+		
+		
+		
+			// 预览
+			$("body").on("click", "#show_view", function() {
+				var url = $("#img_view_2>img").attr("src");
+				if (url.length <= 0) {
+					layer.msg('请选择图片后再预览！');
+					return;
+				}
+				$("#img_view").css("display", "block");
+			})
+			//关闭预览
+			$("body").on("click", "#img_view", function() {
+				$("#img_view").css("display", "none");
+			})
+
+			//表单验证
+			form.verify({
+				title: function(value, item){ //value：表单的值、item：表单的DOM对象
+					if (value.length > 50) {
+						return '栏目长度不能超过50'
+					}
+				},
+				number: function (value) {
+					if (value > 999) {
+						return '排序最大值不能超过999'
+					}
+				}
+			})
+			
+			//图片上传 - 网站LOGO
+			upload.render({
+				elem: '#upload_img_url_2',
+				url: publicMathod.upload,  //上传接口
+				accept: 'images',  //只允许上传图片类型
+				acceptMime: 'image/*', 
+				size: 3072,  //限制文件大小，单位 KB
+				choose: function (obj) { //选择文件触发
+					obj.preview(function (index, file, result) {
+						$("#Wl").val(file.name);
+						$('#img_view_2>img').attr('src', result);
+						url = file;
+					
+						
+					})
+				},
+				done: function (res, index, upload) {//上传时触发
+					if (res.status === '1') {
+						//图片地址 res.path
+						url=res.data.fullPath;
+						$("#Wl").val(res.data.path);
+					} else {
+						layer.msg('图片上传失败,' + res.Msg);
+					}
+				},
+			
+			});
+			
+			//图片预览 - 网站LOGO
+			$("body").on("click", "#show_view_2", function () {
+				var url = $("#img_view_2>img").attr("src");
+				if (url.length <= 0) {
+					layer.msg('请选择图片后再预览！');
+					return;
+				}
+				$("#img_view_2").css("display", "block");
+			})
+
+			$("body").on("click", "#img_view_2", function () {
+				$("#img_view_2").css("display", "none");
+			})
+			//监听提交
+			var lock1 = true
+			form.on('submit(sub_btn)', function (data) {
+				var data = data.field;
+				if(lock1){
+				lock1 = false
+				if(data.PId==0){
+					layer.msg("请选择广告位置！", { icon: 5 })
+					return
+				}else{
+					publicMathod.post({
+					url: "api/ContentAdInfo/Edit",
+					data: {
+						"Id":id,
+						"PId": data.PId,
+						"Ti": data.Ti,
+						"Lo":lock,
+						"SId":data.SId?data.SId:0,
+						"Lu": data.Lu,
+						"Iu":data.Wl						
+					},
+					success: function (result) {
+						if (result.Status == "1") {
+							layer.msg(result.Msg, { icon: 1, shade: 0.4, time: 1000 }, function () {
+								var index = parent.layer.getFrameIndex(window.name);
+								parent.layer.close(index);
+								parent.layui.table.reload('data_table',{page: {curr: 1}});
+								return false; });
+							
+						} else {
+							lock1 = true
+							layer.msg(result.Msg, { icon: 5 });
+						}
+					}
+				})
+			}
+				return false;
+				}
+		
+				
+	
+			});
+		})
+		
+	</script>
+</html>

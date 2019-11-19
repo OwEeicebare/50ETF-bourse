@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>品牌管理</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/agency.css"/>
+	</head>
+	<body>
+        <div class="layui-row" id="service">
+            <div class="first-step">
+                <div class="steps layui-row ">
+                    <div class="layui-col-md4"><span class="circle finished">1</span>服务协议</div>
+                    <div class="layui-col-md4"><span class="circle">2</span>服务费用</div>
+                    <div class="layui-col-md4"><span class="circle">3</span>等待审核</div>
+                </div>
+                <div class="protocal">
+                    <div class="content">
+                        你扫鹅肥腻为了让发给你赛哦对房价哇哦二十大科技佛阿韦日法撒旦十大富豪微软胡锦涛额度内风骚的阿斯蒂芬就哦啊欸然后发射点发生
+                    </div>
+                    <div class="layui-form">
+                        <input type="checkbox" name="" title="同意协议" lay-skin="primary" checked> 
+                    </div>
+                </div>
+                <button class="layui-btn layui-btn-primary" id="first_next">下一步</button>
+            </div>
+            <!-- 第二步 -->
+            <!-- <div class="second-step">
+                <div class="steps layui-row ">
+                    <div class="layui-col-md4"><span class="circle finished">1</span>服务协议</div>
+                    <div class="layui-col-md4"><span class="circle finished">2</span>服务费用</div>
+                    <div class="layui-col-md4"><span class="circle">3</span>等待审核</div>
+                </div>
+                <div class="fee">
+                    <p style="margin-top: 50px;">服务费用说明</p>
+                    <div class="pay-qrcode">
+                        <img src="" alt="支付二维码">
+                    </div>
+                </div>
+                <button class="layui-btn layui-btn-primary" id="first_next">下一步</button>
+            </div> -->
+		</div>
+	</body>
+	<script src="../../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		layui.use(['form',  'jquery', 'layer'], function() {
+			var form = layui.form;
+			var $ = layui.jquery;
+            var layer = layui.layer;
+            $('body').on('click', '#first_next',function () {
+                var str = `<div class='second-step'>
+                    <div class='steps layui-row'>
+                        <div class='layui-col-md4'><span class='circle finished'>1</span>服务协议</div>
+                        <div class='layui-col-md4'><span class='circle finished'>2</span>服务费用</div>
+                        <div class='layui-col-md4'><span class='circle'>3</span>等待审核</div>
+                    </div>
+                    <div class='fee'>
+                        <p style='margin-top: 50px;'>服务费用说明</p>
+                        <div class='pay-qrcode'><img src='' alt='支付二维码'></div>
+                    </div>
+                        <button class='layui-btn layui-btn-primary' id='second_pre'>上一步</button>
+                </div>`;
+                $('#service').html(str);
+                setTimeout(() => {
+                    var sustr = `<div class='second-step'>
+                    <div class="steps layui-row ">
+                        <div class="layui-col-md4"><span class="circle finished">1</span>服务协议</div>
+                        <div class="layui-col-md4"><span class="circle finished">2</span>服务费用</div>
+                        <div class="layui-col-md4"><span class="circle">3</span>等待审核</div></div>
+                        <div class='fee'><h1 style="margin-top: 50px;">成功支付￥999</h1><div>
+                    </div>`;
+                    $('#service').html(sustr);
+                }, 2000);
+                setTimeout(() => {
+                    layer.open({
+                        type: 2,
+                        title: "添加属性",
+                        area: ['800px', '500px'],
+                        shade: 0.8,
+                        content: ['add.html', 'no']
+                    })
+                }, 2000);
+            });
+            $('body').on('click', '#second_pre',function () {
+                var str = `<div class="first-step">
+                    <div class="steps layui-row ">
+                        <div class="layui-col-md4"><span class="circle finished">1</span>服务协议</div>
+                        <div class="layui-col-md4"><span class="circle">2</span>服务费用</div>
+                        <div class="layui-col-md4"><span class="circle">3</span>等待审核</div></div>
+                    <div class="protocal">
+                        <div class="content">你扫鹅肥腻为了让发给你赛哦对房价哇哦二十大科技佛阿韦日法撒旦十大富豪微软胡锦涛额度内风骚的阿斯蒂芬就哦啊欸然后发射点发生</div><div class="layui-form"><input type="checkbox" name="" title="同意协议" lay-skin="primary" checked> </div>
+                    </div>
+                    <button class="layui-btn layui-btn-primary" id="first_next">下一步</button>
+                </div>`;
+                $('#service').html(str); 
+                form.render(); //更新全部
+            })
+		});
+	</script>
+</html>

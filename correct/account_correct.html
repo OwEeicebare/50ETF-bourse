@@ -1,0 +1,1030 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>代理业绩报表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+<style>
+    .layui-table-view .layui-table td {
+        height: 50px;
+        padding: 0;
+        line-height: 25px;
+    }
+
+    .layui-table-cell {
+        height: unset;
+        line-height: unset;
+    }
+
+    .layui-icon-file:before,
+    .layui-icon-triangle-r:before,
+    .layui-icon-triangle-d::before {
+        margin-right: 5px;
+    }
+
+    .layui-icon-levelTwo:before {
+        margin-left: 20px;
+    }
+
+    .layui-icon-levelThree::before {
+        margin-left: 35px;
+    }
+
+    #report-table tbody td,
+    #report-table thead th,
+    #bottom-table thead th,
+    #total-table tbody td,
+    #total-table thead th {
+        padding: 10px;
+    }
+
+    /* .title_wrap {
+        position: relative;
+    } */
+
+    #bottom-table {
+        margin-bottom: 0;
+    }
+
+    #report-table {
+        margin: 0 0 5px 0;
+    }
+
+    #report-table thead th {
+        position: relative;
+    }
+
+
+
+    .layui-table td,
+    .layui-table th {
+        text-align: center;
+    }
+
+    .contract-code {
+        width: 150px;
+    }
+
+    .account {
+        width: 120px;
+    }
+
+    .s-account {
+        width: 110px;
+    }
+
+    .defined-form {
+        margin-top: 20px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .defined-btn {
+        margin-left: 40px;
+    }
+
+    .message {
+        position: fixed;
+        width: 380px;
+        z-index: 105;
+        height: 300px;
+        background-color: #fff;
+        box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8);
+        border-radius: 5px;
+        right: 25px;
+        bottom: 15px;
+        -webkit-transform-origin: 100% 100%;
+        transform-origin: 100% 100%;
+        transition: all 0.5s ease-out;
+        opacity: 0;
+    }
+
+    .message-title {
+        color: rgb(102, 102, 102);
+        text-align: center;
+        position: relative;
+        height: 30px;
+        line-height: 30px;
+        border-bottom: 1px solid rgb(235, 235, 235);
+    }
+
+    .message-title>span {
+        position: absolute;
+        left: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .message-body {
+        height: 270px;
+        width: 100%;
+        overflow: hidden;
+        font-size: 12px;
+    }
+
+    .message-body>div {
+        overflow-y: scroll;
+        height: 100%;
+        width: 100%;
+    }
+
+    .message-body>div>p {
+        padding: 8px;
+        border-bottom: 1px solid rgb(235, 235, 235);
+        color: rgb(102, 102, 102);
+        line-height: 18px;
+        position: relative;
+    }
+
+    .special {
+        color: rgb(16, 142, 233);
+    }
+
+    .message-body .layui-icon-close {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+    }
+
+    .message-hidden {
+        transform: scale(0, 0);
+        opacity: 0;
+    }
+
+    .message-show {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .message-button {
+        right: 25px;
+        bottom: 15px;
+        position: fixed;
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
+        z-index: 105;
+        background-color: rgba(153, 153, 153, 0.7);
+        border-radius: 2px;
+        text-align: center;
+        cursor: pointer;
+        transition: all .5s ease-out;
+        box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+    }
+
+    .message-button .layui-icon {
+        font-size: 30px;
+    }
+
+    .message-button-hidden {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    .message-button-show {
+        opacity: 0.95;
+        transform: scale(1);
+    }
+
+    .layui-table .left-border {
+        border-left: 2px solid #666;
+    }
+
+    .layui-table .right-border {
+        border-right: 2px solid #666;
+    }
+
+    .red {
+        color: red;
+    }
+
+
+    .title_wrap {
+        width: 100%;
+        /* overflow: hidden; */
+        padding: 10px 15px;
+        box-sizing: border-box;
+    }
+
+    .new-report {
+        position: unset;
+        overflow-x: scroll;
+        padding: 0;
+    }
+
+    .bottom-header::-webkit-scrollbar,
+    .bottom::-webkit-scrollbar {
+        display: none;
+        -ms-overflow-style: none;
+        overflow: -moz-scrollbars-none;
+        scrollbar-width: none;
+        scrollbar-color: transparent transparent;
+        scrollbar-track-color: transparent;
+        -ms-scrollbar-track-color: transparent;
+    }
+
+    .bottom-header {
+        position: relative;
+        z-index: 100;
+    }
+
+    .report-wrap {
+        overflow-y: scroll;
+        margin-top: -82px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .bottom {
+        margin-top: -87px;
+    }
+</style>
+
+<body>
+    <div class="layui-fluid" id="root">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="title_wrap">
+                    <div class="layui-card-body new-report">
+                        <div class="bottom-header">
+                            <table class="layui-table" id="bottom-table">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">合约代码</th>
+                                        <th rowspan="2">合约名称</th>
+                                        <th colspan="3">母账户</th>
+                                    </tr>
+                                    <tr>
+                                        <th>系统持仓</th>
+                                        <th>母账户持仓<i class="layui-icon layui-icon-about"
+                                                style="font-size: 15px; color: #1E9FFF; margin-left: 6px;"
+                                                data-illustate="positionIllustate"></i></th>
+                                        <th>当日同步<i class="layui-icon layui-icon-about"
+                                                style="font-size: 15px; color: #1E9FFF; margin-left: 6px;"
+                                                data-illustate="todayIllustate"></i></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div style="height: 370px" class="report-wrap">
+                            <table id="report-table" class="layui-table">
+                                <thead style="visibility: hidden;">
+                                    <tr>
+                                        <th rowspan="2">合约代码</th>
+                                        <th rowspan="2">合约名称</th>
+                                        <th colspan="3">母账户</th>
+                                    </tr>
+                                    <tr>
+                                        <th>系统持仓</th>
+                                        <th>母账户持仓</th>
+                                        <th>当日同步</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" style="padding: 20px 0 20px 10%;"><i
+                                                class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"
+                                                style="font-size: 28px;"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bottom">
+                            <table id="total-table" class="layui-table">
+                                <thead style="visibility: hidden;">
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="layui-form defined-form" lay-filter="test1">
+                        <div class="layui-form-item l_left">
+                            <label class="layui-form-label">合约代码</label>
+                            <div class="layui-input-block">
+                                <input id="code" type="text" name="code" lay-verify="code|number" autocomplete="off"
+                                    placeholder="请输入" class="layui-input l_left">
+                            </div>
+                        </div>
+                        <div class="layui-form-item l_left">
+                            <label class="layui-form-label">选择母账户</label>
+                            <div class="layui-input-block">
+                                <select name="account" lay-filter="account" id="account" lay-verify="account">
+                                    <option value="0" selected="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item l_left">
+                            <label class="layui-form-label">输入张数</label>
+                            <div class="layui-input-block">
+                                <input id="number" type="text" name="number" lay-verify="dealNumber|number"
+                                    autocomplete="off" placeholder="请输入" class="layui-input l_left">
+                            </div>
+                        </div>
+                        <div class="layui-form-item l_left">
+                            <label class="layui-form-label">交易类型</label>
+                            <div class="layui-input-block">
+                                <select name="SId" lay-filter="SId" id="SId" lay-verify="SId">
+                                    <option value="0" selected="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item l_left">
+                            <label class="layui-form-label">当前价格</label>
+                            <div class="layui-input-block">
+                                <input id="price" type="text" name="price" lay-verify="price" autocomplete="off"
+                                    class="layui-input l_left">
+                            </div>
+                        </div>
+                        <div class="layui-form-item l_left">
+                            <span class="layui-btn l_left" style="border-radius: 0;" id="submit_add" lay-submit
+                                lay-filter="submit_add">提交</span>
+                        </div>
+                    </form>
+                </div>
+                <div class="title_wrap">
+                    <form class="layui-form special-form" lay-filter="test2">
+                        <div class="layui-form-item l_left defined-btn">
+                            <span class="layui-btn layui-btn-primary" style="border-radius: 0;" id="entrust" lay-submit
+                                lay-filter="entrust">当日委托</span>
+                        </div>
+                        <div class="layui-form-item l_left defined-btn">
+                            <span class="layui-btn layui-btn-primary" style="border-radius: 0;" id="deal" lay-submit
+                                lay-filter="deal">当日成交</span>
+                        </div>
+                    </form>
+                </div>
+                <div class="table_wrap">
+                    <table id="entrust_table" lay-filter="entrust_table"></table>
+                    <table id="deal_table" lay-filter="deal_table"></table>
+                </div>
+                <div class="message message-hidden" id="message">
+                    <div class="message-title">
+                        <span id="shrink">—</span> 消息通知
+                    </div>
+                    <div class="message-body">
+                        <div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-button message-button-show" id="msgBtn">
+                    <i class="layui-icon layui-icon-layer"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/jquery-3.4.0.min.js"></script>
+    <script src="../js/public.js"></script>
+    <script type="text/javascript">
+        layui.use(['form', 'layer', 'table'], function () {
+            publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+            var form = layui.form;
+            var table = layui.table;
+            var $ = layui.jquery;
+            var layer = layui.layer;
+            switchEntrust();
+            getCorrectData();
+
+            $('#bottom-table').width($('#report-table').width());
+            $('#total-table').width($('#report-table').width());
+            //母账户
+            publicMathod.post({
+                url: 'api/Tool/GetMasterList',
+                success: function (data) {
+                    if (data.Status == "1") {
+                        var str = "";
+                        for (var i = 0; i < data.Data.length; i++) {
+                            if (data.Data[i].Id != 0) {
+                                str += '<option value="' + data.Data[i].Id + '">' + data.Data[i].Name + '</option>';
+                            }
+                        }
+                        $("#account").append(str);
+                        form.render(); //更新全部
+                    }
+                }
+            });
+            //交易类型
+            publicMathod.getDropdownList("api/Tool/GetSellStatus", form, $("#SId"));
+
+
+            function getCorrectData() {
+                publicMathod.post({
+                    url: 'api/Master/GetStockCodeDataList',
+                    success: function (data) {
+                        // console.log(data);
+                        if (data.Status === '1') {
+                            //渲染表头
+                            var strThead = '<tr><th rowspan="2" class="contract-code">合约代码</th><th rowspan="2" class="contract-code">合约名称</th>';
+                            var twoTh = '<tr>';
+                            //总计
+                            var bottomStr = '<tr><td></td><td style="font-weight: bold; font-size: 16px;" class="red">总计：</td>';
+                            var tableWid = 340 + data.MasterList.length * 3 * 135 + 50;
+
+                            for (var i = 0; i < data.MasterList.length; i++) {
+                                strThead += `<th colspan="3" class="account  left-border  right-border">${data.MasterList[i]}号母账户</th>`;
+                                twoTh += `<th class="s-account left-border">系统持仓</th>
+										<th class="s-account">母账户持仓<i class="layui-icon layui-icon-about positionIllustate${data.MasterList[i]}" data-mid="${data.MasterList[i]}" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;" data-illustate="positionIllustate"></i></th>
+										<th class="s-account right-border">当日同步<i class="layui-icon layui-icon-about todayIllustate${data.MasterList[i]}" data-mid="${data.MasterList[i]}" style="font-size: 15px; color: #1E9FFF; margin-left: 6px;" data-illustate="todayIllustate"></i></th>`
+                                //总计
+                                for (var v = 0; v < data.SumData.length; v++) {
+                                    if (data.SumData[v].MasterID === data.MasterList[i]) {
+                                        bottomStr += `<td class="left-border red">${data.SumData[v].SystemNumber}</td><td class="red">${data.SumData[v].OnLineNumber}</td><td class="right-border red">${data.SumData[v].InitialNum}</td>`;
+                                        break;
+                                    }
+                                }
+                            }
+                            strThead += '</tr>';
+                            twoTh += '</tr>';
+                            bottomStr += '</tr>';
+                            $('#bottom-table thead').html(strThead + twoTh);
+                            $('#report-table thead').html(strThead + twoTh);
+                            $('#total-table thead').html(strThead + twoTh);
+                            $('#total-table tbody').html(bottomStr);
+
+
+                            //渲染tbody
+                            var tbodyStr = '';
+                            for (var j = 0; j < data.Data.length; j++) {
+                                tbodyStr += `<tr><td>${data.Data[j].StockCode}</td><td>${data.Data[j].StockName}</td>`;
+                                for (var z = 0; z < data.MasterList.length; z++) {
+                                    for (var h = 0; h < data.Data[j].MasterStockList.length; h++) {
+                                        if (data.MasterList[z] === data.Data[j].MasterStockList[h].MasterID) {
+                                            tbodyStr += `<td class="left-border convinient-method" data-mid="${data.Data[j].MasterStockList[h].MasterID}" data-code="${data.Data[j].StockCode}" data-system="${data.Data[j].MasterStockList[h].SystemNumber}">${data.Data[j].MasterStockList[h].SystemNumber}</td><td>${data.Data[j].MasterStockList[h].OnLineNumber}</td><td class="right-border">${data.Data[j].MasterStockList[h].InitialNum}</td>`;
+                                            break;
+                                        }
+                                    }
+                                }
+                                tbodyStr += '</tr>';
+                            }
+                            // console.log(tbodyStr)
+                            $('#report-table tbody').html(tbodyStr);
+                            if (data.MasterList.length > 3) {
+                                $('#report-table').width(tableWid);
+                                $('.report-wrap').width(tableWid + 20);
+                            }
+                            $('#bottom-table').width($('#report-table').width() + 1);
+                            $('#total-table').width($('#report-table').width() + 1);
+                        } else {
+                            $('#report-table tbody').html(`<tr><td colspan="5" style='padding: 20px 0 20px 10%;'>${data.Msg}</td></tr>`);
+                            layer.msg(data.Msg, {
+                                icon: 5
+                            });
+                        }
+                    },
+                    fail: function (error) {
+                        $('#report-table tbody').html(`<tr><td colspan="5" style='padding: 20px 0 20px 10%;'>请求数据异常</td></tr>`);
+                        layer.msg("请求数据异常", {
+                            icon: 5
+                        });
+                    }
+                })
+            }
+
+
+            // $('#report-table').parent().on('scroll', function () {
+            //     $('#bottom-table').parent().scrollLeft($('#report-table').parent()[0].scrollLeft)
+            //     $('#total-table').parent().scrollLeft($('#report-table').parent()[0].scrollLeft)
+            //     if ($('#report-table').parent()[0].scrollLeft > ($('#report-table').parent()[0].scrollWidth - $('#report-table').parent()[0].offsetWidth - 10)) {
+            //         // console.log('开始禁止',$('#report-table').parent()[0].scrollLeft)
+            //         $('#bottom-table').parent().scrollLeft($('#report-table').parent()[0].scrollWidth - $('#report-table').parent()[0].offsetWidth - 10)
+            //         $('#total-table').parent().scrollLeft($('#report-table').parent()[0].scrollWidth - $('#report-table').parent()[0].offsetWidth - 10) //1752 1015 2767
+            //         $('#report-table').parent().scrollLeft($('#report-table').parent()[0].scrollWidth - $('#report-table').parent()[0].offsetWidth - 10) //1752 1015 2767
+            //     }
+            // })
+
+            //当日委托
+            function switchEntrust() {
+                var lock = true;
+                var entrustTable = table.render({
+                    elem: '#entrust_table',
+                    url: publicMathod.hosturl + 'api/Master/GetAdminTodayStock', //数据接口
+                    method: 'post',
+                    totalRow: true,
+                    headers: {
+                        token: publicMathod.token
+                    },
+                    contentType: "application/json; charset=UTF-8",
+                    cellMinWidth: 100,
+                    limit: 15,
+                    //headers: {token: publicMathod.token},
+                    page: {
+                        layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+                    },
+                    parseData: function (res) { //规定数据格式
+                        if (!res.Data || !res.Data.length) {
+                            layer.msg(res.Data.length ? res.Msg : '当日委托无数据', {
+                                icon: 5
+                            })
+                        } else {
+                            if (lock) {
+                                lock = false;
+                                $(".layui-table-total table tbody ").after(`<tr><td data-field="ID" data-key="1-0-0" class=""><div class="layui-table-cell laytable-cell-1-0-0"></div></td><td data-field="MasterID" data-key="1-0-1" class=""><div class="layui-table-cell laytable-cell-1-0-1"></div></td><td data-field="StockCode" data-key="1-0-2" class=""><div class="layui-table-cell laytable-cell-1-0-2"></div></td><td data-field="StockName" data-key="1-0-3" class=""><div class="layui-table-cell laytable-cell-1-0-3"></div></td><td data-field="DeclTypeName" data-key="1-0-4" class=""><div class="layui-table-cell laytable-cell-1-0-4">全部合计:</div></td><td data-field="DeclNum" data-key="1-0-5" class=""><div class="layui-table-cell laytable-cell-1-0-5">${res.SumData.DeclNum}</div></td><td data-field="DeclPrice" data-key="1-0-6" class=""><div class="layui-table-cell laytable-cell-1-0-6"></div></td><td data-field="AddTime" data-key="1-0-7" class=""><div class="layui-table-cell laytable-cell-1-0-7"></div></td><td data-field="DealNum" data-key="1-0-8" class=""><div class="layui-table-cell laytable-cell-1-0-8">${res.SumData.DealNum}</div></td><td data-field="DealPrice" data-key="1-0-9" class=""><div class="layui-table-cell laytable-cell-1-0-9"></div></td><td data-field="AuthNo" data-key="1-0-10" class=""><div class="layui-table-cell laytable-cell-1-0-10"></div></td><td data-field="DealStatus" data-key="1-0-11" class=""><div class="layui-table-cell laytable-cell-1-0-11"></div></td><td data-field="DealStatus" data-key="1-0-12" class=""><div class="layui-table-cell laytable-cell-1-0-12"></div></td><td data-field="ope" data-key="1-0-13" class=""><div class="layui-table-cell laytable-cell-1-0-13"></div></td></tr>`)
+
+                            }
+                            return {
+                                "Status": res.Status, //解析接口状态
+                                "msg": res.Msg, //解析提示文本
+                                "count": res.Count, //解析数据长度
+                                "data": res.Data //解析数据列表
+                            };
+                        }
+                    },
+                    response: { // 规定响应成功状态码
+                        statusCode: 1,
+                        statusName: "Status"
+                    },
+                    cols: [
+                        [{
+                            field: 'ID',
+                            title: 'ID',
+                            width: 70
+                        }, {
+                            field: 'MasterID',
+                            title: '母账户ID',
+                            width: 120
+                        }, {
+                            field: 'StockCode',
+                            title: '合约代码'
+                        }, {
+                            field: 'StockName',
+                            title: '合约名称',
+                            width: 150
+                        }, {
+                            field: 'DeclTypeName',
+                            title: '交易类型',
+                            totalRowText: '本页合计:'
+                        },
+                        // { field: 'TakeType', title: '持仓类型', width: 100 }, //
+                        {
+                            field: 'DeclNum',
+                            title: '委托数量',
+                            totalRow: true
+                        }, {
+                            field: 'DeclPrice',
+                            title: '委托价格',
+                            templet: function (obj) {
+                                return Number(obj.DeclPrice).toFixed(4);
+                            }
+                        }, {
+                            field: 'AddTime',
+                            title: '挂单时间',
+                            width: 160
+                        }, //
+                        {
+                            field: 'DealNum',
+                            title: '成交数量',
+                            totalRow: true
+                        }, {
+                            field: 'DealPrice',
+                            title: '成交价格',
+                            templet: function (obj) {
+                                return Number(obj.DealPrice).toFixed(4);
+                            }
+                        }, {
+                            field: 'AuthNo',
+                            title: '委托编号'
+                        }, //未知
+                        {
+                            field: 'StatusName',
+                            title: '状态',
+                            width: 100
+                        }, {
+                            field: 'Remark',
+                            title: '备注'
+                        }, {
+                            field: 'ope',
+                            title: '操作',
+                            fixed: 'right',
+                            templet: function (obj) {
+
+                                if (obj.DealStatus == 0 || obj.DealStatus == 1 || obj.DealStatus == 6 || obj.DealStatus == 11) { //存疑  状态的取值为已报/提交成功
+                                    return '<a class="layui-btn  layui-btn-xs" lay-event="revoke">撤单</a>';
+                                } else {
+                                    return '';
+                                }
+                            },
+                        }
+                        ]
+                    ]
+                });
+                $('#deal_table').css('display', 'none');
+                $("[lay-id='deal_table']").css('display', 'none');
+                $('#entrust').css('borderColor', '#009688');
+                $('#deal').css('borderColor', '#C9C9C9');
+            }
+
+            //当日成交
+            function switchDeal() {
+                var lock1 = true;
+                var dealTable = table.render({
+                    elem: '#deal_table',
+                    url: publicMathod.hosturl + 'api/Master/GetAdminMasterDealTodayList', //数据接口
+                    method: 'post',
+                    totalRow: true,
+                    contentType: "application/json; charset=UTF-8",
+                    cellMinWidth: 100,
+                    headers: {
+                        token: publicMathod.token
+                    },
+                    page: {
+                        layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+                    },
+                    parseData: function (res) { //规定数据格式
+                        if (!res.Data || !res.Data.length) {
+                            layer.msg(res.Data.length ? res.Msg : '当日成交无数据', {
+                                icon: 5
+                            })
+                        } else {
+                            if (lock1) {
+                                lock1 = false;
+                                $(".layui-table-total table tbody ").after(`<tr><td data-field="ID" data-key="3-0-0" class=""><div class="layui-table-cell laytable-cell-3-0-0"></div></td><td data-field="MasterID" data-key="3-0-1" class=""><div class="layui-table-cell laytable-cell-3-0-1"></div></td><td data-field="StockCode" data-key="3-0-2" class=""><div class="layui-table-cell laytable-cell-3-0-2"></div></td><td data-field="StockName" data-key="3-0-3" class=""><div class="layui-table-cell laytable-cell-3-0-3"></div></td><td data-field="DeclTypeName" data-key="3-0-4" class=""><div class="layui-table-cell laytable-cell-3-0-4">全部合计:</div></td><td data-field="DealNum" data-key="3-0-5" class=""><div class="layui-table-cell laytable-cell-3-0-5">${res.SumData.DealNum}</div></td><td data-field="DealPrice" data-key="3-0-6" class=""><div class="layui-table-cell laytable-cell-3-0-6"></div></td><td data-field="TimeInput" data-key="3-0-7" class=""><div class="layui-table-cell laytable-cell-3-0-7"></div></td><td data-field="DealNo" data-key="3-0-8" class=""><div class="layui-table-cell laytable-cell-3-0-8"></div></td><td data-field="StatusName" data-key="3-0-9" class=""><div class="layui-table-cell laytable-cell-3-0-9"></div></td></tr>`);
+                            }
+                            return {
+                                "Status": res.Status, //解析接口状态
+                                "msg": res.Msg, //解析提示文本
+                                "count": res.Count, //解析数据长度
+                                "data": res.Data //解析数据列表
+                            };
+
+                        }
+                    },
+                    response: { //规定响应成功状态码
+                        statusCode: 1,
+                        statusName: "Status"
+                    },
+                    cols: [
+                        [{
+                            field: 'ID',
+                            title: 'ID',
+                            width: 70
+                        }, {
+                            field: 'MasterID',
+                            title: '母账户ID',
+                            width: 120
+                        }, {
+                            field: 'StockCode',
+                            title: '合约代码'
+                        }, {
+                            field: 'StockName',
+                            title: '合约名称'
+                        }, {
+                            field: 'DeclTypeName',
+                            title: '交易类型',
+                            totalRowText: '本页合计:'
+                        },
+                        // { field: 'TakeType', title: '持仓类型', width: 120 },
+                        {
+                            field: 'DealNum',
+                            title: '成交数量',
+                            totalRow: true
+                        }, {
+                            field: 'DealPrice',
+                            title: '成交价格',
+                            templet: function (obj) {
+                                return Number(obj.DealPrice).toFixed(4);
+                            }
+                        }, {
+                            field: 'TimeInput',
+                            title: '成交时间',
+                            width: 160
+                        }, {
+                            field: 'DealNo',
+                            title: '成交编号'
+                        }, {
+                            field: 'StatusName',
+                            title: '状态',
+                            width: 70
+                        }
+                        ]
+                    ]
+                });
+                $('#entrust_table').css('display', 'none');
+                $("[lay-id='entrust_table']").css('display', 'none');
+                $('#entrust').css('borderColor', '#C9C9C9');
+                $('#deal').css('borderColor', '#009688');
+            }
+
+            //切换成当日委托
+            form.on("submit(entrust)", function (data) {
+                switchEntrust();
+            })
+
+            //切换成当日成交
+            form.on("submit(deal)", function (data) {
+                switchDeal();
+            })
+
+            //验证
+            form.verify({
+                code: function (value, item) { //value：表单的值、item：表单的DOM对象
+                    if (!value) {
+                        return '请输入合约代码'
+                    }
+                },
+                account: function (value, item) { //value：表单的值、item：表单的DOM对象
+                    if (!Number(value)) {
+                        return '请选择母账户'
+                    }
+                },
+                dealNumber: function (value, item) { //value：表单的值、item：表单的DOM对象
+                    if (!value) {
+                        return '请输入张数'
+                    }
+                    if (value == 0) {
+                        return '委托数量必须大于0'
+                    }
+                },
+                SId: function (value, item) { //value：表单的值、item：表单的DOM对象
+                    if (!Number(value)) {
+                        return '请选择交易类型'
+                    }
+                },
+                price: function (value, item) { //value：表单的值、item：表单的DOM对象
+                    if (!value) {
+                        return '请输入价格'
+                    }
+                }
+            });
+
+            //提交手动操作数据
+            form.on("submit(submit_add)", function (data) {
+                // console.log(data);
+                var field = data.field;
+                field.account = Number(field.account);
+                field.price = Number(field.price);
+                field.SId = Number(field.SId);
+                field.number = Number(field.number);
+                publicMathod.post({
+                    url: 'api/Master/PostAdminStock',
+                    data: {
+                        MasterID: field.account,
+                        StockCode: field.code,
+                        DealType: field.SId,
+                        DeclPrice: field.price,
+                        DeclNum: field.number
+                    },
+                    success: function (res) {
+                        // console.log(res);
+                        if (res.Status === '1') {
+                            layer.msg(res.Msg, {
+                                icon: 1,
+                                shade: 0.5,
+                                time: 1000
+                            }, function () {
+                                location.reload();
+                            });
+                        } else {
+                            layer.msg(res.Msg, {
+                                icon: 5,
+                                shade: 0.5,
+                                time: 1000
+                            });
+                        }
+                    }
+                })
+            })
+
+            //监听合约代码输入框失焦事件
+            var currentEObj = null;
+            $('#code').on('blur', function () {
+                var code = $('#code').val();
+                var dealType = Number($('#SId').val());
+                if (code) {
+                    requestE(code, dealType);
+                }
+            })
+
+            //请求五档数据 10买入开仓  11卖出平仓
+            function requestE(code, dealType) {
+                publicMathod.post({
+                    url: 'mobile/MobileStockTime/GetTimeSharingModel',
+                    data: code,
+                    success: function (data) {
+                        // console.log('请求五档数据', data);
+                        if (data.Status === '1') {
+                            if (dealType) {
+                                var priceVal = dealType === 10 ? decideLevel(data.Data, 10) : dealType === 11 ? decideLevel(data.Data, 11) : '';
+                                $('#price').val(priceVal);
+                            }
+                            currentEObj = data.Data;
+                        } else {
+                            currentEObj = null;
+                        }
+                    }
+                })
+            }
+
+
+            //监听交易类型的选择
+            form.on('select(SId)', function (data) {
+                var dealType = Number(data.value);
+                if (currentEObj && dealType) {
+                    var priceVal = dealType === 10 ? decideLevel(currentEObj, 10) : dealType === 11 ? decideLevel(currentEObj, 11) : '';
+                    $('#price').val(priceVal);
+                }
+            });
+
+            //判断当前价格取几档数据
+            function decideLevel(obj, type) {
+                if (type === 10) { //买 取卖五档
+                    return obj.SaleFiveAmount ? obj.SaleFiveAmount : obj.SaleFourAmount ? obj.SaleFourAmount : obj.SaleThreeAmount ? obj.SaleThreeAmount : obj.SaleTwoAmount ? obj.SaleTwoAmount : obj.SaleOneAmount;
+                } else if (type === 11) { //卖 取买五档
+                    return obj.BuyFiveAmount ? obj.BuyFiveAmount : obj.BuyFourAmount ? obj.BuyFourAmount : obj.BuyThreeAmount ? obj.BuyThreeAmount : obj.BuyTwoAmount ? obj.BuyTwoAmount : obj.BuyOneAmount;
+                } else {
+                    return '';
+                }
+            }
+
+
+            //监听单元格事件 撤单
+            table.on('tool(entrust_table)', function (obj) {
+                var data = obj.data;
+                // console.log(data)
+                if (obj.event === 'revoke') {
+                    layer.open({
+                        // type: 1, 
+                        title: '撤单',
+                        btn: ['确定', '取消'],
+                        shade: 0.8,
+                        content: '是否撤单',
+                        yes: function (index, layero) {
+                            // console.log('yes');
+                            revoke(data.ID);
+                        },
+                        btn2: function (index, layero) {
+                            // console.log('no');
+                            layer.close(index);
+                        }
+                    });
+                }
+            });
+
+            //撤单
+            function revoke(id) {
+                publicMathod.post({
+                    url: 'api/Master/PostAdminStockWithdraw',
+                    data: {
+                        Id: id
+                    },
+                    success: function (res) {
+                        layer.msg(res.Msg, {
+                            icon: res.Status === '1' ? 1 : 5
+                        }, function (index) {
+                            layer.closeAll();
+                            switchEntrust();
+                        })
+                    }
+                })
+            }
+
+            // 实时更新消息
+            var msgTimer = window.setInterval(() => {
+                getMsg();
+            }, 1000);
+
+            //监听消息收起
+            $('body').on('click', '#shrink', function () {
+                $('#message').removeClass('message-show');
+                $('#message').addClass('message-hidden');
+                $('#msgBtn').removeClass('message-button-hidden');
+                $('#msgBtn').addClass('message-button-show');
+            })
+
+            //监听消息展开
+            $('body').on('click', '#msgBtn', function () {
+                $('#message').removeClass('message-hidden');
+                $('#message').addClass('message-show');
+                $('#msgBtn').removeClass('message-button-show');
+                $('#msgBtn').addClass('message-button-hidden');
+            })
+
+            //请求获取消息
+            var messageList = null;
+            var firstExit = true;
+
+            function getMsg() {
+                publicMathod.post({
+                    url: 'api/Master/GetMasterCalibrationLog',
+                    success: function (res) {
+                        var str = '';
+                        if (res.Status === '1') {
+                            if (res.Data.length > 0) {
+                                if (messageList && messageList.length < res.Data.length) { // 如果有新消息 消息展开
+                                    $('#message').removeClass('message-hidden');
+                                    $('#message').addClass('message-show');
+                                    $('#msgBtn').removeClass('message-button-show');
+                                    $('#msgBtn').addClass('message-button-hidden');
+                                }
+                                messageList = res.Data;
+                                for (var i = 0; i < messageList.length; i++) {
+                                    str += `<p><span class="special">${messageList[i].masterid}号</span>母账户出现<span class="special">${messageList[i].deal_type === 10 ? '买入废单' : messageList[i].deal_type === 11 ? '卖出废单' : ''}</span>，合约代码：<span class="special">${messageList[i].stock_code}</span>，时间：<span class="special">${messageList[i].happen_time}</span>，备注：${messageList[i].remark}<i class="layui-icon layui-icon-close" id="closeMsg" data-msgid="${messageList[i].id}"></i></p>`;
+                                }
+                            } else {
+                                if (firstExit) { //第一次进入 无数据 隐藏消息列表
+                                    $('#message').removeClass('message-show');
+                                    $('#message').addClass('message-hidden');
+                                    $('#msgBtn').removeClass('message-button-hidden');
+                                    $('#msgBtn').addClass('message-button-show');
+                                    firstExit = false;
+                                }
+                                str = `<p style="text-align: center; border-bottom: none; margin-top: 30px;font-size: 18px;">无消息</p>`;
+                            }
+                        }
+                        $('#message .message-body > div').html(str);
+                    }
+                })
+            }
+
+            //监听某条消息的关闭
+            var lockClose = true;
+            $('body').on('click', '#closeMsg', function (event) {
+                // console.log(event);
+                var msgId = Number(event.target.dataset.msgid);
+                if (!lockClose) {
+                    return;
+                }
+                publicMathod.post({
+                    url: 'api/Master/PostMasterCalibrationLogYet',
+                    data: {
+                        Id: msgId
+                    },
+                    success: function (res) {
+                        // console.log(res);
+                        if (res.Status !== '1') {
+                            layer.msg(res.Msg, {
+                                icon: 5
+                            }, function (index) {
+                                layer.closeAll();
+                            })
+                        } else {
+                            $(`[data-msgid="${msgId}"]`).parent().css('display', 'none');
+                        }
+                    }
+                })
+            })
+
+            // $(window).resize(function () {
+            //     getCorrectData()
+            // });
+
+            //母账户持仓 在线
+            var illustatePId = 0;
+            $('body').on('click', '[data-illustate="positionIllustate"]', function () {
+                if (illustatePId != $(this)[0].dataset.mid) {
+                    layer.tips('1、母账户持仓数据非接口获取的母账户持仓数据<br /> 2、母账户持仓数据由系统根据昨日持仓于当交易计算得出<br /> 3、母账户持仓=昨日收盘持仓+当日用户成交+账户较准成交', '.positionIllustate' + $(this)[0].dataset.mid, {
+                        tips: 1,
+                        time: 5000
+                    });
+                    illustatePId = $(this)[0].dataset.mid;
+                } else {
+                    illustatePId = 0;
+                    layer.closeAll();
+                }
+            })
+
+            //当日同步 初始值
+            var illustateTId = 0;
+            $('body').on('click', '[data-illustate="todayIllustate"]', function () {
+                if (illustateTId != $(this)[0].dataset.mid) {
+                    layer.tips('1、当日同步的值，将于开市日当日下午15：10更新数值 <br />2、休市前不能进行数据同步，即下午15：10前数值为空', '.todayIllustate' + $(this)[0].dataset.mid, {
+                        tips: 1,
+                        time: 5000
+                    });
+                    illustateTId = $(this)[0].dataset.mid;
+                } else {
+                    illustateTId = 0;
+                    layer.closeAll();
+                }
+            })
+
+
+
+            //快捷操作
+            $('body').on('click', '.convinient-method', function () {
+                form.val('test1', {
+                    "code": $(this)[0].dataset.code,
+                    "account": $(this)[0].dataset.mid,
+                    "number": $(this)[0].dataset.system
+                })
+                var dealType = Number($('#SId').val());
+                if ($(this)[0].dataset.code) {
+                    requestE($(this)[0].dataset.code, dealType);
+                }
+            })
+
+
+
+        })
+    </script>
+</body>
+
+</html>

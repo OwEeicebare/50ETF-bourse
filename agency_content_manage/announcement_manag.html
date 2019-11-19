@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <title>公告管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+</head>
+<body>
+    <div id="app">
+        <div class="title_wrap">
+            
+            <form class="layui-form">
+                <div class="layui-form-item l_left">
+                    <label class="layui-form-label">发布时间</label>
+                    <div class="layui-input-block">
+                        <input type="text" class="layui-input" id="time" name="PTime" placeholder="请选择时间范围">
+                    </div>
+                </div>
+            
+                <div class="layui-form-item l_left">
+                    <label class="layui-form-label">公告类型</label>
+                    <div class="layui-input-block">
+                        <select name="NType">
+                            <option value="0"  selected="">所有类型</option>
+                            <option value="1">普通公告</option>
+                            <option value="2">紧急公告</option>
+                            
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item l_left">
+                    <label class="layui-form-label l_left">搜索关键字</label>
+                    <input type="text" name="SearchKey" lay-verify="title" autocomplete="off" placeholder="请输入标题名称/代理名称" class="layui-input l_left" style="width: initial;min-width: 320px;">
+                    <span class="layui-btn l_left" style="border-radius: 0;" id="search_go"  lay-submit lay-filter="search_go"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="table_wrap">
+                <table id="data_table" lay-filter="data_table"></table>
+                <script type="text/html" id="barDemo">
+                    <a class="layui-btn layui-bg-blue layui-btn-xs" lay-event="edit"><i class="layui-icon">&#xe642;</i>查看</a>
+               
+                </script>
+            </div>
+    </div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script>
+    publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+    layui.use(['form','laydate', 'table'],function(){
+        var form=layui.form
+        var laydate = layui.laydate;
+        var table = layui.table;
+        	//加载来源
+			publicMathod.getDropdownList("api/Tool/GetArticleFrom",form,$("#OId"));			
+        laydate.render({
+            elem: '#time'
+            , type: 'datetime'
+            , range: true
+            ,done: function(value, date, endDate){
+        
+            }
+        });
+        table.render({
+            elem: '#data_table',
+            method:'post',
+            url: publicMathod.hosturl+'api/ContentNotice/GetList', //数据接口
+            where:{"From":2},
+            contentType: "application/json; charset=UTF-8",
+            cellMinWidth: 100,
+			headers: {token: publicMathod.token},
+            page: {
+                layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'] //自定义分页布局
+            },
+            parseData: function(res){ //规定数据格式
+             
+                return {
+                    "code": res.Status, //解析接口状态
+                    "msg": res.Msg, //解析提示文本
+                    "count": res.Count, //解析数据长度
+                    "data": res.Data //解析数据列表
+                };
+            },
+            response: {//规定响应成功状态码
+                statusCode: 1
+            }, 
+            cols: [[
+        
+                {field: 'Id',title: 'ID',sort: true,width:100}, 
+                {field: 'Ti',title: '公告标题',width:400}, 
+                {field: 'Ct',title: '公告类型'}, 
+                {field: 'Cs',title: '排序',sort: true}, 
+                {field: 'Cst',title: '状态'}, 
+                {field: 'AId',title: '代理ID'},
+                {field: 'An',title: '代理名称'}, 
+                {field: 'Cl',title: '点击量',sort: true}, 
+                {field: 'Ut',title: '时间段',sort: true,width:170}, 
+                {field: 'Pt',title: '发布时间',sort: true,width:170}, 
+                {title: '操作',toolbar: '#barDemo',width: 100,fixed: 'right'},
+            ]]
+        });
+
+        // 执行搜索
+		form.on("submit(search_go)", function (data) {
+            var formField = data.field;
+			table.reload('data_table',{
+				page: { curr: 1 },
+				where: {
+                    "PTime": formField.PTime,
+                    "From": parseInt(formField.From),
+                    "NType": parseInt(formField.NType),
+                    "AgentId": 0,
+                    "OrderKey": "",
+                    "Sort": "",
+                    "SearchKey": formField.SearchKey
+                }
+			});
+			return false;
+		});
+        //监听工具条
+        table.on('tool(data_table)', function(obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                //获取编辑行数据,跳转
+                    window.location.href="notice_edit.html?id="+data.Id;
+            } 
+        });
+        //批量删除删除操作
+        $('body').on('click', '#del', function() {
+            var checkStatus = table.checkStatus('data_table');
+                data = checkStatus.data
+            if (!data.length) {
+                layer.msg('请选择要删除的数据');
+                return;
+            }
+            for(var i=0;i<data.length;i++){
+                var ids = data[i].Id
+            
+                    publicMathod.post({
+                        url: 'api/ContentNotice/Remove',
+                        data:ids,
+                        success: function (result) {
+                            if (result.Status == 1) {
+                                layer.msg("删除成功", { icon: 1 });
+                                location.reload();
+                            } else {
+                                layer.msg("删除失败，请重试！", { icon: 5 });
+                            }
+                        }
+                    })
+                    
+                
+            }
+        });
+    })
+    
+
+</script>
+</html>

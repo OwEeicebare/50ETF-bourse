@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>编辑帮助</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="../css/layui/css/layui.css" media="all">
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-header">
+					<a href="help.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>帮助管理</a>
+					<span lay-separator="">/</span>
+					<a><cite>编辑帮助</cite></a>
+				</div>
+				<div class="layui-card-body">
+					<form class="layui-form" lay-filter="sub_form">
+						<!-- 栏目来源 -->
+						<div class="layui-form-item">
+							<label class="layui-form-label">所属栏目</label>
+							<div class="layui-input-inline">
+								<select name="Tyid" id="Tyid" lay-verify="required">
+									<option value="" selected="selected">请选择</option>
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">标题</label>
+							<div class="layui-input-inline">
+								<input type="text" name="TeName" id="title" autocomplete="off" class="layui-input wd480"
+									lay-verify="required|title" />
+								<span class="Validform_checktip"> </span>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-inline">
+								<input type="checkbox" name="IsLock" lay-filter="is_lock_status" lay-skin="switch"
+									lay-text="正常|锁定" checked="checked">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">排序</label>
+							<div class="layui-input-inline">
+								<input type="text" name="MhSort" autocomplete="off" class="layui-input" id="MhSort"
+									lay-verify="number" />
+							</div>
+						</div>
+						<!-- <div class="layui-form-item">
+							<label class="layui-form-label">来源</label>
+							<div class="layui-input-inline">
+								<input type="text" name="MhSour" autocomplete="off" class="layui-input" id="MhSour" />
+							</div>
+						</div> -->
+						<div class="layui-form-item">
+							<label class="layui-form-label">封面图片</label>
+							<div class="layui-input-inline">
+								<input type="text" id="img_url" name="MhImageUrl" placeholder="请上传图片" autocomplete="off"
+									class="layui-input wd340">
+							</div>
+							<div id="img_view"><img style="width: 1000px" src="" /></div>
+							<button style="float: left;" type="button" class="layui-btn"
+								id="upload_img_url">选择图片</button>
+							<button style="float: left;margin-left: 10px;" type="button" class="layui-btn"
+								id="show_view">预览</button>
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">摘要</label>
+							<div class="layui-input-block">
+								<textarea id="zhaiyao" name="MhAbstract" class="layui-textarea wd480"
+									lay-verify="abstract"></textarea>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">SEO标题</label>
+							<div class="layui-input-inline">
+								<input type="text" id="seo_title" name="MhSeTi" class="layui-input wd480"
+									lay-verify="seoTitle" />
+								<span class="Validform_checktip">*自定义的SEO标题</span>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">SEO关键字</label>
+							<div class="layui-input-inline">
+								<input type="text" id="seo_keywords" name="MhSeKe" class="layui-input wd480"
+									lay-verify="seoKeywords" />
+								<span class="Validform_checktip">*页面关键词(keyword)</span>
+							</div>
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">SEO描述</label>
+							<div class="layui-input-block">
+								<textarea id="seo_description" name="MhSeDe" class="layui-textarea wd480"
+									lay-verify="seoDescribe"></textarea>
+								<span class="Validform_checktip">*页面描述(description)</span>
+							</div>
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">详细内容</label>
+							<div class="layui-input-block">
+								<textarea id="layedit" style="display: none;" name="MhCont"
+									lay-verify="required|content"></textarea>
+							</div>
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label"></label>
+							<div class="layui-input-block">
+								<button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+									lay-filter="sub_btn">确认提交</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js//public.js"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+
+	layui.use(['form', 'upload', 'layedit'], function () {
+		var form = layui.form;
+		var upload = layui.upload;
+		var layedit = layui.layedit;
+		var $ = layui.jquery;
+		var url = ""; //存储上传的图片
+		var lock = "1"; //switch开关,默认正常
+		var types = [];//类目
+		// 栏目初始化
+
+		publicMathod.post({
+			url: "api/ContentHelpType/GetList",
+			success: function (data) {
+				if (data.Status == "1") {
+					$.each(data.Data, function (index, item) {
+						$('#Tyid').append(new Option(item.Tie, item.Id));// 下拉菜单里添加元素
+						types.push(item);
+					});
+					// 初始化数据
+					publicMathod.post({
+						url: 'api/ContentHelpInfo/GetModel?id=' + Id,
+						success: function (data) {
+							$('#img_view>img').attr('src', data.Data.ImgUrl);
+							if (data.Status == "1") {
+								form.val("sub_form", {
+									"Tyid": data.Data.Tyid,
+									"TeName": data.Data.TeName,
+									"MhSort": data.Data.MhSort,
+									"MhSour": data.Data.MhSour,
+									"MhImageUrl": data.Data.MhImaUrl,
+									"MhAbstract": data.Data.MhAbs,
+									"MhSeTi": data.Data.MhSeTi,
+									"MhSeKe": data.Data.MhSeKe,
+									"MhSeDe": data.Data.MhSeDe,
+									"IsLock": data.Data.IsLock == 1 ? true : false,
+									"MhCont": data.Data.MhCont
+								})
+								layedit.setContent(layedit_index, data.Data.MhCont, false);
+								// $("input[name=IsLock]").attr('checked',data.Data.IsLock==0?true:false)
+								form.render();
+							} else {
+								layer.msg("获取数据失败，请重试！", { icon: 5 })
+							}
+						}
+					})
+					layui.form.render("select");
+				}
+				else { layer.msg("获取数据失败，请重试！", { icon: 5 }) }
+			}
+		})
+		//获取id值和上级代理
+		var Id = parseInt(publicMathod.getUrlParam("Id"));
+		//富文本编辑器
+		layedit.set({
+			uploadImage: {
+				url: publicMathod.upload, //接口url
+				type: 'post' //默认post
+			}
+		});
+		var layedit_index = layedit.build('layedit'); //建立编辑器 
+
+
+		//监听指定开关
+		form.on('switch(is_lock_status)', function (data) {
+			lock = this.checked ? 1 : 2;
+		});
+
+		//表单验证
+		form.verify({
+			title: function (value, item) { //value：表单的值、item：表单的DOM对象
+				if (value.length > 50) {
+					return '栏目长度不能超过50'
+				}
+			},
+			number: function (value) {
+				if (value > 999 || value < 0) {
+						return '输入的排序范围有误'
+				}
+			},
+			content: function (value) {
+				return layedit.sync(layedit_index);
+			},
+			abstract: function (value) {
+				if (value > 200) {
+					return '摘要长度在200字以内'
+				}
+			},
+			seoTitle: function (value) {
+				if (value > 200) {
+					return 'seo标题长度在200字以内'
+				}
+			},
+			seoKeywords: function (value) {
+				if (value > 200) {
+					return 'seo关键词长度在200字以内'
+				}
+			},
+			seoDescribe: function (value) {
+				if (value > 200) {
+					return 'seo描述长度在200字以内'
+				}
+			}
+		});
+
+		//图片上传初始化
+		upload.render({
+			elem: '#upload_img_url',
+			url: publicMathod.upload, //上传接口
+			accept: 'images', //只允许上传图片类型
+			size: 3072, //限制文件大小，单位 KB
+			choose: function (obj) { //选择文件触发
+				obj.preview(function (index, file, result) {
+					$("#img_url").val(file.name);
+					$('#img_view>img').attr('src', result);
+					url = file;
+				})
+			},
+			done: function (res) { //上传时触发
+				if (res.status === '1') {
+					//图片地址 res.path
+					url = res.data.fullPath;
+					$("#img_url").val(res.data.path);
+				} else {
+					layer.msg('图片上传失败,' + res.Msg);
+				}
+			},
+		});
+		//预览
+		$("body").on("click", "#show_view", function () {
+			var url = $("#img_view>img").attr("src");
+			if (url.length <= 0) {
+				layer.msg('请选择图片后再预览！');
+				return;
+			}
+			$("#img_view").css("display", "block");
+		})
+		//关闭预览
+		$("body").on("click", "#img_view", function () {
+			$("#img_view").css("display", "none");
+		})
+
+
+		//监听提交
+		var lock1 = true
+		form.on('submit(sub_btn)', function (data) {
+			layedit.getContent(layedit_index); //获得富文本内容包括样式
+			data.field.MhCont = layedit.getContent(layedit_index);
+			data.field.IsLock = lock;
+			var typeName = '';
+			$.each(types, function (index, item) {
+				if (item.Id == data.field.Tyid) {
+					typeName = item.Tie;
+				}
+			})
+			if(lock1){
+				lock1 = false
+			publicMathod.post({
+				url: 'api/ContentHelpInfo/Edit',
+				data: {
+					Id: Id,
+					Tyid: parseInt(data.field.Tyid),
+					MhType: typeName,//类别
+					TeName: data.field.TeName,
+					IsLock: parseInt(data.field.IsLock),//是否锁定
+					MhSort: data.field.MhSort ? parseInt( data.field.MhSort) : 0,
+					Mhsour: 0,//来源
+					MhImaUrl: data.field.MhImageUrl,
+					MhAbs: data.field.MhAbstract,//摘要
+					MhSeTi: data.field.MhSeTi,
+					MhSeKe: data.field.MhSeKe,
+					MhSeDe: data.field.MhSeDe,
+					MhCont: data.field.MhCont
+				},
+				success: function (result) {
+
+					if (result.Status == 1) {
+						window.location.href = "help.html";
+					} else {
+						lock1 = true
+						layer.msg(result.Msg, { icon: 5, shade: 0.8, });
+					}
+				}
+			})
+		}
+		});
+	})
+</script>
+
+</html>

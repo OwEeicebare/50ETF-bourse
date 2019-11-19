@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>代理管理</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css" />
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-header">
+					<a href="agency.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>代理管理</a>
+					<span lay-separator="">/</span>
+					<a><cite>编辑代理</cite></a>
+				</div>
+				<div class="layui-card-body">
+					<div class="layui-tab">
+						<ul class="layui-tab-title">
+							<li class="layui-this">基本信息</li>
+							<li>详细信息</li>
+						</ul>
+						<div class="layui-tab-content">
+							<div class="layui-tab-item layui-show">
+								<form class="layui-form" lay-filter="sub_form">
+									<div class="agency-title">基本信息</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">登录账号</label>
+										<div class="layui-input-inline">
+											<input type="text" name="account" autocomplete="off"
+												class="layui-input wd250 l_left" lay-verify="required|phone" />
+											<span class="Validform_checktip">*代理商手机号</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">代理商</label>
+										<div class="layui-input-inline">
+											<input type="text" name="agent_name" autocomplete="off"
+												class="layui-input wd250 l_left" lay-verify="required" />
+											<span class="Validform_checktip">*代理商名称</span>
+										</div>
+									</div>
+									<div class="layui-form-item" style="display: none">
+										<label class="layui-form-label l_width">公司名称</label>
+										<div class="layui-input-inline">
+											<input type="text" name="cor_name" autocomplete="off"
+												class="layui-input wd250 l_left" />
+											<span class="Validform_checktip">*代理商公司名称</span>
+										</div>
+									</div>
+									<!-- 上级代理todo -->
+									<div class="layui-form-item" id="jf">
+										<label class="layui-form-label l_width">上级代理</label>
+										<div class="layui-input-inline wd300 l_left">
+											<input type="text" name="pare_name" autocomplete="off"
+												class="layui-input wd250 l_left" style="cursor:not-allowed;"
+												disabled="disabled" />
+											<button type="button" id="edit" class="layui-btn"
+												style="margin-left:2px;"><i>修改上级</i></button>
+										</div>
+									</div>
+
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">代理类型</label>
+										<div class="layui-input-inline">
+											<input type="radio" name="proxy_type" lay-filter="proxy_type" value="1"
+												title="贴牌">
+											<input type="radio" name="proxy_type" lay-filter="proxy_type" value="0"
+												title="普通">
+										</div>
+									</div>
+									<div class="layui-form-item" id="yuming" style="display: none">
+										<label class="layui-form-label l_width">代理域名</label>
+										<div class="layui-input-inline">
+											<input type="text" name="Fileurl" autocomplete="off"
+												class="layui-input wd250 l_left" />
+											<span class="Validform_checktip">*贴牌代理域名</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">代理状态</label>
+										<div class="layui-input-inline">
+											<input type="radio" name="proxy_status" value="0" title="正常">
+											<input type="radio" name="proxy_status" value="1" title="风控">
+											<input type="radio" name="proxy_status" value="2" title="禁用">
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">隐藏用户手机</label>
+										<div class="layui-input-inline l_left">
+											<input type="radio" name="phone" value="0" title="是">
+											<input type="radio" name="phone" value="1" title="否">
+											<div class="Validform_checktip l_right">*隐藏代理的用户手机号中间4位，该代理的下级代理和员工的用户同步隐藏
+											</div>
+										</div>
+
+									</div>
+									<hr>
+									<div class="agency-title">服务费成本</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">开仓服务费成本</label>
+										<div class="layui-input-inline">
+											<input type="text" name="open_cb" autocomplete="off"
+												class="layui-input wd250 l_left" lay-verify="number" />
+											<span class="Validform_checktip">*元/张</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">平仓服务费成本</label>
+										<div class="layui-input-inline">
+											<input type="text" name="close_cb" autocomplete="off"
+												class="layui-input wd250 l_left" lay-verify="number" />
+											<span class="Validform_checktip">*元/张</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">追加延期成本</label>
+										<div class="layui-input-inline">
+											<input type="text" name="open_deduction_cb" autocomplete="off"
+												class="layui-input wd250 l_left" lay-verify="number" />
+											<span class="Validform_checktip">*元/张</span>
+										</div>
+									</div>
+									<hr>
+									<div class="agency-title">交易服务费</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">开仓服务费</label>
+										<div class="layui-input-inline">
+											<input type="text" name="open" autocomplete="off"
+												class="layui-input wd250 l_left" />
+											<span class="Validform_checktip">*元/张</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">平仓服务费</label>
+										<div class="layui-input-inline">
+											<input type="text" name="close" autocomplete="off"
+												class="layui-input wd250 l_left" />
+											<span class="Validform_checktip">*元/张</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">追加延期服务费</label>
+										<div class="layui-input-inline">
+											<input type="text" name="open_deduction" autocomplete="off"
+												class="layui-input wd250 l_left" />
+											<span class="Validform_checktip">*元/张</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">起买张数</label>
+										<div class="layui-input-inline">
+											<input type="text" name="numin" lay-verify="required" autocomplete="off"
+												class="layui-input wd250 l_left" />
+											<span class="Validform_checktip">张</span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">是否同步到所有用户</label>
+										<div class="layui-input-inline">
+											<select name="Syn" id="Syn" lay-verify="required" lay-filter="aihao">
+
+											</select>
+										</div>
+									</div>
+
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">备注</label>
+										<div class="layui-input-block">
+											<textarea id="remark" name="remark" class="layui-textarea wd480"></textarea>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width"></label>
+										<div class="layui-input-block">
+											<button type="button" class="layui-btn" id="sub_btn" lay-submit=""
+												lay-filter="sub_btn">确认保存</button>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="layui-tab-item">
+								<form class="layui-form">
+									<div class="agency-title">提现银行卡</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">开户银行</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="khyh"></span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">开户支行</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="khzh"></span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">开户姓名</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="khxm"></span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">银行卡号</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="yhkh"></span>
+										</div>
+									</div>
+									<hr>
+									<div class="agency-title">责任人</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">责任人</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="zrr"></span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">联系电话</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="lxdh"></span>
+										</div>
+									</div>
+									<hr>
+									<div class="agency-title">代理客服</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">客服QQ</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="kfqq"></span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">客服微信</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="kfwx"></span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">客服电话</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="kfdh"></span>
+										</div>
+									</div>
+									<hr>
+									<div class="agency-title">品牌信息</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">品牌LOGO</label>
+										<div class="layui-input-inline">
+											<img id="pplogo" src="" style="width: 144px"/>
+										</div>
+									</div>
+									<!-- <div class="layui-form-item">
+										<label class="layui-form-label l_width">网站LOGO</label>
+										<div class="layui-input-inline">
+											<img id="wzlogo" src="https://www.oschina.net/action/user/captcha" />
+										</div>
+									</div> -->
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">品牌名称</label>
+										<div class="layui-input-inline">
+											<span id="ppmc" class="l_span"></span>
+										</div>
+									</div>
+									<!-- <div class="layui-form-item">
+										<label class="layui-form-label l_width">广告标语</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="ggby">品fdsfds梵蒂冈地方是告诉对方股份第三个牌名称</span>
+										</div>
+									</div> -->
+									<hr>
+									<div class="agency-title">微信</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">微信号</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="wxh"></span>
+										</div>
+									</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">微信二维码</label>
+										<div class="layui-input-inline">
+											<img id="wxewm" src="" style="width: 144px"/>
+										</div>
+									</div>
+									<hr>
+									<div class="agency-title">SEO设置</div>
+									<div class="layui-form-item">
+										<label class="layui-form-label l_width">首页标题(SEO)</label>
+										<div class="layui-input-inline">
+											<span class="l_span" id="syby"></span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">页面关键词(SEO)</label>
+										<div class="layui-input-block">
+											<span class="l_span" id="ymgjc"></span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">页面描述(SEO)</label>
+										<div class="layui-input-block">
+											<span class="l_span" id="ymms"></span>
+										</div>
+									</div>
+									<hr>
+									<div class="agency-title">代理推广信息</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">推广码</label>
+										<div class="layui-input-block">
+											<span class="l_span" id="tgm"></span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">推广链接</label>
+										<div class="layui-input-block">
+											<span class="l_span" id="tglj" ></span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">推广二维码</label>
+										<div class="layui-input-inline">
+											<img id="tgewm" src="" style="width: 144px"/>
+										</div>
+									</div>
+									<hr>
+									<div class="agency-title">其他</div>
+
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">网站版权信息</label>
+										<div class="layui-input-block">
+											<span class="l_span" id="wzbah"></span>
+										</div>
+									</div>
+
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">安卓地址</label>
+										<div class="layui-input-block">
+											<span class="l_span" id="azdz"></span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">安卓地址链接二维码</label>
+										<div class="layui-input-block">
+											<img class="l_span" id="azewm" style="width: 144px" src="" alt=""/>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">苹果地址</label>
+										<div class="layui-input-block">
+											<span class="l_span" id="pgdz" ></span>
+										</div>
+									</div>
+									<div class="layui-form-item layui-form-text">
+										<label class="layui-form-label l_width">苹果地址链接二维码</label>
+										<div class="layui-input-block">
+											<img class="l_span" style="width: 144px" id="pgewm"src="" alt=""/>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'element', 'jquery'], function () {
+		var form = layui.form;
+		var element = layui.element;
+		var $ = layui.jquery;
+		var bwz
+
+		//获取id值和上级代理
+		var id = publicMathod.getUrlParam("Id");
+		//获取是否同步
+		publicMathod.getDropdownList("api/Tool/GetEnumSynUser", form, $("#Syn"));
+
+		//初始化详情数据
+		publicMathod.post({
+					url: "api/Agents/GetAgentInfo" ,
+					data:id,
+					success: function (data) {
+					
+						$("#tgm").html(data.Data.Tcode)
+						$("#tglj").html(data.Data.Turl)
+						$("#tgewm").attr("src",publicMathod.hosturl+data.Data.QRCode)
+					}
+				})
+		publicMathod.post({
+			url: "api/Agents/GetAgentsDetailedModel",
+			data:id,
+			success: function (data) {
+				bwz = data.Data.bwz
+				
+				$("#khyh").html(data.Data.bname)
+				$("#khzh").html(data.Data.babran)
+				$("#khxm").html(data.Data.banaccname)
+				$("#yhkh").html(data.Data.banaccqq)
+				$("#zrr").html(data.Data.lerson)
+				$("#lxdh").html(data.Data.Cobile)
+				$("#kfqq").html(data.Data.sq)
+				$("#kfwx").html(data.Data.Wq)
+				$("#kfdh").html(data.Data.wetel)
+				$("#ppmc").html(data.Data.brme)
+				//$("#ggby").html(data.Data.)
+				$("#wxh").html(data.Data.bwet)
+				$("#syby").html(data.Data.bseoa)
+				$("#ymgjc").html(data.Data.bseob)
+				$("#ymms").html(data.Data.bsec)
+			
+			
+				$("#wzbah").html(data.Data.byinfo)
+				$("#azdz").html(data.Data.byarl)
+				$("#azewm").attr("src",data.Data.ImgUrlbyarlqr)
+				$("#pgdz").html(data.Data.byiol)
+				$("#pgewm").attr("src",data.Data.ImgUrlbyiolqr)
+			
+				$("#pplogo").attr("src",data.Data.ImgUrlogo)
+				//$("#wzlogo").attr("src",data.Data)
+				$("#wxewm").attr("src",data.Data.ImgUrlbwqr)
+			
+			}
+		})
+
+		//监听代理类型
+		form.on('radio(proxy_type)', function (data) {
+			if (data.value == 1) {
+				$("#yuming").css("display", "block")
+			} else if (data.value == 0) {
+				$("#yuming").css("display", "none")
+			}
+
+		})
+		//上级代理Id
+		var parent_id;
+		//通过id获取数据
+		publicMathod.post({
+			url: "api/Agents/GetModel",
+			header: { "token": publicMathod.token },
+			data: id,
+			success: function (data) {
+				var datas = data.Data.Agent;
+				parent_id = datas.PareId;
+				if (datas.TypeId == 1) {
+					$("#yuming").css("display", "block")
+				} else if (datas.TypeId == 0) {
+					$("#yuming").css("display", "none")
+				}
+			
+				if (datas.cs === 1) {
+					publicMathod.post({
+						url: 'api/Agents/AgentFrom',
+						success: function (result) {
+							var str = `<div class="layui-form-item">
+											<label class="layui-form-label l_width">员工来源</label>
+											<div class="layui-input-inline">
+												<div class="layui-input-inline">
+													<select name="Person" id="Person">
+														<option value="0" selected="">选择员工</option>`;
+							for (var i = 0; i < result.Data.length; i++) {
+								str += '<option value="' + result.Data[i].Id + '">' + result.Data[i].Name + '</option>';
+							}
+							str += `
+								</select>
+									</div>
+
+								</div>
+							</div>`;
+							$('#jf').after(str);
+							form.render(); //更新全部
+							//表单初始化
+							form.val("sub_form", {
+								"account": datas.AsAcount//账号
+								, "agent_name": datas.AsName//代理商
+								, "cor_name": datas.AsCaName//公司名
+								, "Fileurl":bwz //代理域名
+								, "proxy_type": datas.TypeId == 0 ? "0" : "1"//代理类型
+								, "proxy_status": datas.IsLock == 0 ? "0" : ((datas.IsLock == 1) ? "1" : "2")//代理状态
+								, "phone": datas.IhIde == 0 ? "0" : "1"//是否隐藏手机号
+								, "open_cb": datas.FBuy//开仓服务费成本
+								, "close_cb": datas.FSale//平仓服务费成本
+								//, "Syn":datas.Syn//是否同步
+								, "numin": datas.numin//起买张数
+								, "open_deduction_cb": datas.Raser//追加延期服务费成本
+								, "open": datas.Rfbuy//开仓服务费
+								, "close": datas.Rfsale//平仓服务费
+								, "open_deduction": datas.Ratdel//追加延期费
+								, "remark": datas.Remark//备注
+								, "pare_name": datas.upname//上级代理名称
+								, "Person": datas.Person //员工来源
+
+							})
+						}
+					});
+				} else {
+					//表单初始化
+					form.val("sub_form", {
+						"account": datas.AsAcount//账号
+						, "agent_name": datas.AsName//代理商
+						, "cor_name": datas.AsCaName//公司名
+						, "Fileurl": data.Fileurl
+						, "proxy_type": datas.TypeId == 0 ? "0" : "1"//代理类型
+						, "proxy_status": datas.IsLock == 0 ? "0" : ((datas.IsLock == 1) ? "1" : "2")//代理状态
+						, "phone": datas.IhIde == 0 ? "0" : "1"//是否隐藏手机号
+						, "open_cb": datas.FBuy//开仓服务费成本
+						, "close_cb": datas.FSale//平仓服务费成本
+						//, "Syn":datas.Syn//是否同步
+						, "numin": datas.numin//起买张数
+						, "open_deduction_cb": datas.Raser//追加延期服务费成本
+						, "open": datas.Rfbuy//开仓服务费
+						, "close": datas.Rfsale//平仓服务费
+						, "open_deduction": datas.Ratdel//追加延期费
+						, "remark": datas.Remark//备注
+						, "pare_name": datas.upname//上级代理名称
+
+					})
+				}
+
+			},
+		});
+
+
+
+		$("#edit").click(function () {
+			var id = publicMathod.getUrlParam("Id");
+			window.location.href = "edit_agency_new.html?id=" + id;
+		});
+		//自定义验证规则
+		// form.verify({
+		// 	zznumber: function (value) {
+		// 		if (value.toString().trim().length == 0) return;//如果为空可以提交
+		// 		if (!publicMathod.zznumber(value.toString().trim())) {
+		// 			return '必须填写非零正整数';
+		// 		}
+		// 	}
+		// });
+		//监听提交
+		var lock = true
+		form.on('submit(sub_btn)', function (data) {
+			var data = data.field;
+		
+			if (lock) {
+				lock = false
+				publicMathod.post({
+					url: "api/Agents/Edit",
+					header: { "token": publicMathod.token },
+					data: {
+						"Id": parseInt(id),
+						"AsAcount": data.account,
+						"AsName": data.agent_name,
+						"AsCaName": data.cor_name?data.cor_name:'',
+						"PareId": parseInt(parent_id),
+						"Person": data.Person ? data.Person : 0,
+						"Fileurl": data.Fileurl ? data.Fileurl : '',
+						"IsLock": parseInt(data.proxy_status),
+						"IhIde": parseInt(data.phone),
+						"TypeId": parseInt(data.proxy_type),
+						"FBuy": Number(data.open_cb),
+						"FSale": Number(data.close_cb),
+						"Raser": Number(data.open_deduction_cb),
+						"Rfbuy": Number(data.open),
+						"Rfsale": Number(data.close),
+						"numin": parseInt(data.numin),//起买张数
+						"Syn": parseInt(data.Syn),
+						"Ratdel": data.open_deduction,
+						"Remark": data.remark
+					},
+					success: function (result) {
+						if (result.Status == 1) {
+							window.location.href = "agency.html";
+						} else {
+							lock = true
+							layer.msg(result.Msg, { icon: 5, shade: 0.5, });
+						}
+					}
+				})
+			}
+			return false;
+		});
+	})
+
+</script>
+
+</html>

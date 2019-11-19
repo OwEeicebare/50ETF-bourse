@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <title>未通过说明</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+</head>
+<body>
+    <form action="" class="layui-form">
+        <div class="layui-form-item" style="margin-left: 80px; margin-top: 20px;">
+            <input type="checkbox" name="1" title="品牌名称" lay-skin="primary"> 
+        </div>
+        <div class="layui-form-item" style="margin-left: 80px; margin-top: 20px;">
+            <input type="checkbox" name="2" title="域名" lay-skin="primary"> 
+        </div>
+        <div class="layui-form-item" style="margin-left: 80px; margin-top: 20px;">
+            <input type="checkbox" name="3" title="品牌Logo" lay-skin="primary"> 
+        </div>
+        <div class="layui-form-item" style="margin-left: 80px; margin-top: 20px;">
+            <input type="checkbox" name="4" title="营业执照" lay-skin="primary" > 
+        </div>
+        <div class="layui-form-item" style="margin-left: 80px; margin-top: 20px;display:none;" id="upgrade">
+            <input type="checkbox" name="5" title="服务费" lay-skin="primary"> 
+        </div>
+        <a  class="layui-btn jump_refresh_url" lay-submit lay-filter="sub-btn" style="position: relative;top:80px;left:197px;">确认未通过</a>
+    </form>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+ publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+    layui.use(['form','jquery'],function(){
+        var form=layui.form
+        var $=layui.jquery
+        var saype=""
+        //获取当前状态
+        var status=publicMathod.getUrlParam("status")
+        var id=publicMathod.getUrlParam("id")
+        var paype=publicMathod.getUrlParam("paype")
+        
+        if(paype==2||paype==1){$("#upgrade").css("display","block")}
+        //监听未通过按钮
+        form.on("submit(sub-btn)",function(data){
+           var field = data.field
+           saype = ""
+           $.each(field, function(key, val) {      
+           
+                saype = saype+key+","
+        　　   
+    　　   });   
+           
+            
+            var newSaype = saype.substr(0, saype.length - 1)
+           publicMathod.post({
+                    url: "api/AgentMoneyCashType/Edit",  
+                    data:{
+                        "id": parseInt(id),
+                        "status": 2,
+                        "saype": newSaype,
+                        "sae":parseInt(status) 
+                    },
+                    success:function(result){
+						if(result.Status==1){
+                            var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.close(index);
+							parent.location.href='oem_agency.html';
+						}else{
+							layer.msg(result.Msg,{icon:5,shade:0.8,});	
+						}
+					}
+            })
+           
+        })
+       
+    })
+</script>
+</html>

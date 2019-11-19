@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <title>编辑公告</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+    <style>
+        .layui-form-item .layui-input-inline{
+            min-width: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <a href="notice.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>公告管理</a> 
+                    <span lay-separator="">/</span>
+                    <a><cite>编辑公告</cite></a>
+                </div>
+                <div class="layui-card-body">
+                    <form class="layui-form" lay-filter="sub_form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公告标题</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="seo_title" name="Ti" class="layui-input wd480" lay-verify="title" >
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">显示状态</label>
+                            <div class="layui-input-inline">
+                                <input type="radio" name="Cst" id="Cst" value="1" title="显示">
+                                <input type="radio" name="Cst" id="Cst" value="2" title="隐藏">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">排序</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="seo_title" name="Cs" class="layui-input" lay-verify="number">
+                            </div>
+                        </div>
+                        <!-- <div class="layui-form-item">
+                            <label class="layui-form-label">来源</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="seo_title" name="Cf" class="layui-input">
+                            </div>
+                        </div> -->
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公告类型</label>
+                            <div class="layui-input-inline">
+                                <input type="radio" name="Ct" id="Ct" value="1" title="普通公告">
+                                <input type="radio" name="Ct" id="Ct" value="2" title="弹窗公告">
+                            </div>
+                        </div>
+                        <div class="layui-form-item ">
+                            <label class="layui-form-label">时间段</label>
+                            <div class="layui-input-inline " style="width: 150px;">
+                                <input type="text" class="layui-input" id="Stime" name="St" placeholder="开始时间" >
+                            </div>
+                            <div class="layui-input-inline " style="width: 20px;">
+                                <span class="Validform_checktip">-</span>
+                            </div>
+                            <div class="layui-input-inline " style="width: 150px;">
+                                <input type="text" class="layui-input" id="Etime" name="Et" placeholder="结束时间" >
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">详细内容</label>
+                            <div class="layui-input-block">
+                                <textarea id="layedit" style="display: none;" name="Cc"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item ">
+                            <label class="layui-form-label"></label>
+                            <a href="javascript:;" class="layui-btn" lay-submit lay-filter="sub-btn">确认修改</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js"></script>
+<script>
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+    layui.use(['form','laydate','layedit'],function(){
+        var form=layui.form
+        var laydate = layui.laydate;
+        var layedit = layui.layedit;
+        laydate.render({
+            elem: '#Stime'
+            , type: 'datetime'
+        });
+        laydate.render({
+            elem: '#Etime'
+            , type: 'datetime'
+        });
+
+        //富文本编辑器
+       layedit.set({
+				uploadImage: {
+					url: publicMathod.upload //接口url
+						,
+					type: 'post' //默认post
+				}
+			});
+        var layedit_index = layedit.build('layedit'); //建立编辑器
+        var id=publicMathod.getUrlParam("id");
+        //表单验证
+        form.verify({
+            title: function(value, item){ //value：表单的值、item：表单的DOM对象
+                if (value.length > 50) {
+                    return '标题长度不能超过50'
+                }
+            },
+            number: function (value) {
+                if (value > 999) {
+                    return '排序最大值不能超过999'
+                }
+            }
+        });   
+        //初始化内容
+        publicMathod.post({
+            url:'api/ContentNotice/GetModel',
+            data:id,
+            success:function(data){
+              
+                if(data.Status==1){
+                    form.val("sub_form",{
+                        "Cst": data.Data.Cst + '',
+                        "Ct": data.Data.Ct + '',
+                        "Ti":data.Data.Ti,
+                          //"Cst":data.Data.Cst,
+                        "Cs":data.Data.Cs,
+                        "Cf":data.Data.Cf,
+                          //"Ct":data.Data.Ct,
+                        "St":data.Data.St,
+                        "Et":data.Data.Et,
+                        //"Cc":data.Data.Cc,
+                    })
+                    layedit.setContent(layedit_index, data.Data.Cc, false);
+                 
+                    form.render();
+                }
+            }
+        })
+
+        //提交表单
+        //表单提交
+        var lock = true
+        form.on('submit(sub-btn)',function(data){
+            data.field.rich_text = layedit.getContent(layedit_index);
+            var Datas = data.field;
+      
+            if(lock){
+				lock = false
+            publicMathod.post({
+                url:"api/ContentNotice/Edit",
+                header:{"token":publicMathod.token},
+                data:{
+                    "Id":parseInt(id),
+                    "Ti":Datas.Ti,
+                    "Cst":parseInt(Datas.Cst),
+                    "Cs":Datas.Cs?parseInt(Datas.Cs):0,
+                    "Cf": 1,
+                    "Ct":parseInt(Datas.Ct),
+                    "St":Datas.St,
+                    "Et":Datas.Et,
+                    "Cc":Datas.rich_text
+                },
+                success:function(result){
+                    if(result.Status == 1){
+                        window.location.href = "notice.html";
+                    }else{
+                        lock = true
+                        layer.msg(result.Msg,{icon:5,shade:0.8,});
+                    }   
+                }
+            })
+        }
+            return false;
+        })
+    })
+</script>
+</html>

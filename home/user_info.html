@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>用户概况</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../css/layui/css/layui.css" media="all">
+		<link rel="stylesheet" type="text/css" href="../css/user_info.css"/>
+	</head>
+	<body>
+		<div id="app">
+			
+			<div class="first">
+				<div class="layui-row layui-col-space15">
+					<div v-for="(item,i) in card_list" class="layui-col-sm6 layui-col-md3">
+						<div class="layui-card">
+							<div class="layui-card-header">
+								{{item.card_name}}
+								<span class="layui-badge  layuiadmin-badge" :class="item.ico_bg" v-if="i > 0">
+									{{item.ico_font}}
+								</span>
+							</div>
+							<div class="layui-card-body layuiadmin-card-list">
+								<p class="layuiadmin-big-font money_stock_profit">
+									{{item.num}}
+								</p>
+								<p>
+									<span v-html="item.peo_font"></span><span class="layuiadmin-span-color"><span v-html="item.peo"></span>
+									<i class="layui-inline layui-icon" :class="item.ico_down"></i></span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="layui-col-md6">
+						<div class="layui-col-md12">
+							<div class="layui-card">
+								<div class="layui-card-header" title="有充值入金的客户">有效用户</div>
+								<div class="layui-card-body">
+									<div id="effectiveUser" style="width: 100%; height: 320px;"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="layui-col-md6">
+						<div class="layui-col-md12">
+							<div class="layui-card">
+								<div class="layui-card-header" id="haha" v-bind:zong="zong,huo,you" title="有持仓的客户">活跃用户</div>
+								<div class="layui-card-body">
+									<div id="activeUser" style="width: 100%; height: 320px;"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../lib/echarts.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../lib/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery-3.4.0.min.js"></script>
+		<script src="../js/public.js"></script>
+		<script type="text/javascript">
+			publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+
+
+			
+				var vv = new Vue({
+							el:"#app",
+							data () {
+								return {
+									card_list:[
+										{card_name:"总注册量 / 今日新增注册量",ico_bg:"layui-bg-blue",ico_down:"layui-icon-user",peo_font:"&nbsp",peo:"",num:"0"},
+										{card_name:"充值",ico_font:"日",ico_bg:"layui-bg-blue",ico_down:"layui-icon-rmb",peo_font:"&nbsp;",peo:"&nbsp;",num:"0"},
+										{card_name:"提现",ico_font:"日",ico_bg:"layui-bg-blue",ico_down:"layui-icon-rmb",peo_font:"&nbsp;",peo:"&nbsp;",num:"0"},
+										{card_name:"账户余额",ico_font:"日",ico_bg:"layui-bg-blue",ico_down:"layui-icon-rmb",peo_font:"&nbsp;",peo:"&nbsp;",num:"0"},
+										{card_name:"今日开仓张数 / 今日平仓张数",ico_font:"日",ico_bg:"layui-bg-blue",ico_down:"layui-icon-templeate-1",peo_font:"&nbsp;",peo:"&nbsp;",num:"0"},
+										{card_name:"今日开仓金额 / 今日平仓金额(不含手续费)",ico_font:"日",ico_bg:"layui-bg-blue",ico_down:"layui-icon-flag",peo_font:"&nbsp;",peo:"&nbsp;",num:"0"},
+										{card_name:"持仓张数 / 持仓市值",ico_font:"总",ico_bg:"layui-bg-orange",ico_down:"layui-icon-chart-screen",peo_font:"&nbsp;",peo:"&nbsp;",num:"0"},
+										{card_name:"持仓盈亏",ico_font:"总",ico_bg:"layui-bg-orange",ico_down:"layui-icon-chart-screen",peo_font:"&nbsp;",peo:"&nbsp;",num:"0"},
+									],
+									huo:'',
+									you:'',
+									zong:''
+								}
+							},
+							 methods:{
+								getData: function(){
+							
+									var _this = this
+								  publicMathod.post({
+											url: "api/User/HomePage" ,
+											success: function (data) {
+												_this.card_list[0].num = data.Data.TotalRegister+" / "+data.Data.Register;
+												//_this.card_list[0].peo = ;
+												_this.card_list[1].num = data.Data.Recharge;
+												_this.card_list[2].num = data.Data.Cash;
+												_this.card_list[3].num = data.Data.Balance.toFixed(2);
+												_this.card_list[4].num = data.Data.Mairushu+" / "+data.Data.Maichushu;
+												_this.card_list[5].num = data.Data.JiaoYi+" / "+data.Data.JiaoYi_Sale;
+												_this.card_list[6].num = data.Data.NowStockNum+" / "+data.Data.NowMoney.toFixed(2);
+												_this.card_list[7].num = data.Data.YingKui;
+
+												_this.you = data.Data.EffectiveUser 
+												_this.huo = data.Data.ActiveUsers 
+												_this.zong = data.Data.TotalRegister
+											}
+										})
+										
+								},
+							
+							},created() {
+								
+							this.getData()
+							
+							
+							},
+						})
+						setTimeout(
+							function test(){
+						
+							
+						//请求数据
+						var user_data1 = [
+							{value:parseInt($("#haha").attr("you")) , name:'有效用户'},
+							{value:$("#haha").attr("zong")-$("#haha").attr("you"), name:'其他用户'}
+						];
+						var user_data2 = [
+							{value:parseInt($("#haha").attr("huo")), name:'活跃用户'},
+							{value:$("#haha").attr("zong")-$("#haha").attr("huo"), name:'其他用户'}
+						];
+						var effectiveUser = echarts.init(document.getElementById('effectiveUser'));
+var activeUser = echarts.init(document.getElementById('activeUser'));
+//开启动画
+effectiveUser.showLoading();
+activeUser.showLoading();
+//饼状图配置配置
+option = {
+	tooltip : {
+		trigger: 'item',
+		formatter: "{b} : {c} ({d}%)"
+	},
+	toolbox: {
+		show: true,
+		itemGap:15,
+		feature: {
+			dataView: {},
+			restore: {},
+			saveAsImage: {}
+		}
+	},
+	series : [
+		{
+			name: '访问来源',
+			type: 'pie',
+			radius : '55%',
+			center: ['50%', '60%'],
+			itemStyle: {
+				emphasis: {
+					shadowBlur: 10,
+					shadowOffsetX: 0,
+					shadowColor: 'rgba(0, 0, 0, 0.5)'
+				}
+			},
+			data:[],
+		}
+	]
+};
+effectiveUser.setOption(option);
+activeUser.setOption(option);
+
+
+
+
+ //初始化表格
+
+
+	effectiveUser.setOption({
+		title : {
+			text: '有效用户',
+			x:'center'
+		},
+		legend: {
+			orient: 'vertical',
+			left: 'left',
+			data: ['有效用户','其他用户']
+		},
+		series :{
+			data:user_data1,
+		}
+	})
+	activeUser.setOption({
+		title : {
+			text: '活跃用户',
+			x:'center'
+		},
+		legend: {
+			orient: 'vertical',
+			left: 'left',
+			data: ['活跃用户','其他用户']
+		},
+		series :{
+			data:user_data2,
+		}
+	}) 
+
+
+//隐藏加载动画
+effectiveUser.hideLoading();
+activeUser.hideLoading();
+
+						
+					}
+						,"500");
+						
+						
+					
+			
+		</script>
+	</body>
+</html>

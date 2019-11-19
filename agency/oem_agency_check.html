@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <title>贴牌代理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+    <style>
+        .layui-form-item .layui-input-inline{
+            min-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <a href="oem_agency.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>贴牌管理</a> 
+                    <span lay-separator="">/</span>
+                    <a><cite>审核</cite></a>
+                </div>
+                <div class="layui-card-body">
+                        <form class="layui-form" lay-filter="sub_form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label l_width">品牌名称:</label>
+                        <div class="layui-input-inline">
+                            <span class="Validform_checktip" id="brandname" name="brandname"></span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label l_width">域名:</label>
+                        <div class="layui-input-inline">
+                            <span class="Validform_checktip" id="realmname" name="realmname">域名</span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label l_width">品牌Logo:</label>
+                        <div class="layui-input-inline" style="width:100px;height:100px; border:1px solid #000; margin-top:8px; " id="show_view_2">
+                            <img src="" alt="" style="width: 100%;" id="img-view">
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;" class="layui-form-item">
+                        <label class="layui-form-label l_width" >营业执照:</label>
+                        <div class="layui-input-inline" style="width:100px;height:150px; border:1px solid #000;margin-top:8px;" id="show_view_1">
+                            <img src="" alt="" style="width: 100%;height:100%;" id="img-view-1">
+                        </div>
+                    </div>
+                    <div id="img_view_2" style="display: none;position: fixed;left: 0;right: 0;top: 0;bottom: 0;z-index: 1001;background: rgba(0, 0, 0, 0.5);">
+                        <img src=""style="position: relative;left: 50%;top: 50%;transform: translate(-50%, -50%);">
+                    </div>
+                    <div id="phone" style="display: none">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label l_width">支付渠道:</label>
+                            <div class="layui-input-inline">
+                                <span class="Validform_checktip" id="paype" name="paype">支付宝</span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label l_width">支付金额:</label>
+                            <div class="layui-input-inline">
+                                <span class="Validform_checktip" id="moneply" name="moneply">￥998</span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label l_width">支付时间:</label>
+                            <div class="layui-input-inline">
+                                <span class="Validform_checktip" id="timed" name="timed">2019-05-18</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="voucher" style="display: none">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label l_width">转账银行:</label>
+                            <div class="layui-input-inline">
+                                <span class="Validform_checktip" id="zzyh" name="brandname">支付宝</span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label l_width">开户姓名:</label>
+                            <div class="layui-input-inline">
+                                <span class="Validform_checktip" id="khxm" name="openme">￥998</span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label l_width">银行卡号:</label>
+                            <div class="layui-input-inline">
+                                <span class="Validform_checktip" id="yhkh" name="bande"></span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label l_width">转账时间:</label>
+                            <div class="layui-input-inline">
+                                <span class="Validform_checktip" id="zzsj" name="timed"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-btn-group" style="margin:20px 0  0 100px;">
+                        <button class="layui-btn" type="button" id="pass">通过</button>
+                        <button class="layui-btn layui-btn-primary" type="button" style="margin-left: 10px !important;" id="notpass">未通过</button>
+                    </div>
+                    <div style="display: none;position: fixed;left: 0;right: 0;top: 0;bottom: 0;z-index: 1001;background: rgba(0, 0, 0, 0.5);"></div>
+                </form>
+                </div>
+           
+            </div> 
+        </div>
+    </div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+
+    layui.use(['jquery','layer'],function(){
+        var $ = layui.jquery;
+        var layer=layui.layer;
+        //var status=publicMathod.getUrlParam("Status")
+        var id=publicMathod.getUrlParam("id")
+       var paype 
+        var paypesx
+        publicMathod.post({
+                    url: "api/AgentMoneyCashType/GetModel",  
+                    data:id,
+					success: function (data) {
+						var data = data.Data;
+                        paype=data.status
+                        paypesx = data.paype
+                        if(data.paype == 1){
+                            $("#phone").css("display","block")
+                        }	
+                        if(data.paype == 2){
+                            $("#voucher").css("display","block")
+                        }	
+						//表单初始化
+                        $("#brandname").html(data.brandname)//品牌名称
+                        $("#realmname").html(data.realmname)//品牌名称
+                        $("#img-view").attr("src",data.logoImgUrl)//logo
+                        $("#img-view-1").attr("src",data.businImgUrl)//营业执照
+                        $("#zzyh").html(data.bank)//品牌名称
+                        $("#khxm").html(data.openme)//品牌名称
+                        $("#yhkh").html(data.bande)//logo
+                        $("#zzsj").html(data.timed)//营业执照
+					}
+				});
+
+
+
+        
+ 
+        //logo图标发大
+        $("body").on("click", "#show_view_2", function () {
+            var url=$("#img-view")[0].src
+        
+			$("#img_view_2>img").attr("src",url);
+			$("#img_view_2").css("display", "block");
+        })
+        //营业执照放大
+        $("body").on("click", "#show_view_1", function () {
+            var url=$("#img-view-1")[0].src
+           
+			$("#img_view_2>img").attr("src",url);
+			$("#img_view_2").css("display", "block");
+		})
+        $("body").on("click", "#img_view_2", function () {
+			$("#img_view_2").css("display", "none");
+        })
+
+        $("body").on("click",'#pass',function(){
+            publicMathod.post({
+                    url: "api/AgentMoneyCashType/Edit",  
+                    data:{
+                        "id": parseInt(id) ,
+                        "status": 1,
+                        "saype": "0",
+                        "sae": parseInt(paype)
+                    },
+                    success:function(result){
+						if(result.Status==1){
+							window.location.href='oem_agency.html';
+						}else{
+							layer.msg(result.Msg,{icon:5,shade:0.8,});	
+						}
+					}
+            })
+        })
+        //跳转未通过
+        $("body").on("click",'#notpass',function(){
+         
+            
+            open_adv("未通过说明",id,paype,paypesx);
+        })
+        function open_adv(type,id,status,paypesx){
+            layer.open({
+                type: 2, 
+                title:type,
+                area: ['500px', '500px'],
+                shade:0.8,
+                content: ['oem_agenry_notpass.html?id='+id+'&status='+status+'&paype='+paypesx,'no'],
+                // success: function (layero) {
+                //     layer.setTop(layero); //重点2
+                // },
+              
+            });
+		}
+    })
+</script>
+</html>

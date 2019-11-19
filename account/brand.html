@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>品牌管理</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../css/layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/agency.css"/>
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row">
+				<div class="layui-card">
+					<div class="layui-card-body">
+						<div class="layui-tab">
+							<ul class="layui-tab-title">
+								<li class="layui-this">基本信息</li>
+								<li>详细信息</li>
+							</ul>
+							<div class="layui-tab-content">
+								<!-- 基础信息 -->
+								<div class="layui-tab-item layui-show">
+									<form class="layui-form">
+                                        <div>品牌信息</div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">品牌LOGO</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="brand_url" name="brand_url" placeholder="请上传图片" autocomplete="off" class="layui-input wd340" disabled="disabled">
+                                            </div>
+                                            <div id="brand_view"><img src="" /></div>
+                                            <button style="float: left;" type="button" class="layui-btn" id="upload_brand_url">上传</button>
+                                            <button style="float: left;margin-left: 10px;" type="button" class="layui-btn" id="brand_preview" >预览</button>
+                                            <span class="Validform_checktip">*用于系统头像，尺寸宽1024px，高1024px，png格式</span>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">网站LOGO</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="website_url" name="website_url" placeholder="请上传图片" autocomplete="off" class="layui-input wd340" disabled="disabled">
+                                            </div>
+                                            <div id="website_view"><img src="" /></div>
+                                            <button style="float: left;" type="button" class="layui-btn" id="upload_website_url">上传</button>
+                                            <button style="float: left;margin-left: 10px;" type="button" class="layui-btn" id="show_website" >预览</button>
+                                            <span class="Validform_checktip">*用于登录、注册等界面，尺寸宽1024px，高1024px，png格式</span>
+                                        </div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">品牌名称</label>
+											<div class="layui-input-inline">
+												<input type="text" name="title" autocomplete="off" class="layui-input wd480" lay-verify="title" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">广告标语</label>
+											<div class="layui-input-inline">
+												<input type="text" name="ad" autocomplete="off" class="layui-input wd480" lay-verify="ad" />
+											</div>
+                                        </div>
+                                        <hr>
+                                        <div>网站信息</div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">微信号</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" name="wx" autocomplete="off" class="layui-input wd480" lay-verify="wx" />
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">微信二维码</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="qrcode" name="qrcode" placeholder="请上传图片" autocomplete="off" class="layui-input wd340" disabled="disabled">
+                                            </div>
+                                            <div id="qrcode_view"><img src="" /></div>
+                                            <button style="float: left;" type="button" class="layui-btn" id="upload_qrcode_url">上传图片</button>
+                                            <button style="float: left;margin-left: 10px;" type="button" class="layui-btn" id="show_qrcode" >预览</button>
+                                        </div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">首页标题(SEO)</label>
+											<div class="layui-input-inline">
+												<input type="text" id="index_title" name="index_title" class="layui-input wd480">
+												<span class="Validform_checktip">*自定义的首页标题</span>
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">页面关键字(SEO)</label>
+											<div class="layui-input-inline">
+												<input type="text" id="index_keywords" name="index_keywords" class="layui-input wd480">
+												<span class="Validform_checktip">*页面关键词(keyword)</span>
+											</div>
+										</div>
+										<div class="layui-form-item layui-form-text">
+											<label class="layui-form-label">页面描述(SEO)</label>
+											<div class="layui-input-block">
+												<textarea id="index_description" name="index_description" class="layui-textarea wd480"></textarea>
+												<span class="Validform_checktip">*页面描述(description)</span>
+											</div>
+                                        </div>
+                                        <hr>
+                                        <div>我的客服</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">客服QQ</label>
+											<div class="layui-input-inline">
+												<input type="text" name="qq" autocomplete="off" class="layui-input wd480" lay-verify="qq" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">客服微信</label>
+											<div class="layui-input-inline">
+												<input type="text" name="wx" autocomplete="off" class="layui-input wd480" lay-verify="qq" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">客服电话</label>
+											<div class="layui-input-inline">
+												<input type="text" name="hot-line" autocomplete="off" class="layui-input wd480" lay-verify="hot-line" />
+											</div>
+										</div>
+										<div class="layui-form-item layui-form-text">
+											<label class="layui-form-label"></label>
+											<div class="layui-input-block">
+												<button  type="button" class="layui-btn" id="base_btn" lay-submit="" lay-filter="sub_btn">保存编辑</button>
+											</div>
+										</div>
+									</form>
+								</div>
+								<!-- 接口服务 -->
+								<div class="layui-tab-item">
+									<form class="layui-form">
+										<div class="layui-form-item">
+											<label class="layui-form-label">服务器</label>
+											<div class="layui-input-block">
+                                                <input type="text" name="ms_id" autocomplete="off" class="layui-input wd480" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">网站域名</label>
+											<div class="layui-input-inline">
+												<input type="text" name="ms_id" autocomplete="off" class="layui-input wd480" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">网站备案号</label>
+											<div class="layui-input-inline">
+												<input type="text" name="ms_account" autocomplete="off" class="layui-input wd480" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">网站版权信息</label>
+											<div class="layui-input-inline">
+												<input type="text" name="ms_pass" autocomplete="off" class="layui-input wd480" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">手机域名</label>
+											<div class="layui-input-inline">
+												<input type="text" name="ms_signal" autocomplete="off" class="layui-input wd480" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">API域名</label>
+											<div class="layui-input-inline">
+												<input type="text" name="ms_interval" autocomplete="off" class="layui-input wd480" lay-verify="api" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">工作时间</label>
+											<div class="layui-input-inline">
+												<input type="text" name="ms_limit" autocomplete="off" class="layui-input wd480" lay-verify="hot-line" />
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">安卓地址</label>
+											<div class="layui-input-inline">
+												<input type="text" id="a_address" name="andriod" class="layui-input wd480">
+											</div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">链接二维码</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="a_url" name="a_url" placeholder="请上传图片" autocomplete="off" class="layui-input wd340" disabled="disabled">
+                                            </div>
+                                            <div id="a_view"><img src="" /></div>
+                                            <button style="float: left;" type="button" class="layui-btn" id="upload_a_url">上传</button>
+                                            <button style="float: left;margin-left: 10px;" type="button" class="layui-btn" id="show_a" >预览</button>
+                                            <span class="Validform_checktip">*用于系统头像，尺寸宽1024px，高1024px，png格式</span>
+                                        </div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">苹果地址</label>
+											<div class="layui-input-inline">
+												<input type="text" id="m_address" name="mac" class="layui-input wd480">
+											</div>
+										</div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">链接二维码</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="m_url" name="m_url" placeholder="请上传图片" autocomplete="off" class="layui-input wd340" disabled="disabled">
+                                            </div>
+                                            <div id="m_view"><img src="" /></div>
+                                            <button style="float: left;" type="button" class="layui-btn" id="upload_m_url">上传</button>
+                                            <button style="float: left;margin-left: 10px;" type="button" class="layui-btn" id="show_m" >预览</button>
+                                            <span class="Validform_checktip">*用于系统头像，尺寸宽1024px，高1024px，png格式</span>
+                                        </div>
+										<div class="layui-form-item">
+											<label class="layui-form-label">服务协议</label>
+											<div class="layui-input-inline">
+                                                <label class="layui-form-label">已签署</label>
+                                            </div>
+                                            <button class="layui-btn layui-btn-primary" style="border: none">查看</button>
+										</div>
+										<div class="layui-form-item layui-form-text">
+											<label class="layui-form-label"></label>
+											<div class="layui-input-block">
+												<button  type="button" class="layui-btn" id="api_btn" lay-submit="" lay-filter="sub_btn">保存编辑</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/public.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		layui.use(['form', 'upload',  'jquery', 'element'], function() {
+			var form = layui.form;
+			var upload = layui.upload;
+			var $ = layui.jquery;
+			var element = layui.element;
+			var url = ""; //存储上传的图片
+		
+		
+			//自定义验证规则
+			form.verify({
+				title: function(value) {
+					if (value.length > 255) {
+						return '名称不能超过255个字符';
+					}
+				}
+			});
+
+			$('#base').click(function () {
+				var id = getUrlParam('id');
+				window.location.href="edit_base.html?id="+ id;
+			})
+
+			$('#detail').click(function () {
+				var id = getUrlParam('id');
+				window.location.href="edit_detail.html?id="+ id;
+			})
+			var uploadUrl = publicMathod.upload; 
+			function uploadImg (btnEle, uploadUrl, inputID, previewBtn, previewImg) {
+				//图片上传初始化
+				upload.render({
+					elem: btnEle,
+					url: uploadUrl //上传接口
+					,accept: 'images' //只允许上传图片类型
+					,auto: false //不自动上传
+					,size: 3072 //限制文件大小，单位 KB
+					,choose: function(obj) { //选择文件触发
+						obj.preview(function(index, file, result) {
+							$(inputID).val(file.name);
+						    $(previewImg + '>img').attr('src', result);
+							url = file;
+						})
+					},
+					done: function(res) { //上传时触发
+						
+					},
+				});
+
+                //预览
+                $("body").on("click", previewBtn, function() {
+                    var url = $(previewImg + ">img").attr("src");
+                    if (url.length <= 0) {
+                        layer.msg('请选择图片后再预览！');
+                        return;
+                    }
+                    $(previewImg).css("display", "block");
+                })
+                //关闭预览
+                $("body").on("click", previewImg, function() {
+                    $(previewImg).css("display", "none");
+                })
+			}
+
+			uploadImg("#upload_brand_url", "/upload/", "#brand_url", '#brand_preview', '#brand_view');
+			uploadImg("#upload_website_url", "/upload/", "#website_url", '#show_website', '#website_view');
+			uploadImg("#upload_qrcode_url", "/upload/", "#qrcode", '#show_qrcode', '#qrcode_view');
+			uploadImg("#upload_a_url", "/upload/", "#a_url", '#show_a', '#a_view');
+			uploadImg("#upload_m_url", "/upload/", "#m_url", '#show_m', '#m_view');
+
+            
+
+
+			//监听提交
+			form.on('submit(sub_btn)', function(data) {
+				layer.alert(JSON.stringify(data.field), {
+					title: '最终的提交信息'
+				})
+				return false;
+			});
+		})
+		
+	</script>
+</html>

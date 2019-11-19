@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>查看文章</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="../css/layui/css/layui.css" media="all">
+	<link rel="stylesheet" type="text/css" href="../css/management_table.css"/>
+</head>
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row">
+			<div class="layui-card">
+				<div class="layui-card-header">
+					<a href="article_manag.html" class="list-nav"><i class="layui-icon layui-icon-left"></i>文章管理</a> 
+					<span lay-separator="">/</span>
+					<a><cite>查看文章</cite></a>
+				</div>
+				<div class="layui-card-body">
+					<form class="layui-form" lay-filter="sub_form">
+						<!-- 栏目来源 -->
+					
+						<div class="layui-form-item">
+							<label class="layui-form-label">标题</label>
+							<div class="layui-input-inline">
+								<input type="text" name="Ti" autocomplete="off" class="layui-input wd480" lay-verify="title|required"/>
+							</div>
+                        </div>
+                        <div class="layui-form-item">
+							<label class="layui-form-label">所属栏目</label>
+							<div class="layui-input-inline">
+								<select id="CId" name="CId">
+									<option value="" selected="selected"></option>
+									
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">状态</label>
+							<div class="layui-input-inline">
+								<input type="checkbox" name="Lo" lay-filter="is_lock_status" lay-skin="switch" lay-text="正常|锁定">
+							</div>
+						</div>
+					
+						<!-- <div class="layui-form-item">
+							<label class="layui-form-label">来源</label>
+							<div class="layui-input-inline">
+								<input type="text" name="OId" autocomplete="off" class="layui-input"  />
+							</div>
+						</div> -->
+						<div class="layui-form-item">
+							<label class="layui-form-label">封面图片</label>
+							<div class="layui-input-inline">
+								<input type="text" id="img_url" name="Iu" placeholder="请上传图片" autocomplete="off" class="layui-input wd340" disabled="disabled">
+							</div>
+							<div id="img_view"><img style="width: 1000px" src="" /></div>
+							
+							<button style="float: left;margin-left: 10px;" type="button" class="layui-btn" id="show_view" >预览</button>
+						</div>
+				
+					
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">详细内容</label>
+							<div class="layui-input-block">
+								<textarea id="layedit" style="display: none;" name="Co" lay-verify="content" ></textarea>
+							</div>
+						</div>
+					
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../css/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-3.4.0.min.js"></script>
+<script src="../js//public.js"></script>
+<script type="text/javascript">
+	
+	publicMathod.token = localStorage.getItem('Token') != null ? unescape(localStorage.getItem('Token')) : publicMathod.token;
+	layui.use(['form', 'upload', 'layedit'], function() {
+		var form = layui.form;
+		var upload = layui.upload;
+		var layedit = layui.layedit;
+		var $ = layui.jquery;
+		var url = ""; //存储上传的图片
+		var lock = "1"; //switch开关,默认正常
+				//所有来源
+				publicMathod.getAllAgency("api/ContentNewType/GetAllTree",form,$("#CId"));
+
+		//获取id值和上级代理
+		var Id =parseInt(publicMathod.getUrlParam("Id"));
+		//富文本编辑器
+		layedit.set({
+			uploadImage: {
+				url: publicMathod.upload, //接口url
+				type: 'post' //默认post
+			}
+		});
+		var layedit_index = layedit.build('layedit'); //建立编辑器 
+		// 初始化数据
+		publicMathod.post({
+			url:'api/ContentNewInfo/GetModel',
+			data: {
+				CNId: Id
+			},
+			success: function (data) {
+				$('#img_view>img').attr('src', data.Data.ImgUrl);
+				if (data.Status == "1") {
+					form.val("sub_form",{
+						"CId":data.Data.CId,
+						"Ti":data.Data.Ti,
+						"SId":data.Data.SId,
+						"OId":data.Data.OId,
+						"Iu":data.Data.Iu,
+						"Zy":data.Data.Zy,
+						"St":data.Data.St,
+						"Sk":data.Data.Sk,
+						"Sd":data.Data.Sd,
+						"Lo": data.Data.Lo == 1 ? true : false,
+						"Co":data.Data.Co
+					})
+					layedit.setContent(layedit_index, data.Data.Co, false);
+					// $("input[name=Lo]").attr('checked',data.Data.Lo==0?true:false)
+					form.render();
+				}else{
+					layer.msg("获取数据失败，请重试！", { icon: 5 }) 
+				}
+			}
+		})
+	
+		//监听指定开关
+		form.on('switch(is_lock_status)', function(data) {
+			lock = this.checked ? 1 : 2;
+		});
+
+		//预览
+		$("body").on("click", "#show_view", function() {
+			var url = $("#img_view>img").attr("src");
+			if (url.length <= 0) {
+				layer.msg('请选择图片后再预览！');
+				return;
+			}
+			$("#img_view").css("display", "block");
+		})
+		//关闭预览
+		$("body").on("click", "#img_view", function() {
+			$("#img_view").css("display", "none");
+		})
+	
+	})
+</script>
+</html>
